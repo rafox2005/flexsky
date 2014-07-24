@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RsEncode.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">dispersal.reedsolomon</a> &gt; <span class="el_source">RsEncode.java</span></div><h1>RsEncode.java</h1><pre class="source lang-java linenums">package dispersal.reedsolomon;
+
+/**
+ * ReedSolomon Code Encoder
+ *
+ * @author Masayuki Miyazaki
+ * http://sourceforge.jp/projects/reedsolomon/
+ */
+public class RsEncode {
+	private final Galois galois;
+	private int npar;
+	private int[] encodeGx;
+
+<span class="nc" id="L14">	public RsEncode(Galois galois, int npar) {</span>
+<span class="nc" id="L15">		this.galois = galois;</span>
+<span class="nc" id="L16">		this.npar = npar;</span>
+<span class="nc bnc" id="L17" title="All 4 branches missed.">		if(npar &lt;= 0 || npar &gt;= 128) {</span>
+<span class="nc" id="L18">			throw new IllegalArgumentException(&quot;bad npar&quot;);</span>
+		}
+<span class="nc" id="L20">		encodeGx = galois.makeEncodeGx(npar);</span>
+<span class="nc" id="L21">	}</span>
+
+<span class="fc" id="L23">	public RsEncode(int npar) {</span>
+<span class="fc" id="L24">		this.galois = GaloisQR.getInstance();</span>
+<span class="fc" id="L25">		this.npar = npar;</span>
+<span class="pc bpc" id="L26" title="2 of 4 branches missed.">		if(npar &lt;= 0 || npar &gt;= 128) {</span>
+<span class="nc" id="L27">			throw new IllegalArgumentException(&quot;bad npar&quot;);</span>
+		}
+<span class="fc" id="L29">		encodeGx = galois.makeEncodeGx(npar);</span>
+<span class="fc" id="L30">	}</span>
+
+	public int encode(int[] data, int length, int[] parity, int parityStartPos)	{
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">		if(length &lt; 0 || length + npar &gt; 255) {</span>
+<span class="nc" id="L34">			throw new IllegalArgumentException(&quot;bad data length:&quot; + length);</span>
+		}
+<span class="fc" id="L36">		int[] wr = new int[npar];</span>
+
+<span class="fc bfc" id="L38" title="All 2 branches covered.">		for(int idx = 0; idx &lt; length; idx++) {</span>
+<span class="fc" id="L39">			int code = data[idx];</span>
+<span class="fc" id="L40">			int ib = wr[0] ^ code;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">			for(int i = 0; i &lt; npar - 1; i++) {</span>
+<span class="fc" id="L42">				wr[i] = wr[i + 1] ^ galois.mul(ib, encodeGx[i]);</span>
+			}
+<span class="fc" id="L44">			wr[npar - 1] = galois.mul(ib, encodeGx[npar - 1]);</span>
+		}
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">		if(parity != null) {</span>
+<span class="fc" id="L47">			System.arraycopy(wr, 0, parity, parityStartPos, npar);</span>
+		}
+<span class="fc" id="L49">		return 0;</span>
+	}
+
+	public int encode(int[] data, int length, int[] parity)	{
+<span class="nc" id="L53">		return encode(data, length, parity, 0);</span>
+	}
+
+	public int encode(int[] data, int[] parity)	{
+<span class="nc" id="L57">		return encode(data, data.length, parity, 0);</span>
+	}
+
+	public int encode(int[] data, int length)	{
+<span class="fc" id="L61">		return encode(data, length, data, length);</span>
+	}
+
+	public int encode(int[] data) {
+<span class="fc" id="L65">		return encode(data, data.length - npar);</span>
+	}
+
+/*
+	public static void main(String[] args) {
+		int[] data = new int[] {32, 65, 205, 69, 41, 220, 46, 128, 236};
+		int[] parity = new int[17];
+		RsEncode enc = new RsEncode(17);
+		enc.encode(data, parity);
+		System.out.println(java.util.Arrays.toString(parity));
+		System.out.println(&quot;[42, 159, 74, 221, 244, 169, 239, 150, 138, 70, 237, 85, 224, 96, 74, 219, 61]&quot;);
+	}
+*/
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

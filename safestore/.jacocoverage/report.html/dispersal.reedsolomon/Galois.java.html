@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Galois.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">dispersal.reedsolomon</a> &gt; <span class="el_source">Galois.java</span></div><h1>Galois.java</h1><pre class="source lang-java linenums">package dispersal.reedsolomon;
+
+/**
+ * Galois Field GF(2^8)
+ *
+ * @author Masayuki Miyazaki
+ * http://sourceforge.jp/projects/reedsolomon/
+ */
+public class Galois {
+	private final int polynomial;
+	private final int symStart;
+<span class="fc" id="L12">	private int[] expTbl = new int[255 * 2];</span>
+<span class="fc" id="L13">	private int[] logTbl = new int[255 + 1];</span>
+
+<span class="fc" id="L15">	protected Galois(int polynomial, int symStart) {</span>
+<span class="fc" id="L16">		this.polynomial = polynomial;</span>
+<span class="fc" id="L17">		this.symStart = symStart;</span>
+<span class="fc" id="L18">		initGaloisTable();</span>
+<span class="fc" id="L19">	}</span>
+
+	private void initGaloisTable() {
+<span class="fc" id="L22">		int d = 1;</span>
+<span class="fc bfc" id="L23" title="All 2 branches covered.">		for(int i = 0; i &lt; 255; i++) {</span>
+<span class="fc" id="L24">			expTbl[i] = expTbl[255 + i] = d;</span>
+<span class="fc" id="L25">			logTbl[d] = i;</span>
+<span class="fc" id="L26">			d &lt;&lt;= 1;</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">			if((d &amp; 0x100) != 0) {</span>
+<span class="fc" id="L28">				d = (d ^ polynomial) &amp; 0xff;</span>
+			}
+		}
+<span class="fc" id="L31">	}</span>
+
+	public int toExp(int a) {
+<span class="fc" id="L34">		return expTbl[a];</span>
+	}
+
+	public int toLog(int a) {
+<span class="fc" id="L38">		return logTbl[a];</span>
+	}
+
+	public int toPos(int length, int a) {
+<span class="fc" id="L42">		return length - 1 - logTbl[a];</span>
+	}
+
+	public int mul(int a, int b)	{
+<span class="pc bpc" id="L46" title="1 of 4 branches missed.">		return (a == 0 || b == 0)? 0 : expTbl[logTbl[a] + logTbl[b]];</span>
+	}
+
+	public int mulExp(int a, int b)	{
+<span class="fc bfc" id="L50" title="All 2 branches covered.">		return (a == 0)? 0 : expTbl[logTbl[a] + b];</span>
+	}
+
+	public int div(int a, int b) {
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">		return (a == 0)? 0 : expTbl[logTbl[a] - logTbl[b] + 255];</span>
+	}
+
+	public int divExp(int a, int b) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		return (a == 0)? 0 : expTbl[logTbl[a] - b + 255];</span>
+	}
+
+	public int inv(int a) {
+<span class="nc" id="L62">		return expTbl[255 - logTbl[a]];</span>
+	}
+
+	public int[] mulPoly(int[] a, int[] b, int jisu) {
+<span class="fc" id="L66">		int[] seki = new int[jisu];</span>
+<span class="fc" id="L67">		final int ia2 = Math.min(jisu, a.length);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">		for(int ia = 0; ia &lt; ia2; ia++) {</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">			if(a[ia] != 0) {</span>
+<span class="fc" id="L70">				final int loga = logTbl[a[ia]];</span>
+<span class="fc" id="L71">				final int ib2 = Math.min(b.length, jisu - ia);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">				for(int ib = 0; ib &lt; ib2; ib++) {</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">					if(b[ib] != 0) {</span>
+<span class="fc" id="L74">						seki[ia + ib] ^= expTbl[loga + logTbl[b[ib]]];</span>
+					}
+				}
+			}
+		}
+<span class="fc" id="L79">		return seki;</span>
+	}
+
+	public boolean calcSyndrome(int[] data, int length, int[] syn) {
+<span class="fc" id="L83">		int hasErr = 0;</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">		for(int i = 0, s = symStart; i &lt; syn.length;  i++, s++) {</span>
+<span class="fc" id="L85">			int wk = 0;</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">			for(int idx = 0; idx &lt; length; idx++) {</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">				if(wk != 0) {</span>
+<span class="fc" id="L88">					wk = expTbl[logTbl[wk] + s];</span>
+				}
+<span class="fc" id="L90">				wk ^= data[idx];</span>
+			}
+<span class="fc" id="L92">			syn[i] = wk;</span>
+<span class="fc" id="L93">			hasErr |= wk;</span>
+		}
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">		return hasErr == 0;</span>
+	}
+
+	public int[] makeEncodeGx(int npar) {
+<span class="fc" id="L99">		int[] encodeGx = new int[npar];</span>
+<span class="fc" id="L100">		encodeGx[npar - 1] = 1;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">		for(int i = 0, kou = symStart; i &lt; npar; i++, kou++) {</span>
+<span class="fc" id="L102">			int ex = toExp(kou);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">			for(int j = 0; j &lt; npar - 1; j++) {</span>
+<span class="fc" id="L104">				encodeGx[j] = mul(encodeGx[j], ex) ^ encodeGx[j + 1];</span>
+			}
+<span class="fc" id="L106">			encodeGx[npar - 1] = mul(encodeGx[npar - 1], ex);</span>
+		}
+<span class="fc" id="L108">		return encodeGx;</span>
+	}
+
+	public int calcOmegaValue(int[] omega, int zlog) {
+<span class="fc" id="L112">		int wz = zlog;</span>
+<span class="fc" id="L113">		int ov = omega[0];</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">		for(int i = 1; i &lt; omega.length; i++) {</span>
+<span class="fc" id="L115">			ov ^= mulExp(omega[i], wz);</span>
+<span class="fc" id="L116">			wz = (wz + zlog) % 255;</span>
+		}
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">		if(symStart != 0) {</span>
+<span class="nc" id="L119">			ov = mulExp(ov, (zlog * symStart) % 255);</span>
+		}
+<span class="fc" id="L121">		return ov;</span>
+	}
+
+	public int calcSigmaDashValue(int[] sigma, int zlog) {
+<span class="fc" id="L125">		final int jisu = sigma.length - 1;</span>
+<span class="fc" id="L126">		final int zlog2 = (zlog * 2) % 255;</span>
+<span class="fc" id="L127">		int wz = zlog2;</span>
+<span class="fc" id="L128">		int dv = sigma[1];</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">		for(int i = 3; i &lt;= jisu; i += 2) {</span>
+<span class="nc" id="L130">			dv ^= mulExp(sigma[i], wz);</span>
+<span class="nc" id="L131">			wz = (wz + zlog2) % 255;</span>
+		}
+<span class="fc" id="L133">		return dv;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

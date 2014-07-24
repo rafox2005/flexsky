@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Safestore.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">core</a> &gt; <span class="el_source">Safestore.java</span></div><h1>Safestore.java</h1><pre class="source lang-java linenums">/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package core;
+
+import util.Monitor;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import dispersal.rabin.DecoderRabinIDA;
+import dispersal.rabin.EncoderRabinIDA;
+import dispersal.reedsolomon.DecoderRS;
+import dispersal.reedsolomon.EncoderRS;
+
+/**
+ *
+ * @author mira
+ */
+<span class="nc" id="L21">public class Safestore {</span>
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L27">        int totParts = Integer.parseInt(args[1]);</span>
+<span class="nc" id="L28">        int reqParts = Integer.parseInt(args[2]);</span>
+<span class="nc" id="L29">        String filepath = args[3];</span>
+<span class="nc" id="L30">        File file = new File(filepath);</span>
+<span class="nc" id="L31">        File path = new File(file.getParent());</span>
+<span class="nc" id="L32">        double sizeStart = file.length();</span>
+        double sizeEnd;
+
+
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (args[0].equalsIgnoreCase(&quot;rabin&quot;)) {</span>
+<span class="nc" id="L37">            EncoderRabinIDA ida = new EncoderRabinIDA(totParts, reqParts, file);</span>
+<span class="nc" id="L38">            ida.encode();</span>
+<span class="nc" id="L39">            ByteArrayOutputStream[] partesSaida = ida.getWriteBufs();</span>
+<span class="nc" id="L40">            sizeEnd = partesSaida.length * partesSaida[0].size();</span>
+
+<span class="nc" id="L42">            File[] partesEntrada = new File[reqParts];</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            for (int i = 0; i &lt; totParts; i++) {</span>
+                try {
+<span class="nc" id="L46">                    OutputStream outputStream = new FileOutputStream(new File(path, &quot;idapart&quot; + i));</span>
+<span class="nc" id="L47">                    partesSaida[i].writeTo(outputStream);</span>
+<span class="nc" id="L48">                    outputStream.close();</span>
+<span class="nc" id="L49">                } catch (Exception e) {</span>
+<span class="nc" id="L50">                }</span>
+
+            }
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            for (int i = 0; i &lt; reqParts; i++) {</span>
+                try {
+<span class="nc" id="L56">                    partesEntrada[i] = new File(path, &quot;idapart&quot; + i);</span>
+<span class="nc" id="L57">                } catch (Exception e) {</span>
+<span class="nc" id="L58">                }</span>
+
+            }
+
+<span class="nc" id="L62">            DecoderRabinIDA dida = new DecoderRabinIDA(totParts, reqParts, partesEntrada);</span>
+<span class="nc" id="L63">            dida.decode();</span>
+            try {
+
+<span class="nc" id="L66">                OutputStream outputStream2 = new FileOutputStream(new File(path, &quot;idafinal&quot; + file.getName()));</span>
+<span class="nc" id="L67">                dida.getWriteBuffer().writeTo(outputStream2);</span>
+<span class="nc" id="L68">            } catch (Exception e) {</span>
+<span class="nc" id="L69">            }</span>
+
+<span class="nc" id="L71">            System.out.println(&quot;RABIN;&quot; + Monitor.getInstance().getTimeToEncode() + &quot;;&quot; + Monitor.getInstance().getTimeToDecode() + &quot;;&quot; + (sizeEnd/sizeStart));</span>
+
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        } else if (args[0].equalsIgnoreCase(&quot;reed&quot;)) {</span>
+<span class="nc" id="L75">            int partsWithPar = (totParts - reqParts) * 2 + reqParts;</span>
+<span class="nc" id="L76">            EncoderRS reed = new EncoderRS(totParts, reqParts, file);</span>
+<span class="nc" id="L77">            reed.encode();</span>
+<span class="nc" id="L78">            ByteArrayOutputStream[] partesSaida = reed.getWriteBufs();</span>
+<span class="nc" id="L79">            sizeEnd = partesSaida.length * partesSaida[0].size();</span>
+<span class="nc" id="L80">            File[] partesEntrada = new File[partsWithPar];</span>
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            for (int i = 0; i &lt; partsWithPar; i++) {</span>
+                try {
+<span class="nc" id="L84">                    OutputStream outputStream = new FileOutputStream(new File(path, &quot;rspart&quot; + i));</span>
+<span class="nc" id="L85">                    partesSaida[i].writeTo(outputStream);</span>
+<span class="nc" id="L86">                    outputStream.close();</span>
+<span class="nc" id="L87">                } catch (Exception e) {</span>
+<span class="nc" id="L88">                }</span>
+            }           
+            
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            for (int i = 0; i &lt; partsWithPar; i++) {</span>
+                try {
+<span class="nc" id="L93">                    partesEntrada[i] = new File(path, &quot;rspart&quot; + i);</span>
+<span class="nc" id="L94">                } catch (Exception e) {</span>
+<span class="nc" id="L95">                }</span>
+
+            }            
+            
+
+<span class="nc" id="L100">            DecoderRS dreed = new DecoderRS(totParts, reqParts, partesEntrada);</span>
+<span class="nc" id="L101">            dreed.decode();</span>
+            try {
+
+<span class="nc" id="L104">                OutputStream outputStream2 = new FileOutputStream(new File(path, &quot;rsfinal&quot; + file.getName()));</span>
+<span class="nc" id="L105">                dreed.getWriteBuffer().writeTo(outputStream2);</span>
+<span class="nc" id="L106">            } catch (Exception e) {</span>
+<span class="nc" id="L107">            }</span>
+            
+<span class="nc" id="L109">            System.out.println(&quot;REED-SOLOMON;&quot; + Monitor.getInstance().getTimeToEncode() + &quot;;&quot; + Monitor.getInstance().getTimeToDecode() + &quot;;&quot; + (sizeEnd/sizeStart));</span>
+        }
+<span class="nc" id="L111">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

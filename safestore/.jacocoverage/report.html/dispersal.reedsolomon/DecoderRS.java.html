@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DecoderRS.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">dispersal.reedsolomon</a> &gt; <span class="el_source">DecoderRS.java</span></div><h1>DecoderRS.java</h1><pre class="source lang-java linenums">/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dispersal.reedsolomon;
+import java.io.BufferedInputStream;
+import dispersal.IDecoderIDA;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import util.Monitor;
+import util.Utils;
+
+/**
+ *
+ * @author rafox
+ */
+public class DecoderRS implements IDecoderIDA{
+    private int totalParts;
+    private int reqParts;
+    private int parParts;
+    private BufferedInputStream[] readBufs;
+    private ByteArrayOutputStream writeBuffer;
+    private RsDecode reed;
+    
+    public DecoderRS(int totalParts, int reqParts, File[] parts)
+<span class="fc" id="L29">    {</span>
+<span class="fc" id="L30">        this.totalParts = totalParts;</span>
+<span class="fc" id="L31">        this.reqParts = reqParts;</span>
+<span class="fc" id="L32">        this.parParts = (totalParts-reqParts)*2;</span>
+<span class="fc" id="L33">        this.reed = new RsDecode(parParts);</span>
+        
+        try {
+<span class="fc" id="L36">            InputStream[] in = new InputStream[parts.length];</span>
+<span class="fc" id="L37">            this.readBufs = new BufferedInputStream[parts.length];</span>
+
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            for (int i = 0; i &lt; parts.length; i++) {</span>
+<span class="fc" id="L40">                in[i] = new FileInputStream(parts[i]);</span>
+<span class="fc" id="L41">                this.readBufs[i] = new BufferedInputStream(in[i]);</span>
+            }
+
+<span class="fc" id="L44">            this.writeBuffer = new ByteArrayOutputStream();</span>
+<span class="nc" id="L45">        } catch (Exception e) {</span>
+<span class="nc" id="L46">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L47">        }</span>
+<span class="fc" id="L48">    }</span>
+    
+    @Override
+     public ByteArrayOutputStream getWriteBuffer() {
+<span class="fc" id="L52">        return writeBuffer;</span>
+    }
+     
+     private int readParts(byte[] eachout) {
+        try {
+<span class="fc" id="L57">            byte[] eachpart = new byte[this.reqParts + this.parParts];</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">            for (int i = 0; i &lt; this.reqParts + this.parParts; i++) {</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">                if (this.readBufs[i].read(eachpart, i, 1) == -1) {</span>
+<span class="fc" id="L60">                    throw new EOFException();</span>
+                }
+            }
+<span class="nc" id="L63">            System.arraycopy(eachpart, 0, eachout, 0, eachpart.length);</span>
+<span class="nc" id="L64">            return 1;</span>
+<span class="fc" id="L65">        } catch (Exception e) {</span>
+<span class="fc" id="L66">            return -1;</span>
+        }
+    }
+     
+     private int[] readPartsIndex() {
+        try {
+<span class="fc" id="L72">            int[] eachpart = new int[this.reqParts + this.parParts];</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            for (int i = 0; i &lt; this.reqParts + this.parParts; i++) {</span>
+<span class="fc" id="L74">                eachpart[i] = this.readBufs[i].read();</span>
+            }
+<span class="fc" id="L76">            return eachpart;</span>
+<span class="nc" id="L77">        } catch (Exception e) {</span>
+<span class="nc" id="L78">            return null;</span>
+        }
+    }
+     
+    @Override
+     public void decode() {
+        try {
+<span class="fc" id="L85">            byte[] input = new byte[reqParts + this.parParts];</span>
+<span class="fc" id="L86">            byte[] finalInput = new byte[totalParts + this.parParts];</span>
+<span class="fc" id="L87">            int[] indexes = this.readPartsIndex();</span>
+            
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            while (this.readParts(input) != -1) {</span>
+<span class="nc" id="L90">                int j=0;</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                for (int i=0; i&lt;totalParts + this.parParts; i++) {</span>
+                    
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                    if (i == indexes[j]) {</span>
+<span class="nc" id="L94">                        finalInput[i] = input[indexes[i]];</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                        if (j &lt; indexes.length - 1) j++;</span>
+                    }
+<span class="nc" id="L97">                    else finalInput[i] = 0x00;</span>
+                    
+                }
+<span class="nc" id="L100">                int[] inputInt = Utils.bytesToInts(finalInput);</span>
+<span class="nc" id="L101">                Monitor.getInstance().startTimeToDecode();</span>
+<span class="nc" id="L102">                int nerrors = this.reed.decode(inputInt);</span>
+<span class="nc" id="L103">                Monitor.getInstance().stopTimeToDecode();</span>
+<span class="nc" id="L104">                int msgindex[] = new int[reqParts];</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                for (int i=0; i&lt;reqParts;i++) msgindex[i] = i;</span>
+<span class="nc" id="L106">                int finalInt[] = Utils.partOfArray(inputInt, msgindex);</span>
+<span class="nc" id="L107">                this.writeBuffer.write(Utils.intsToBytes(finalInt));</span>
+                
+<span class="nc" id="L109">                finalInput = new byte[totalParts + this.parParts];</span>
+<span class="nc" id="L110">            }</span>
+<span class="nc" id="L111">        } catch (Exception e) {</span>
+<span class="nc" id="L112">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L113">        }</span>
+<span class="fc" id="L114">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DecoderRabinIDA.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">dispersal.rabin</a> &gt; <span class="el_source">DecoderRabinIDA.java</span></div><h1>DecoderRabinIDA.java</h1><pre class="source lang-java linenums">/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package dispersal.rabin;
+
+import dispersal.IDecoderIDA;
+import java.io.BufferedInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import util.Monitor;
+
+/**
+ *  Class that takes the parts and decode into one file using Rabin IDA
+ * @author rafox
+ */
+public class DecoderRabinIDA implements IDecoderIDA {
+
+    private int totalParts;
+    private int reqParts;
+    private BufferedInputStream[] readBufs;
+    private ByteArrayOutputStream writeBuffer;
+    private RabinIDA rabin;
+
+    /**
+     * Constructor for the Decoding proccess
+     *
+     * @param totalParts Number of total parts of the schemma used
+     * @param reqParts  Number of required parts of the schemma used
+     * @param parts File vector with the parts to create the read buffers needed
+     */
+<span class="fc" id="L35">    public DecoderRabinIDA(int totalParts, int reqParts, File[] parts) {</span>
+<span class="fc" id="L36">        this.totalParts = totalParts;</span>
+<span class="fc" id="L37">        this.reqParts = reqParts;</span>
+<span class="fc" id="L38">        this.rabin = new RabinIDA(totalParts, reqParts);</span>
+        try {
+<span class="fc" id="L40">            InputStream[] in = new InputStream[parts.length];</span>
+<span class="fc" id="L41">            this.readBufs = new BufferedInputStream[parts.length];</span>
+
+<span class="pc bnc" id="L43" title="All 2 branches missed.">            for (int i = 0; i &lt; parts.length; i++) {</span>
+<span class="nc" id="L44">                in[i] = new FileInputStream(parts[i]);</span>
+<span class="nc" id="L45">                this.readBufs[i] = new BufferedInputStream(in[i]);</span>
+            }
+
+<span class="nc" id="L48">            this.writeBuffer = new ByteArrayOutputStream();</span>
+<span class="fc" id="L49">        } catch (Exception e) {</span>
+<span class="fc" id="L50">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L51">        }</span>
+<span class="fc" id="L52">    }</span>
+
+    /**
+     * Get the writeBuffer
+     *
+     * @return Write buffer of the file complete
+     */
+    @Override
+    public ByteArrayOutputStream getWriteBuffer() {
+<span class="nc" id="L61">        return writeBuffer;</span>
+    }
+    
+    /**
+     * Constructor for the Decoding proccess
+     *
+     * @param totalParts Number of total parts of the schemma used
+     * @param reqParts  Number of required parts of the schemma used
+     * @param parts BufferedInputStream vector with the parts to create the read buffers needed
+     */
+<span class="nc" id="L71">    public DecoderRabinIDA(int totalParts, int reqParts, BufferedInputStream[] parts) {</span>
+<span class="nc" id="L72">        this.totalParts = totalParts;</span>
+<span class="nc" id="L73">        this.reqParts = reqParts;</span>
+<span class="nc" id="L74">        this.rabin = new RabinIDA(totalParts, reqParts);</span>
+        try {
+<span class="nc" id="L76">            this.readBufs = parts;</span>
+<span class="nc" id="L77">            this.writeBuffer = new ByteArrayOutputStream();</span>
+<span class="nc" id="L78">        } catch (Exception e) {</span>
+<span class="nc" id="L79">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">    }</span>
+    
+
+    /**
+     * Read the parts into the readBuffers and get each byte from the parts
+     * to be multiplied later
+     *
+     * @param eachout Byte vector to be written into with eachbyte from the parts
+     * @return 1 for success, -1 for failure
+     */
+    private int readParts(byte[] eachout) {
+        try {
+<span class="fc" id="L93">            byte[] eachpart = new byte[this.reqParts];</span>
+<span class="pc bnc" id="L94" title="All 2 branches missed.">            for (int i = 0; i &lt; this.reqParts; i++) {</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                if (this.readBufs[i].read(eachpart, i, 1) == -1) {</span>
+<span class="nc" id="L96">                    throw new EOFException();</span>
+                }
+            }
+<span class="nc" id="L99">            System.arraycopy(eachpart, 0, eachout, 0, eachpart.length);</span>
+<span class="nc" id="L100">            return 1;</span>
+<span class="fc" id="L101">        } catch (Exception e) {</span>
+<span class="fc" id="L102">            return -1;</span>
+        }
+    }
+
+    /**
+     * Read the parts index to know what parts are recovered
+     *
+     * @return An index int vector or null if not succeed
+     */
+    private int[] readPartsIndex() {
+        try {
+<span class="fc" id="L113">            int[] eachpart = new int[this.reqParts];</span>
+<span class="pc bnc" id="L114" title="All 2 branches missed.">            for (int i = 0; i &lt; this.reqParts; i++) {</span>
+<span class="nc" id="L115">                eachpart[i] = this.readBufs[i].read();</span>
+            }
+<span class="nc" id="L117">            return eachpart;</span>
+<span class="fc" id="L118">        } catch (Exception e) {</span>
+<span class="fc" id="L119">            return null;</span>
+        }
+    }
+
+    /**
+     * Decode all the parts into the writeBuffer
+     *
+     */
+    @Override
+    public void decode() {
+        try {
+<span class="fc" id="L130">            byte[] input = new byte[reqParts];</span>
+<span class="fc" id="L131">            int[] indexes = this.readPartsIndex();</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            while (this.readParts(input) != -1) {</span>
+<span class="nc" id="L133">                Monitor.getInstance().startTimeToDecode();</span>
+<span class="nc" id="L134">                byte[] decrypt = this.rabin.decodeEachEnough(input, indexes);</span>
+<span class="nc" id="L135">                Monitor.getInstance().stopTimeToDecode();</span>
+<span class="nc" id="L136">                this.writeBuffer.write(decrypt);</span>
+<span class="nc" id="L137">            }</span>
+<span class="nc" id="L138">        } catch (Exception e) {</span>
+<span class="nc" id="L139">            System.out.println(e.getMessage());</span>
+<span class="fc" id="L140">        }</span>
+<span class="fc" id="L141">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

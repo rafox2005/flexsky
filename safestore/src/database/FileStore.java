@@ -173,7 +173,7 @@ public class FileStore
     {
         try {
             ResultSet rs;
-            PreparedStatement prepStatement = conn.prepareStatement("SELECT id FROM files WHERE name=? AND revision=?");
+            PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files WHERE name=? AND revision=?");
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
             rs = prepStatement.executeQuery();
@@ -187,10 +187,10 @@ public class FileStore
             file.setSize(rs.getLong("size"));
             file.setTotalParts(rs.getInt("total_parts"));
             file.setType(rs.getString("type"));
-            return rs.getInt("id");
+            return true;
         } catch (SQLException ex) {
             Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
-            return -1;
+            return false;
         }
 
     }
@@ -200,6 +200,21 @@ public class FileStore
         try {
             PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET hash=? WHERE name=? AND revision=?");
             prepStatement.setString(1, file.getHash());
+            prepStatement.setString(2, file.getName());
+            prepStatement.setInt(3, file.getRevision());
+            prepStatement.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+    
+    public boolean updateLastAccessedDate(StoreSafeFile file)
+    {
+        try {
+            PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET last_accessed=? WHERE name=? AND revision=?");
+            prepStatement.setDate(1, file.getLastAccessed());
             prepStatement.setString(2, file.getName());
             prepStatement.setInt(3, file.getRevision());
             prepStatement.executeUpdate();

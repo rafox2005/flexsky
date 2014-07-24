@@ -20,9 +20,10 @@ import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import java.util.ArrayList;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  *
@@ -62,12 +63,42 @@ public class StoreSafeManagerTest
     /**
      * Test of storeFile method, of class StoreSafeManager.
      */
-    @Test
+    @Ignore @Test
     public void testStoreFile()
     {
         System.out.println("storeFile");
-        String path = "/home/rafox/NetBeansProjects/safestore/safestore/test/filesToTest/video2.3gp";
+        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
         String type = "music";
+        String dispersalMethod = "rabin";
+        int totalParts = 3;
+        int reqParts = 2;
+        int revision = 3;
+        StoreSafeManager instance = StoreSafeManager.getInstance();      
+        ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
+        
+        boolean expResult = true;
+        boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts);
+        assertEquals(expResult, result);
+    }
+    
+     @Test
+    public void testDownloadFile()
+    {
+        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        //Download part test
+        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
+        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 3);
+        instance.downloadFile(pathDown, ssf);        
+     
+    }
+    
+    @Ignore  @Test
+    public void testStoreAndDownloadFile()
+    {
+        //Store part test
+        System.out.println("storeFileAndDownload");
+        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
+        String type = "book";
         String dispersalMethod = "rabin";
         int totalParts = 3;
         int reqParts = 2;
@@ -77,8 +108,17 @@ public class StoreSafeManagerTest
         
         boolean expResult = true;
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts);
-        assertEquals(expResult, result);
+        
+        //Download part test
+        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
+        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 4);
+        instance.downloadFile(pathDown, ssf);        
+     
     }
+    
+     
+    
+    
 
 //    /**
 //     * Test of listFiles method, of class StoreSafeManager.

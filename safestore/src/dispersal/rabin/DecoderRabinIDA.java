@@ -9,6 +9,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import util.Monitor;
 
@@ -55,8 +56,9 @@ public class DecoderRabinIDA extends IDecoderIDA
      * @param reqParts Number of required parts of the schema used
      * @param parts BufferedInputStream vector with the parts to create the read
      * buffers needed
+     * @param fileToWrite
      */
-    public DecoderRabinIDA(int totalParts, int reqParts, BufferedInputStream[] parts, BufferedOutputStream fileToWrite)
+    public DecoderRabinIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream fileToWrite)
     {
         super(totalParts, reqParts, parts, fileToWrite);
         this.rabin = new RabinIDA(totalParts, reqParts);

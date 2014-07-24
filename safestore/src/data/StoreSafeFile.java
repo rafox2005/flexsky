@@ -91,6 +91,12 @@ public class StoreSafeFile
         this.name = name;
     }
 
+    public StoreSafeFile(String name, int revision) {
+        this.revision = revision;
+        this.name = name;
+    }
+    
+    
     /**
      * Get the value of id
      *

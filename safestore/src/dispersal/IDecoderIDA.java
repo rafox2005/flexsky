@@ -26,7 +26,7 @@ import util.Utils;
 public abstract class IDecoderIDA
 {
 
-    protected BufferedInputStream[] readBufs;
+    protected InputStream[] readBufs;
     protected BufferedOutputStream writeBuffer;
     protected int totalParts;
     protected int reqParts;
@@ -43,8 +43,9 @@ public abstract class IDecoderIDA
      * @param reqParts Number of required parts of the schemma used
      * @param parts BufferedInputStream vector with the parts to create the read
      * buffers needed
+     * @param file
      */
-    public IDecoderIDA(int totalParts, int reqParts, BufferedInputStream[] parts, BufferedOutputStream file)
+    public IDecoderIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream file)
     {
         this.totalParts = totalParts;
         this.reqParts = reqParts;
@@ -57,7 +58,7 @@ public abstract class IDecoderIDA
                 this.mdParts[i] = MessageDigest.getInstance("SHA1");
                 this.disParts[i] = new DigestInputStream(this.readBufs[i], this.mdParts[i]);
             }
-            this.writeBuffer = file;
+            this.writeBuffer = new BufferedOutputStream(file, this.bufSize);
             //Create Hash for the file
             this.mdFile = MessageDigest.getInstance("SHA1");
             this.disFile = new DigestOutputStream(this.writeBuffer, this.mdFile);

@@ -18,14 +18,22 @@ package management;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
+import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
+import dispersal.rabin.DecoderRabinIDA;
 import dispersal.rabin.EncoderRabinIDA;
+import dispersal.reedsolomon.DecoderRS;
 import dispersal.reedsolomon.EncoderRS;
 import driver.DiskDriver;
 import driver.IDriver;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -81,6 +89,66 @@ class StorageManager
         
         return true;
 
+    }
+    
+    public boolean downloadFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts)
+    {
+        try {
+            IDecoderIDA ida = null;
+            ArrayList<InputStream> inputStreams = new ArrayList<>();
+            OutputStream os = new FileOutputStream(file);
+            
+            //Get the download streams for each driver
+            for (int i = 0; i < slices.size(); i++) {
+                IDriver sliceDriver = null;
+                StoreSafeSlice currentSlice = slices.get(i);
+                StoreSafeAccount currentAccount = listAccounts.get(i);
+                
+                //Disk Driver
+                if (currentAccount.getType() == 0) {
+                    sliceDriver = new DiskDriver(currentAccount.getName(), currentAccount.getPath());
+                }
+                //Add inputstream to list
+                //Try to get the inputstreams
+                InputStream input = sliceDriver.getSliceDownloadStream(currentSlice);
+                
+                if (input != null) {
+                    inputStreams.add(input);
+                }           
+                              
+                
+            }
+            
+            //Check if got minimum req. parts
+                if (inputStreams.size() < ssf.getReqParts()) {
+                    throw new Exception("ERROR: Not able to retrieve the minimum amount of parts required");                    
+                }
+            
+            //Get the desired dispersal method
+            if ("rabin".equals(ssf.getDispersalMethod())) {
+                InputStream[] aux = new InputStream[ssf.getReqParts()];
+                ida = new DecoderRabinIDA(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
+            }
+            else if ("rs".equals(ssf.getDispersalMethod())) {
+                InputStream[] aux = new InputStream[ssf.getReqParts()];
+                ida = new DecoderRS(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
+            }
+            
+            //Decode
+            ida.decode();
+            
+            //Check if file hash match
+            if (ssf.getHash().equals(ida.getFileHash()))
+                return true;
+            else
+                throw new Exception("ERROR: recovered file hash differs from the original");
+        } catch (Exception ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            //Delete output file
+            file.deleteOnExit();
+            return false;
+        }
+        
     }
 
 }

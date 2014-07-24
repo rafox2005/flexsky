@@ -54,7 +54,7 @@ public class FileStoreTest
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rafox/NetBeansProjects/safestore/safestore/db/safestore_test.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:/var/autofs/home/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db");
             this.fs = new FileStore("FSTeste", this.conn);
         } catch (SQLException ex) {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,6 +124,17 @@ public class FileStoreTest
         instance.insertFile(file1);        
         Assert.assertFalse(instance.insertFile(file1));
         instance.deleteFile(file1);
+        
+    }
+    
+    @Test
+    public void testGetFile()
+    {
+        FileStore instance = this.fs;
+        StoreSafeFile file1 = new StoreSafeFile("book.pdf", 0);
+        instance.getFile(file1);
+        
+        Assert.assertEquals(file1.getSize(), 8493855);
         
     }
 }

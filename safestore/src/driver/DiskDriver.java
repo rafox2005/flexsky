@@ -64,8 +64,8 @@ public class DiskDriver implements IDriver
             return is;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DiskDriver.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         } 
-        return null;
     }
     
     @Override

@@ -16,6 +16,7 @@
 
 package management;
 
+import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
 import database.AccountStore;
@@ -89,6 +90,38 @@ class DatabaseManager
     }
     
     public boolean updateFileHash(StoreSafeFile file)
+    {
+        return this.fs.updateHash(file);
+    }
+    
+    public ArrayList<StoreSafeSlice> getFileSlices(StoreSafeFile file)
+    {
+        this.fs.getFile(file);
+        return this.ss.getSlicesFromFile(file);        
+        
+    }
+    
+    public ArrayList<StoreSafeAccount> getSlicesAccount(ArrayList<StoreSafeSlice> listSlices)
+    {
+        ArrayList<StoreSafeAccount> listAccounts = new ArrayList<>();
+        
+        //Get all Accounts
+        ArrayList<StoreSafeAccount> listAccountsAux = this.as.getAccounts();
+        
+        //Get Slices Accounts
+        for (StoreSafeSlice slice : listSlices)
+        {
+            for (StoreSafeAccount account : listAccountsAux)
+            {
+                if (slice.getAccount().equals(account.getName())) listAccounts.add(account);                
+            }
+                
+        }
+        
+        return listAccounts;
+    }
+    
+    public boolean updateFileLastAccessedDate(StoreSafeFile file)
     {
         return this.fs.updateHash(file);
     }

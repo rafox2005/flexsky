@@ -26,7 +26,7 @@ public class DecoderRS extends IDecoderIDA
     private int parParts;
     private RsDecode reed;
 
-    public DecoderRS(int totalParts, int reqParts, BufferedInputStream[] parts, BufferedOutputStream file)
+    public DecoderRS(int totalParts, int reqParts, InputStream[] parts, OutputStream file)
     {
         super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, file);
         this.parParts = (totalParts - reqParts) * 2;

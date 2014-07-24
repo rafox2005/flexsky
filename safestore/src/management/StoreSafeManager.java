@@ -114,7 +114,7 @@ public class StoreSafeManager {
 
     }
 
-    public boolean deleteFile() {
+    public boolean deleteFile() {        
         return true;
     }
 

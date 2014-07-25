@@ -81,7 +81,7 @@ public class StoreSafeManagerTest
         assertEquals(expResult, result);
     }
     
-     @Test
+    @Ignore @Test
     public void testDownloadFile()
     {
         StoreSafeManager instance = StoreSafeManager.getInstance();  
@@ -92,7 +92,7 @@ public class StoreSafeManagerTest
      
     }
     
-    @Ignore  @Test
+    @Test
     public void testStoreAndDownloadFile()
     {
         //Store part test

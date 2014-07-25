@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.StoreSafeLogger;
 
 /**
  *
@@ -36,11 +37,15 @@ public class StoreSafeManager {
     private static StoreSafeManager instance = null;
     private final DatabaseManager db;
     private final StorageManager storage;
+    
+    private final StoreSafeLogger logger;
+    
+    public final static boolean LOGMODE=true;
 
     protected StoreSafeManager() {
         this.db = new DatabaseManager("/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db");
         this.storage = new StorageManager();
-
+        if (StoreSafeManager.LOGMODE) this.logger = new StoreSafeLogger("/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_log.db"); 
     }
 
     public static StoreSafeManager getInstance() {
@@ -51,6 +56,8 @@ public class StoreSafeManager {
     }
 
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts) {
+        Date start, end;
+        start = new Date(System.currentTimeMillis());
         StoreSafeFile ssf = null;
         try {
             if (totalParts != listAccounts.size()) {
@@ -78,7 +85,11 @@ public class StoreSafeManager {
 
             //And update the hash of the file            
             this.db.updateFileHash(ssf);
-
+            
+            //Finish and log everything
+            end = new Date(System.currentTimeMillis());
+            StoreSafeLogger.addLog("file", ssf.getId(), "Upload-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+            
             return true;
         } catch (Exception ex) {
             Logger.getLogger(StoreSafeManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -94,6 +105,8 @@ public class StoreSafeManager {
 
     public boolean downloadFile(String path, StoreSafeFile ssf) {
         try {
+            Date start, end;
+            start = new Date(System.currentTimeMillis());
             ArrayList<StoreSafeSlice> slicesList = this.db.getFileSlices(ssf);
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
@@ -106,6 +119,10 @@ public class StoreSafeManager {
 
             this.db.updateFileLastAccessedDate(ssf);
 
+            //Finish and log everything
+            end = new Date(System.currentTimeMillis());
+            StoreSafeLogger.addLog("file", ssf.getId(), "Download-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+        
             return true;
         } catch (IOException ex) {
             Logger.getLogger(StoreSafeManager.class.getName()).log(Level.SEVERE, null, ex);

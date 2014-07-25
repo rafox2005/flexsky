@@ -31,9 +31,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.StoreSafeLogger;
 
 /**
  *
@@ -73,7 +75,14 @@ class StorageManager
         }
 
         //Encode
+        Date start, end;
+        start = new Date(System.currentTimeMillis());
         long sliceSize = ida.encode();
+        
+        //Finish and log everything
+            end = new Date(System.currentTimeMillis());
+            StoreSafeLogger.addLog("file", ssf.getId(), "Dispersal-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+           
 
         //Update important values
         ssf.setHash(ida.getFileHash());
@@ -134,8 +143,16 @@ class StorageManager
                 ida = new DecoderRS(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
             }
             
+            Date start, end;
+            start = new Date(System.currentTimeMillis());
+            
             //Decode
             ida.decode();
+            
+            //Finish and log everything
+            end = new Date(System.currentTimeMillis());
+            StoreSafeLogger.addLog("file", ssf.getId(), "Retrieval-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+           
             
             //Check if file hash match
             if (ssf.getHash().equals(ida.getFileHash()))

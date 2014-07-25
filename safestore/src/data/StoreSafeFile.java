@@ -35,6 +35,7 @@ public class StoreSafeFile
     private String type;
     private String name;
     private int id;
+    private management.StorageOptions options;
 
     /**
      *

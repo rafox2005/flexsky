@@ -19,28 +19,24 @@ package management;
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
 import java.util.ArrayList;
+import java.util.HashMap;
+import pipeline.IPipeProcess;
 
 /**
  *
  * @author rafox
  */
-class StorageOptions
+public class StorageOptions
 {    
-    private int totalParts;
-    private int reqParts;
-    private ArrayList accounts;
-    private ArrayList filePipeline;
-    //TODO private ArrayList slicePipeline;
-    private IEncoderIDA encoder;
-    private IDecoderIDA decoder;
-
-    public StorageOptions(int totalParts, int reqParts, ArrayList accounts, ArrayList filePipeline, IEncoderIDA encoder, IDecoderIDA decoder)
+    public HashMap<String,String> additionalParameters; 
+    public ArrayList<IPipeProcess> filePipeline;
+    public ArrayList<IPipeProcess> slicePipeline;
+ 
+    public StorageOptions(int totalParts, int reqParts, ArrayList accounts, ArrayList filePipeline, IEncoderIDA encoder, IDecoderIDA decoder, HashMap additionalParameters)
     {
-        this.totalParts = totalParts;
-        this.reqParts = reqParts;
-        this.accounts = accounts;
-        this.encoder = encoder;
-        this.decoder = decoder;
+        this.filePipeline = filePipeline;
+        this.slicePipeline = slicePipeline;
+        this.additionalParameters = additionalParameters;
     }
     
     

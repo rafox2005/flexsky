@@ -55,7 +55,7 @@ public class StoreSafeManager {
         return instance;
     }
 
-    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts) {
+    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
         Date start, end;
         start = new Date(System.currentTimeMillis());
         StoreSafeFile ssf = null;
@@ -76,7 +76,7 @@ public class StoreSafeManager {
             }
 
             //Store the files and finish the parts to store
-            this.storage.storeFile(file, ssf, slices, listAccounts);
+            this.storage.storeFile(file, ssf, slices, listAccounts, options);
 
             //After parts are stored insert slices into the DB
             for (int i = 0; i < totalParts; i++) {
@@ -103,7 +103,7 @@ public class StoreSafeManager {
         return this.db.listFiles();
     }
 
-    public boolean downloadFile(String path, StoreSafeFile ssf) {
+    public boolean downloadFile(String path, StoreSafeFile ssf, StorageOptions options) {
         try {
             Date start, end;
             start = new Date(System.currentTimeMillis());
@@ -111,7 +111,7 @@ public class StoreSafeManager {
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
 
-            this.storage.downloadFile(file, ssf, slicesList, accountList);
+            this.storage.downloadFile(file, ssf, slicesList, accountList, options);
 
             //Update last_accessed info
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);

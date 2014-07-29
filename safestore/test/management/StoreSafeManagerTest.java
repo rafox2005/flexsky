@@ -19,11 +19,13 @@ package management;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import pipeline.PipeTest;
 
 /**
  *
@@ -49,7 +51,7 @@ public class StoreSafeManagerTest
     /**
      * Test of getInstance method, of class StoreSafeManager.
      */
-    @Test
+    @Ignore @Test
     public void testGetInstance()
     {
         System.out.println("getInstance");
@@ -92,7 +94,7 @@ public class StoreSafeManagerTest
      
     }
     
-    @Test
+    @Ignore @Test
     public void testStoreAndDownloadFile()
     {
         //Store part test
@@ -112,6 +114,39 @@ public class StoreSafeManagerTest
         //Download part test
         String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
         StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 4);
+        instance.downloadFile(pathDown, ssf);        
+     
+    }
+    
+    @Test
+    public void testStoreAndDownloadFileWithFilePipeline()
+    {
+        //Store part test
+        System.out.println("storeFileAndDownload");
+        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
+        String type = "book";
+        String dispersalMethod = "rabin";
+        int totalParts = 3;
+        int reqParts = 2;
+        int revision = 17;
+        StoreSafeManager instance = StoreSafeManager.getInstance();      
+        ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
+        
+        PipeTest pt = new PipeTest();
+        HashMap<String,String> param = new HashMap<String, String>();
+        param.put("chave-geral", "ronaldo");
+        param.put("metodoTeste", "chupetinha");
+        
+        ArrayList filePipeline = new ArrayList();
+        filePipeline.add(pt);
+        StorageOptions options = new StorageOptions(filePipeline, null, param);
+        
+        boolean expResult = true;
+        boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
+        
+        //Download part test
+        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
+        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 17);
         instance.downloadFile(pathDown, ssf);        
      
     }

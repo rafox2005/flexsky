@@ -67,6 +67,7 @@ public class StoreSafeManager {
             File file = new File(path); //Get File object from the file
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class); //Needed for lasAccess file variable
             ssf = new StoreSafeFile(file.getName(), file.length(), type, dispersalMethod, totalParts, reqParts, "0", new Date(attrs.lastAccessTime().toMillis()), new Date(attrs.lastModifiedTime().toMillis()), revision);
+            ssf.setOptions(options);
             int fileID = this.db.insertFile(ssf);
 
             ArrayList<StoreSafeSlice> slices = new ArrayList<>();
@@ -76,7 +77,7 @@ public class StoreSafeManager {
             }
 
             //Store the files and finish the parts to store
-            this.storage.storeFile(file, ssf, slices, listAccounts, options);
+            this.storage.storeFile(file, ssf, slices, listAccounts);
 
             //After parts are stored insert slices into the DB
             for (int i = 0; i < totalParts; i++) {
@@ -99,11 +100,16 @@ public class StoreSafeManager {
 
     }
 
+    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts) {
+        StorageOptions options = new StorageOptions(null, null, null);
+        return storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
+    }
+    
     public ArrayList listFiles() {
         return this.db.listFiles();
     }
 
-    public boolean downloadFile(String path, StoreSafeFile ssf, StorageOptions options) {
+    public boolean downloadFile(String path, StoreSafeFile ssf) {
         try {
             Date start, end;
             start = new Date(System.currentTimeMillis());
@@ -111,7 +117,7 @@ public class StoreSafeManager {
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
 
-            this.storage.downloadFile(file, ssf, slicesList, accountList, options);
+            this.storage.downloadFile(file, ssf, slicesList, accountList);
 
             //Update last_accessed info
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -131,7 +137,24 @@ public class StoreSafeManager {
 
     }
 
-    public boolean deleteFile() {        
+    public boolean deleteFile(StoreSafeFile ssf) {
+        ArrayList<StoreSafeSlice> slices = this.db.getFileSlices(ssf);
+        ArrayList<StoreSafeAccount> accounts = this.db.getSlicesAccount(slices);
+        
+        //Delete the slices
+        for (int i = 0; i < slices.size(); i++) {
+            this.storage.deleteSlice(slices.get(i), accounts.get(i));
+        }
+        //Delete the file from DB
+        this.db.deleteFile(ssf);
+        return true;
+    }
+    
+    public boolean deleteAllFiles() {
+        ArrayList<StoreSafeFile> files = this.listFiles();
+        for (StoreSafeFile storeSafeFile : files) {
+            this.deleteFile(storeSafeFile);
+        }
         return true;
     }
 

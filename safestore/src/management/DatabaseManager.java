@@ -124,11 +124,6 @@ class DatabaseManager
     public boolean updateFileLastAccessedDate(StoreSafeFile file)
     {
         return this.fs.updateHash(file);
-    }
-    
-    public boolean deleteAllFiles()
-    {
-        return this.fs.deleteAllFiles();
-    }
+    }   
     
 }

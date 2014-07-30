@@ -21,8 +21,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import management.StorageOptions;
+import org.apache.commons.lang3.SerializationUtils;
+import pipeline.IPipeProcess;
 
 /**
  * Class to deal with File Store Database Access
@@ -71,6 +75,43 @@ public class FileStore
         this.name = name;
     }
 
+    
+    private String serializePipeline(ArrayList<IPipeProcess> list)
+    {
+        String pipelineString = new String();
+        for (Iterator<IPipeProcess> it = list.iterator(); it.hasNext();) {
+            IPipeProcess pipe = it.next();
+            pipelineString += pipe.getClass().getName(); 
+            
+            if (it.hasNext()) {
+                pipelineString += "-";
+            }
+            
+        }
+        
+        return pipelineString;
+    }
+    
+    private ArrayList<IPipeProcess> deSerializePipeline(String pipeString)
+    {
+        ArrayList<IPipeProcess> list = new ArrayList();
+        String[] pipeStringList = pipeString.split("-");
+        
+        for (String stringPipe : pipeStringList) {
+            try {            
+                list.add((IPipeProcess) Class.forName(stringPipe).newInstance());
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }       
+        
+        return list;
+    }
+    
     /**
      *
      * @param file
@@ -79,9 +120,13 @@ public class FileStore
     public boolean insertFile(StoreSafeFile file)
     {
         try {
+            //Get File Pipe Info            
+            byte[] parametersBlob = SerializationUtils.serialize(file.getOptions().additionalParameters);
+            String pipeString = this.serializePipeline(file.getOptions().filePipeline);
+            
             PreparedStatement prepStatement
-                    = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision)"
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision, pipeline, parameters)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             prepStatement.setString(1, file.getName());
             prepStatement.setLong(2, file.getSize());
             prepStatement.setString(3, file.getType());
@@ -92,6 +137,8 @@ public class FileStore
             prepStatement.setDate(8, file.getLastAccessed());
             prepStatement.setDate(9, file.getLastModified());
             prepStatement.setInt(10, file.getRevision());
+            prepStatement.setString(11, pipeString);
+            prepStatement.setBytes(12, parametersBlob);
             prepStatement.executeUpdate();
 
             file.setId(this.getFileID(file));
@@ -115,7 +162,14 @@ public class FileStore
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files");
             rs = prepStatement.executeQuery();
             while (rs.next()) {
-                list.add(new StoreSafeFile(rs.getInt("id"),
+                
+            //Pipeline Stuff
+            StorageOptions options = new StorageOptions();    
+            ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+            options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
+            options.filePipeline = pipeline;                
+                
+                StoreSafeFile file = new StoreSafeFile(rs.getInt("id"),
                         rs.getString("name"),
                         rs.getLong("size"),
                         rs.getString("type"),
@@ -125,7 +179,9 @@ public class FileStore
                         rs.getString("hash"),
                         rs.getDate("last_accessed"),
                         rs.getDate("last_modified"),
-                        rs.getInt("revision")));
+                        rs.getInt("revision"),
+                        options);
+                list.add(file);
             }
             return list;
         } catch (SQLException ex) {
@@ -172,12 +228,20 @@ public class FileStore
     public boolean getFile(StoreSafeFile file)
     {
         try {
+            
             ResultSet rs;
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files WHERE name=? AND revision=?");
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
             rs = prepStatement.executeQuery();
             if (rs.getInt("id") < 0) new SQLException("file not found");
+            
+            //Pipeline Stuff
+            StorageOptions options = new StorageOptions();    
+            ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+            options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
+            options.filePipeline = pipeline;
+            
             file.setDispersalMethod(rs.getString("dispersal_method"));
             file.setHash(rs.getString("hash"));
             file.setId(rs.getInt("id"));
@@ -186,7 +250,9 @@ public class FileStore
             file.setReqParts(rs.getInt("req_parts"));
             file.setSize(rs.getLong("size"));
             file.setTotalParts(rs.getInt("total_parts"));
-            file.setType(rs.getString("type"));
+            file.setType(rs.getString("type"));           
+            
+            file.setOptions(options);
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);

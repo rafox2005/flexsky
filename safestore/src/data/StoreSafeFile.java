@@ -16,6 +16,7 @@
 package data;
 
 import java.sql.Date;
+import management.StorageOptions;
 
 /**
  *
@@ -77,7 +78,7 @@ public class StoreSafeFile
      * @param lastModified the value of lastModified
      * @param revision the value of revision
      */
-    public StoreSafeFile(int id, String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision)
+    public StoreSafeFile(int id, String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision, StorageOptions options)
     {
         this.id = id;
         this.lastModified = lastModified;
@@ -90,6 +91,7 @@ public class StoreSafeFile
         this.reqParts = reqParts;
         this.type = type;
         this.name = name;
+        this.options = options;
     }
 
     public StoreSafeFile(String name, int revision) {
@@ -317,6 +319,14 @@ public class StoreSafeFile
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public StorageOptions getOptions() {
+        return options;
+    }
+
+    public void setOptions(StorageOptions options) {
+        this.options = options;
     }
 
 }

@@ -41,6 +41,7 @@ public class StoreSafeManagerTest
     @Before
     public void setUp()
     {
+        
     }
     
     @After
@@ -75,7 +76,8 @@ public class StoreSafeManagerTest
         int totalParts = 3;
         int reqParts = 2;
         int revision = 3;
-        StoreSafeManager instance = StoreSafeManager.getInstance();      
+        StoreSafeManager instance = StoreSafeManager.getInstance();    
+        instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
         boolean expResult = true;
@@ -105,7 +107,8 @@ public class StoreSafeManagerTest
         int totalParts = 3;
         int reqParts = 2;
         int revision = 4;
-        StoreSafeManager instance = StoreSafeManager.getInstance();      
+        StoreSafeManager instance = StoreSafeManager.getInstance();    
+        instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
         boolean expResult = true;
@@ -123,13 +126,14 @@ public class StoreSafeManagerTest
     {
         //Store part test
         System.out.println("storeFileAndDownload");
-        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
+        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/sqlitestudio-2.1.5.bin";
         String type = "book";
         String dispersalMethod = "rabin";
         int totalParts = 3;
         int reqParts = 2;
         int revision = 17;
-        StoreSafeManager instance = StoreSafeManager.getInstance();      
+        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
         PipeTest pt = new PipeTest();
@@ -145,8 +149,8 @@ public class StoreSafeManagerTest
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
         
         //Download part test
-        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
-        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 17);
+        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/sqlitestudio-2.1.5.bin";
+        StoreSafeFile ssf =  new StoreSafeFile("sqlitestudio-2.1.5.bin", 17);
         instance.downloadFile(pathDown, ssf);        
      
     }

@@ -126,4 +126,9 @@ class DatabaseManager
         return this.fs.updateHash(file);
     }
     
+    public boolean deleteAllFiles()
+    {
+        return this.fs.deleteAllFiles();
+    }
+    
 }

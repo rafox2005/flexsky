@@ -24,10 +24,10 @@ public class StoreSafeAccount
 {
     
     private String name;
-    private int type;
+    private String type;
     private String path;
 
-    public StoreSafeAccount(String name, int type, String path)
+    public StoreSafeAccount(String name, String type, String path)
     {
         this.name = name;
         this.type = type;
@@ -60,7 +60,7 @@ public class StoreSafeAccount
      *
      * @return the value of type
      */
-    public int getType()
+    public String getType()
     {
         return type;
     }
@@ -70,7 +70,7 @@ public class StoreSafeAccount
      *
      * @param type new value of type
      */
-    public void setType(int type)
+    public void setType(String type)
     {
         this.type = type;
     }

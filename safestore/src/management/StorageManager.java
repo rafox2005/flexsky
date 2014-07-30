@@ -27,45 +27,44 @@ import dispersal.reedsolomon.EncoderRS;
 import driver.DiskDriver;
 import driver.IDriver;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
-import pipeline.IPipeProcess;
 import util.StoreSafeLogger;
 
 /**
  *
  * @author rafox
  */
-class StorageManager {
+class StorageManager
+{
 
-    public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
+    public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
         try {
             IEncoderIDA ida = null;
+            StorageOptions options = ssf.getOptions();
 
-            ArrayList<OutputStream> outputStreams = new ArrayList<>();
-            //Get the upload streams for each driver
-            for (int i = 0; i < slices.size(); i++) {
-                IDriver sliceDriver = null;
-                StoreSafeSlice currentSlice = slices.get(i);
-                StoreSafeAccount currentAccount = listAccounts.get(i);
+        //Get the upload streams for each driver        
+        for (int i = 0; i < slices.size(); i++) {
+            IDriver sliceDriver = null;
+            StoreSafeSlice currentSlice = slices.get(i);
+            StoreSafeAccount currentAccount = listAccounts.get(i);
 
-                //Disk Driver
-                if (currentAccount.getType() == 0) {
-                    sliceDriver = new DiskDriver(currentAccount.getName(), currentAccount.getPath());
-                }
+                //Use Reflection to retrieve the Storage Driver required
+                sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                
                 //Add outputstream to list
                 outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice));
 
             }
+            //Add outputstream to list
+            outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice));
 
             if (options.filePipeline.size() > 0) {
 
@@ -78,7 +77,7 @@ class StorageManager {
                 OutputStream outputAux = new FileOutputStream(tmpFile2);
 
                 for (IPipeProcess pipe : options.filePipeline) {
-                    pipe.process(inputAux, outputAux);
+                    pipe.process(inputAux, outputAux, options.additionalParameters);
                     FileUtils.copyFile(tmpFile2, tmpFile1);
                 }
 
@@ -106,6 +105,9 @@ class StorageManager {
             StoreSafeLogger.addLog("file", ssf.getId(), "Dispersal-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
             //Update important values
             ssf.setHash(ida.getFileHash());
+            
+            //TODO Pipeline slices
+            
             String[] partsHash = ida.getPartsHash();
             for (int i = 0; i < slices.size(); i++) {
                 StoreSafeSlice currentSlice = slices.get(i);
@@ -124,16 +126,40 @@ class StorageManager {
         } catch (IOException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
             return false;
+        } catch (InstantiationException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
         }
+        return false;
 
-    }
+        //Get the desired dispersal method
+        if ("rabin".equals(ssf.getDispersalMethod())) {
+            OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
+            ida = new EncoderRabinIDA(ssf.getTotalParts(), ssf.getReqParts(), file, outputStreams.toArray(aux));
+        }
+        else if ("rs".equals(ssf.getDispersalMethod())) {
+            OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
+            ida = new EncoderRS(ssf.getTotalParts(), ssf.getReqParts(), file, outputStreams.toArray(aux));
+        }
 
-    public boolean downloadFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
+    public boolean downloadFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
         try {
             IDecoderIDA ida = null;
             ArrayList<InputStream> inputStreams = new ArrayList<>();
             OutputStream os = new FileOutputStream(file);
+            StorageOptions options = ssf.getOptions();
 
             //Get the download streams for each driver
             for (int i = 0; i < slices.size(); i++) {
@@ -141,44 +167,45 @@ class StorageManager {
                 StoreSafeSlice currentSlice = slices.get(i);
                 StoreSafeAccount currentAccount = listAccounts.get(i);
 
-                //Disk Driver
-                if (currentAccount.getType() == 0) {
-                    sliceDriver = new DiskDriver(currentAccount.getName(), currentAccount.getPath());
-                }
+                sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                
                 //Add inputstream to list
                 //Try to get the inputstreams
                 InputStream input = sliceDriver.getSliceDownloadStream(currentSlice);
-
+                
                 if (input != null) {
                     inputStreams.add(input);
-                }
-
+                }           
+                              
+                
             }
-
+            
             //Check if got minimum req. parts
-            if (inputStreams.size() < ssf.getReqParts()) {
-                throw new Exception("ERROR: Not able to retrieve the minimum amount of parts required");
-            }
-
+                if (inputStreams.size() < ssf.getReqParts()) {
+                    throw new Exception("ERROR: Not able to retrieve the minimum amount of parts required");                    
+                }
+            
             //Get the desired dispersal method
             if ("rabin".equals(ssf.getDispersalMethod())) {
                 InputStream[] aux = new InputStream[ssf.getReqParts()];
                 ida = new DecoderRabinIDA(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
-            } else if ("rs".equals(ssf.getDispersalMethod())) {
+            }
+            else if ("rs".equals(ssf.getDispersalMethod())) {
                 InputStream[] aux = new InputStream[ssf.getReqParts()];
                 ida = new DecoderRS(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
             }
-
+            
             Date start, end;
             start = new Date(System.currentTimeMillis());
-
+            
             //Decode
             ida.decode();
-
+            
             //Finish and log everything
             end = new Date(System.currentTimeMillis());
             StoreSafeLogger.addLog("file", ssf.getId(), "Retrieval-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
-
+           
+            
             //Check if file hash match
             if (ssf.getHash().equals(ida.getFileHash())) {
 
@@ -193,7 +220,7 @@ class StorageManager {
                     OutputStream outputAux = new FileOutputStream(tmpFile2);
 
                     for (IPipeProcess pipe : options.filePipeline) {
-                        pipe.process(inputAux, outputAux);
+                        pipe.reverseProcess(inputAux, outputAux, options.additionalParameters);
                         FileUtils.copyFile(tmpFile2, tmpFile1);
                     }
 
@@ -207,16 +234,38 @@ class StorageManager {
                 }
 
                 return true;
-            } else {
+            else
                 throw new Exception("ERROR: recovered file hash differs from the original");
-            }
         } catch (Exception ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
             //Delete output file
             file.deleteOnExit();
             return false;
         }
-
+        
     }
 
+    public boolean deleteSlice(StoreSafeSlice slice, StoreSafeAccount currentAccount) {
+        
+        try {
+            IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+           return sliceDriver.deleteSlice(slice);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
 }

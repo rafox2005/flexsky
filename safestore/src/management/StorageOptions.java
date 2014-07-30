@@ -18,6 +18,7 @@ package management;
 
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import pipeline.IPipeProcess;
@@ -26,18 +27,35 @@ import pipeline.IPipeProcess;
  *
  * @author rafox
  */
-public class StorageOptions
+public class StorageOptions implements Serializable
 {    
     public HashMap<String,String> additionalParameters; 
     public ArrayList<IPipeProcess> filePipeline;
     public ArrayList<IPipeProcess> slicePipeline;
+    
  
-    public StorageOptions(int totalParts, int reqParts, ArrayList accounts, ArrayList filePipeline, IEncoderIDA encoder, IDecoderIDA decoder, HashMap additionalParameters)
+    public StorageOptions(ArrayList filePipeline, ArrayList slicePipeline, HashMap additionalParameters)
     {
+        if (filePipeline == null) {
+            filePipeline = new ArrayList();
+        }
+        if (slicePipeline == null) {
+            slicePipeline = new ArrayList();
+        }
+        
+        if (additionalParameters == null) {
+            additionalParameters = new HashMap();
+        }
+        
         this.filePipeline = filePipeline;
         this.slicePipeline = slicePipeline;
-        this.additionalParameters = additionalParameters;
+        this.additionalParameters = additionalParameters;        
     }
+
+    public StorageOptions() {    
+    }
+    
+    
     
     
     

@@ -25,16 +25,10 @@ import java.util.HashMap;
  *
  * @author rlibardi
  */
-public abstract class IPipeProcess {
-
-    protected HashMap<String,String> parameters;
-
-    public IPipeProcess(HashMap<String, String> parameters) {
-        this.parameters = parameters;
-    }    
+public interface IPipeProcess {
     
-    public abstract void process(InputStream io, OutputStream os);
-    public abstract void reverseProcess(OutputStream os, InputStream io);
+    public abstract void process(InputStream io, OutputStream os, HashMap<String,String> parameters);
+    public abstract void reverseProcess(InputStream io, OutputStream os, HashMap<String,String> parameters);
     
     
 }

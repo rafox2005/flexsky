@@ -53,7 +53,7 @@ public class AccountStore
         try {
             PreparedStatement prepStatement = conn.prepareStatement("INSERT INTO accounts (name, type, path) VALUES(?, ?, ?)");
             prepStatement.setString(1, account.getName());
-            prepStatement.setInt(2, account.getType());
+            prepStatement.setString(2, account.getType());
             prepStatement.setString(3, account.getPath());
             prepStatement.executeUpdate();
             return true;
@@ -97,7 +97,7 @@ public class AccountStore
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM accounts");
             rs = prepStatement.executeQuery();
             while (rs.next()) {
-                list.add(new StoreSafeAccount(rs.getString("name"), rs.getInt("type"), rs.getString("path")));
+                list.add(new StoreSafeAccount(rs.getString("name"), rs.getString("type"), rs.getString("path")));
             }
             return list;
         } catch (SQLException ex) {

@@ -16,10 +16,18 @@
 
 package management;
 
+import com.github.sardine.Sardine;
+import com.github.sardine.SardineFactory;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -90,8 +98,8 @@ public class StoreSafeManagerTest
     {
         StoreSafeManager instance = StoreSafeManager.getInstance();  
         //Download part test
-        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
-        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 3);
+        String pathDown = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
+        StoreSafeFile ssf =  new StoreSafeFile("sqlitestudio-2.1.5.bin", 17);
         instance.downloadFile(pathDown, ssf);        
      
     }
@@ -121,12 +129,12 @@ public class StoreSafeManagerTest
      
     }
     
-    @Test
+   @Test
     public void testStoreAndDownloadFileWithFilePipeline()
     {
         //Store part test
         System.out.println("storeFileAndDownload");
-        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/sqlitestudio-2.1.5.bin";
+        String path = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/sqlitestudio-2.1.5.bin";
         String type = "book";
         String dispersalMethod = "rabin";
         int totalParts = 3;
@@ -149,13 +157,13 @@ public class StoreSafeManagerTest
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
         
         //Download part test
-        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/sqlitestudio-2.1.5.bin";
+        String pathDown = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
         StoreSafeFile ssf =  new StoreSafeFile("sqlitestudio-2.1.5.bin", 17);
         instance.downloadFile(pathDown, ssf);        
      
-    }
-    
-     
+    }   
+
+        
     
     
 

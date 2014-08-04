@@ -2,10 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dispersal.reedsolomon;
+package dispersal.encoder;
 
 import dispersal.IEncoderIDA;
 import dispersal.rabin.RabinIDA;
+import dispersal.reedsolomon.RsEncode;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

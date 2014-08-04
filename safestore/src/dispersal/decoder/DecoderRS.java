@@ -2,16 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dispersal.reedsolomon;
+package dispersal.decoder;
 
 import java.io.BufferedInputStream;
 import dispersal.IDecoderIDA;
 import java.io.BufferedOutputStream;
+import dispersal.reedsolomon.RsDecode;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import util.Monitor;
 import util.Utils;
@@ -26,9 +28,9 @@ public class DecoderRS extends IDecoderIDA
     private int parParts;
     private RsDecode reed;
 
-    public DecoderRS(int totalParts, int reqParts, InputStream[] parts, OutputStream file)
+    public DecoderRS(int totalParts, int reqParts, InputStream[] parts, OutputStream file, HashMap additionalOptions)
     {
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, file);
+        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, file, additionalOptions);
         this.parParts = (totalParts - reqParts) * 2;
         this.reed = new RsDecode(parParts);
 
@@ -42,9 +44,9 @@ public class DecoderRS extends IDecoderIDA
 
     }
 
-    public DecoderRS(int totalParts, int reqParts, File[] parts, OutputStream fileOs)
+    public DecoderRS(int totalParts, int reqParts, File[] parts, OutputStream fileOs, HashMap additionalOptions)
     {
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, fileOs);
+        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, fileOs, additionalOptions);
         this.parParts = (totalParts - reqParts) * 2;
         this.reed = new RsDecode(parParts);
 

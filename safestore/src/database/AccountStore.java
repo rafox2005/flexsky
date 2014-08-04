@@ -23,11 +23,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -51,10 +53,15 @@ public class AccountStore
     public boolean insertAccount(StoreSafeAccount account)
     {
         try {
-            PreparedStatement prepStatement = conn.prepareStatement("INSERT INTO accounts (name, type, path) VALUES(?, ?, ?)");
+            
+            //Get File Pipe Info            
+            byte[] parametersBlob = SerializationUtils.serialize(account.getAdditionalParameters());
+            
+            PreparedStatement prepStatement = conn.prepareStatement("INSERT INTO accounts (name, type, path, parameters) VALUES(?, ?, ?, ?)");
             prepStatement.setString(1, account.getName());
             prepStatement.setString(2, account.getType());
             prepStatement.setString(3, account.getPath());
+            prepStatement.setBytes(4, parametersBlob);
             prepStatement.executeUpdate();
             return true;
         } catch (SQLException ex) {
@@ -97,7 +104,13 @@ public class AccountStore
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM accounts");
             rs = prepStatement.executeQuery();
             while (rs.next()) {
-                list.add(new StoreSafeAccount(rs.getString("name"), rs.getString("type"), rs.getString("path")));
+                HashMap additionalParameters = null;
+                byte[] param = rs.getBytes("parameters");
+                if (param != null) {
+                    additionalParameters = SerializationUtils.deserialize(param);
+                }
+                
+                list.add(new StoreSafeAccount(rs.getString("name"), rs.getString("type"), rs.getString("path"), additionalParameters));
             }
             return list;
         } catch (SQLException ex) {

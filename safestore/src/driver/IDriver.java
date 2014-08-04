@@ -17,8 +17,10 @@
 package driver;
 
 import data.StoreSafeSlice;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 /**
  *
@@ -26,11 +28,11 @@ import java.io.OutputStream;
  */
 public interface IDriver
 {
+    
+    boolean deleteSlice(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
 
-    boolean deleteSlice(StoreSafeSlice slice);
+    InputStream getSliceDownloadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
 
-    InputStream getSliceDownloadStream(StoreSafeSlice slice);
-
-    OutputStream getSliceUploadStream(StoreSafeSlice slice);
+    OutputStream getSliceUploadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
     
 }

@@ -9,10 +9,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import dispersal.rabin.DecoderRabinIDA;
-import dispersal.rabin.EncoderRabinIDA;
-import dispersal.reedsolomon.DecoderRS;
-import dispersal.reedsolomon.EncoderRS;
+import dispersal.decoder.DecoderRabinIDA;
+import dispersal.encoder.EncoderRabinIDA;
+import dispersal.decoder.DecoderRS;
+import dispersal.encoder.EncoderRS;
 
 /**
  *

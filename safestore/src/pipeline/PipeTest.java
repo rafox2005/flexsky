@@ -39,6 +39,9 @@ public class PipeTest implements IPipeProcess {
                 vector = new byte[8];
             }
             
+            //Close inputStream
+            io.close();
+            
         } catch (IOException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -53,6 +56,9 @@ public class PipeTest implements IPipeProcess {
                 io.read();
                 vector = new byte[8];
             }
+            
+            //Close inputStream
+            io.close();
             
         } catch (IOException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);

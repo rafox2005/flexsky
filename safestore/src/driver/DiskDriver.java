@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,7 @@ public class DiskDriver implements IDriver
     }       
                 
     @Override
-    public OutputStream getSliceUploadStream(StoreSafeSlice slice) {
+    public OutputStream getSliceUploadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
         OutputStream os = null;
         try {
             os = new FileOutputStream(new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex())));
@@ -57,7 +58,7 @@ public class DiskDriver implements IDriver
     }
     
     @Override
-    public InputStream getSliceDownloadStream(StoreSafeSlice slice) {
+    public InputStream getSliceDownloadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
         InputStream is = null;
         try {
             is = new FileInputStream(new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex())));
@@ -69,7 +70,7 @@ public class DiskDriver implements IDriver
     }
     
     @Override
-    public boolean deleteSlice(StoreSafeSlice slice) {
+    public boolean deleteSlice(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
         File file = new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex()));
         return file.delete();
     }

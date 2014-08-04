@@ -16,6 +16,8 @@
 
 package data;
 
+import java.util.HashMap;
+
 /**
  *
  * @author rafox
@@ -26,12 +28,22 @@ public class StoreSafeAccount
     private String name;
     private String type;
     private String path;
+    private HashMap<String,String> additionalParameters; 
 
     public StoreSafeAccount(String name, String type, String path)
     {
         this.name = name;
         this.type = type;
         this.path = path;
+        this.additionalParameters = null;
+    }
+    
+    public StoreSafeAccount(String name, String type, String path, HashMap<String,String> additionalParameters)
+    {
+        this.name = name;
+        this.type = type;
+        this.path = path;
+        this.additionalParameters = additionalParameters;
     }
 
     /**
@@ -95,5 +107,15 @@ public class StoreSafeAccount
     {
         this.name = name;
     }
+
+    public HashMap<String, String> getAdditionalParameters() {
+        return additionalParameters;
+    }
+
+    public void setAdditionalParameters(HashMap<String, String> additionalParameters) {
+        this.additionalParameters = additionalParameters;
+    }
+    
+    
 
 }

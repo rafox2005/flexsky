@@ -15,17 +15,20 @@
  */
 package management;
 
+import com.github.sardine.Sardine;
+import com.github.sardine.SardineFactory;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
-import dispersal.rabin.DecoderRabinIDA;
-import dispersal.rabin.EncoderRabinIDA;
-import dispersal.reedsolomon.DecoderRS;
-import dispersal.reedsolomon.EncoderRS;
+import dispersal.decoder.DecoderRabinIDA;
+import dispersal.encoder.EncoderRabinIDA;
+import dispersal.decoder.DecoderRS;
+import dispersal.encoder.EncoderRS;
 import driver.DiskDriver;
 import driver.IDriver;
+import driver.WebDavDriver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,7 +36,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +60,7 @@ class StorageManager {
         try {
             IEncoderIDA ida = null;
             StorageOptions options = ssf.getOptions();
+            InputStream fileInputStream = new FileInputStream(file);
 
             ArrayList<OutputStream> outputStreams = new ArrayList<>();
             //Get the upload streams for each driver
@@ -61,9 +69,8 @@ class StorageManager {
                 StoreSafeSlice currentSlice = slices.get(i);
                 StoreSafeAccount currentAccount = listAccounts.get(i);
 
-                
                 sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
-                
+
                 //Add outputstream to list
                 outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
 
@@ -71,38 +78,64 @@ class StorageManager {
 
             if (options.filePipeline.size() > 0) {
 
-                //Implement Pipeline Filters using Aux File
-                File tmpFile1 = new File(file.getAbsolutePath() + "-temp1");
-                File tmpFile2 = new File(file.getAbsolutePath() + "-temp2");
-                FileUtils.copyFile(file, tmpFile1);
+                //Implement Pipeline using Java Pipes
+                ArrayList<InputStream> listPipesIn = new ArrayList<>();
+                ArrayList<OutputStream> listPipesOut = new ArrayList<>();
 
-                InputStream inputAux = new FileInputStream(tmpFile1);
-                OutputStream outputAux = new FileOutputStream(tmpFile2);
+                //Adding the first
+                listPipesIn.add(new FileInputStream(file));
 
-                for (IPipeProcess pipe : options.filePipeline) {
-                    pipe.process(inputAux, outputAux, options.additionalParameters);
-                    FileUtils.copyFile(tmpFile2, tmpFile1);
+                //Creating and connecting the pipes
+                for (int i = 0; i < options.filePipeline.size(); i++) {
+                    PipedOutputStream out = new PipedOutputStream();
+                    PipedInputStream in = new PipedInputStream(out);
+
+                    listPipesIn.add(in);
+                    listPipesOut.add(out);
                 }
 
-                //Close aux streams, delete tmp file 1 and redirect file to tmp2
-                inputAux.close();
-                outputAux.close();
-                tmpFile1.delete();
-                file = tmpFile2;
+                //Now that we already have a pipeline, just need to send the right Streams for each PipeProcess
+                for (int i = 0; i < options.filePipeline.size(); i++) {
+
+                    //Get actual Pipe
+                    IPipeProcess pipe = options.filePipeline.get(i);
+
+                    //Get the streams
+                    InputStream inT = listPipesIn.get(i);
+                    OutputStream outT = listPipesOut.get(i);
+
+                    //Run the process for the pipes in a new thread (parallel)
+                    new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    try {
+                                        pipe.process(inT, outT, options.additionalParameters);
+                                        outT.close();
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                            }
+                    ).start();
+
+                }
+
+                //Get Last InputStream
+                fileInputStream = listPipesIn.get(listPipesIn.size() - 1);
 
             }
 
-            //Get the desired dispersal method
-            if ("rabin".equals(ssf.getDispersalMethod())) {
-                OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
-                ida = new EncoderRabinIDA(ssf.getTotalParts(), ssf.getReqParts(), file, outputStreams.toArray(aux));
-            } else if ("rs".equals(ssf.getDispersalMethod())) {
-                OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
-                ida = new EncoderRS(ssf.getTotalParts(), ssf.getReqParts(), file, outputStreams.toArray(aux));
-            }
+            OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
+
+            //Get The Desired IDA Algorithm
+            ida = (IEncoderIDA) Class.forName("dispersal.encoder.Encoder" + ssf.getDispersalMethod()).
+                    getDeclaredConstructor(int.class, int.class, InputStream.class, OutputStream[].class, HashMap.class).
+                    newInstance(ssf.getTotalParts(), ssf.getReqParts(), fileInputStream, outputStreams.toArray(aux), ssf.getOptions().additionalParameters);
+
             Date start, end;
             start = new Date(System.currentTimeMillis());
             long sliceSize = ida.encode();
+
             //Finish and log everything
             end = new Date(System.currentTimeMillis());
             StoreSafeLogger.addLog("file", ssf.getId(), "Dispersal-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
@@ -116,9 +149,7 @@ class StorageManager {
                 currentSlice.setSize(sliceSize);
 
             }
-            if (options.filePipeline.size() > 0) {
-                file.delete();
-            }
+
             return true;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -160,7 +191,7 @@ class StorageManager {
                 StoreSafeAccount currentAccount = listAccounts.get(i);
 
                 sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
-                
+
                 //Add inputstream to list
                 //Try to get the inputstreams
                 InputStream input = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
@@ -173,18 +204,71 @@ class StorageManager {
 
             //Check if got minimum req. parts
             if (inputStreams.size() < ssf.getReqParts()) {
-                throw new Exception("ERROR: Not able to retrieve the minimum amount of parts required");
+                throw new IOException("ERROR: Not able to retrieve the minimum amount of parts required");
             }
 
-            //Get the desired dispersal method
-            if ("rabin".equals(ssf.getDispersalMethod())) {
-                InputStream[] aux = new InputStream[ssf.getReqParts()];
-                ida = new DecoderRabinIDA(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
-            } else if ("rs".equals(ssf.getDispersalMethod())) {
-                InputStream[] aux = new InputStream[ssf.getReqParts()];
-                ida = new DecoderRS(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os);
-            }
+            
+            if (options.filePipeline.size() > 0) {
 
+                    //Implement Pipeline using Java Pipes
+                    ArrayList<InputStream> listPipesIn = new ArrayList<>();
+                    ArrayList<OutputStream> listPipesOut = new ArrayList<>();    
+                                                
+                    //Creating and connecting the pipes
+                    for (int i = 0; i < options.filePipeline.size(); i++) {
+                        
+                        PipedOutputStream out = new PipedOutputStream();
+                        PipedInputStream in = new PipedInputStream(out);
+                        
+
+                        listPipesIn.add(in);
+                        listPipesOut.add(out);
+                    }              
+                    
+                    //Replace the last Output for the file writer (FileOutputStream)
+                    FileOutputStream fos = new FileOutputStream(file);
+                    listPipesOut.add(fos);                   
+                    
+
+                    //Now that we already have a pipeline, just need to send the right Streams for each PipeProcess
+                    for (int i = 0; i < options.filePipeline.size(); i++) {
+
+                        //Get actual Pipe
+                        IPipeProcess pipe = options.filePipeline.get(i);
+
+                        //Get the streams
+                        InputStream inT = listPipesIn.get(i);
+                        OutputStream outT = listPipesOut.get(i+1);
+
+                        //Run the process for the pipes in a new thread (parallel)
+                        new Thread(
+                                new Runnable() {
+                                    public void run() {
+                                        try {
+                                            pipe.reverseProcess(inT, outT, options.additionalParameters);
+                                            outT.close();
+                                        } catch (IOException ex) {
+                                            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                }
+                        ).start();
+
+                    }
+
+                    //Get First OutputStream
+                    os = listPipesOut.get(0);
+
+                }
+            
+            //Get The Desired IDA Algorithm
+            InputStream[] aux = new InputStream[ssf.getReqParts()];
+            ida = (IDecoderIDA) Class.forName("dispersal.decoder.Decoder" + ssf.getDispersalMethod()).
+                    getDeclaredConstructor(int.class, int.class, InputStream[].class, OutputStream.class, HashMap.class).
+                    newInstance(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os, ssf.getOptions().additionalParameters);
+
+            
+            
             Date start, end;
             start = new Date(System.currentTimeMillis());
 
@@ -196,32 +280,7 @@ class StorageManager {
             StoreSafeLogger.addLog("file", ssf.getId(), "Retrieval-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
 
             //Check if file hash match
-            if (ssf.getHash().equals(ida.getFileHash())) {
-
-                if (options.filePipeline.size() > 0) {
-
-                    //Implement Pipeline Filters using Aux File
-                    File tmpFile1 = new File(file.getAbsolutePath() + "-temp1");
-                    File tmpFile2 = new File(file.getAbsolutePath() + "-temp2");
-                    FileUtils.copyFile(file, tmpFile1);
-
-                    InputStream inputAux = new FileInputStream(tmpFile1);
-                    OutputStream outputAux = new FileOutputStream(tmpFile2);
-
-                    for (IPipeProcess pipe : options.filePipeline) {
-                        pipe.reverseProcess(inputAux, outputAux, options.additionalParameters);
-                        FileUtils.copyFile(tmpFile2, tmpFile1);
-                    }
-
-                    //Close aux streams, delete tmp file 1 copy file2 to file and delete tmp2
-                    inputAux.close();
-                    outputAux.close();
-                    tmpFile1.delete();
-                    FileUtils.copyFile(tmpFile2, file);
-                    tmpFile2.delete();
-
-                }
-
+            if (ssf.getHash().equals(ida.getFileHash())) {              
                 return true;
             } else {
                 throw new Exception("ERROR: recovered file hash differs from the original");
@@ -236,10 +295,10 @@ class StorageManager {
     }
 
     public boolean deleteSlice(StoreSafeSlice slice, StoreSafeAccount currentAccount) {
-        
+
         try {
             IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
-           return sliceDriver.deleteSlice(slice, currentAccount.getAdditionalParameters());
+            return sliceDriver.deleteSlice(slice, currentAccount.getAdditionalParameters());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
@@ -257,7 +316,7 @@ class StorageManager {
         } catch (IOException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return false;
     }
 }

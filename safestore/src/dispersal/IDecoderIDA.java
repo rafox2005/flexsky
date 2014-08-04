@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import util.Utils;
 
 /**
@@ -35,6 +36,7 @@ public abstract class IDecoderIDA
     protected MessageDigest mdFile;
     protected DigestInputStream[] disParts;
     protected DigestOutputStream disFile;
+    protected HashMap<String, String> additionalOptions;
 
     /**
      * Constructor for the Decoding proccess
@@ -45,12 +47,13 @@ public abstract class IDecoderIDA
      * buffers needed
      * @param file
      */
-    public IDecoderIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream file)
+    public IDecoderIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream file, HashMap additionalOptions)
     {
         this.totalParts = totalParts;
         this.reqParts = reqParts;
         this.mdParts = new MessageDigest[totalParts];
         this.disParts = new DigestInputStream[totalParts];
+        this.additionalOptions = additionalOptions;
         try {
             this.readBufs = parts;
             for (int i = 0; i < parts.length; i++) {
@@ -115,12 +118,13 @@ public abstract class IDecoderIDA
      * @param parts File vector with the parts to create the read buffers needed
      * @param file File to write to
      */
-    public IDecoderIDA(int totalParts, int reqParts, File[] parts, OutputStream fileOs)
+    public IDecoderIDA(int totalParts, int reqParts, File[] parts, OutputStream fileOs, HashMap additionalOptions)
     {
         try {
             InputStream[] in = new InputStream[parts.length];
             BufferedInputStream[] readBuffers = new BufferedInputStream[parts.length];
             BufferedOutputStream fileBos = new BufferedOutputStream(fileOs, this.bufSize);
+            this.additionalOptions = additionalOptions;
 
             for (int i = 0; i < parts.length; i++) {
                 in[i] = new FileInputStream(parts[i]);

@@ -2,15 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package dispersal.rabin;
+package dispersal.decoder;
 
 import dispersal.IDecoderIDA;
+import dispersal.rabin.RabinIDA;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import util.Monitor;
 
 /**
@@ -43,9 +45,9 @@ public class DecoderRabinIDA extends IDecoderIDA
      * @param reqParts Number of required parts of the schema used
      * @param parts File vector with the parts to create the read buffers needed
      */
-    public DecoderRabinIDA(int totalParts, int reqParts, File[] parts, OutputStream fileToWrite)
+    public DecoderRabinIDA(int totalParts, int reqParts, File[] parts, OutputStream fileToWrite, HashMap additionalOptions)
     {
-        super(totalParts, reqParts, parts, fileToWrite);
+        super(totalParts, reqParts, parts, fileToWrite, additionalOptions);
         this.rabin = new RabinIDA(totalParts, reqParts);
     }
 
@@ -58,9 +60,9 @@ public class DecoderRabinIDA extends IDecoderIDA
      * buffers needed
      * @param fileToWrite
      */
-    public DecoderRabinIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream fileToWrite)
+    public DecoderRabinIDA(int totalParts, int reqParts, InputStream[] parts, OutputStream fileToWrite, HashMap additionalOptions)
     {
-        super(totalParts, reqParts, parts, fileToWrite);
+        super(totalParts, reqParts, parts, fileToWrite, additionalOptions);
         this.rabin = new RabinIDA(totalParts, reqParts);
 
     }

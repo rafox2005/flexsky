@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
@@ -64,7 +65,7 @@ class StorageManager {
                 sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
                 
                 //Add outputstream to list
-                outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice));
+                outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
 
             }
 
@@ -162,7 +163,7 @@ class StorageManager {
                 
                 //Add inputstream to list
                 //Try to get the inputstreams
-                InputStream input = sliceDriver.getSliceDownloadStream(currentSlice);
+                InputStream input = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
 
                 if (input != null) {
                     inputStreams.add(input);
@@ -238,7 +239,7 @@ class StorageManager {
         
         try {
             IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
-           return sliceDriver.deleteSlice(slice);
+           return sliceDriver.deleteSlice(slice, currentAccount.getAdditionalParameters());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
@@ -252,6 +253,8 @@ class StorageManager {
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         

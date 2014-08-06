@@ -17,10 +17,12 @@
 package database;
 
 import data.StoreSafeAccount;
+import driver.WebDavDriver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -62,7 +64,7 @@ public class AccountStoreTest
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rafox/NetBeansProjects/safestore/safestore/db/safestore_test.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db");
             as = new AccountStore(this.conn);
         } catch (SQLException ex) {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -147,14 +149,17 @@ public class AccountStoreTest
     {
         System.out.println("testOperations");
         AccountStore instance = this.as;
-        StoreSafeAccount account1 = new StoreSafeAccount("teste5", 0, "path_teste");
-        StoreSafeAccount account2 = new StoreSafeAccount("teste6", 0, "path_teste");
-        instance.insertAccount(account1);
+        HashMap parametros = new HashMap();
+        parametros.put("username", "rafox2005@gmail.com");
+        parametros.put("password", "ra281190");
+        //StoreSafeAccount account1 = new StoreSafeAccount("teste5", 0, "path_teste");
+        StoreSafeAccount account2 = new StoreSafeAccount("remote-box", WebDavDriver.class.getName(), "https://dav.box.com/dav", parametros);
+        //instance.insertAccount(account1);
         instance.insertAccount(account2);
         ArrayList acc_list = instance.getAccounts();
         assertTrue(acc_list.size() == 4);
-        instance.deleteAccountByName("teste5");
-        instance.deleteAccountByName("teste6");
+        //instance.deleteAccountByName("teste5");
+        //instance.deleteAccountByName("teste6");
         acc_list = instance.getAccounts();
         assertTrue(acc_list.size() == 2);
         

@@ -5,9 +5,9 @@
 package dispersal.reedsolomon;
 
 import dispersal.reedsolomon.RsEncode;
-import dispersal.reedsolomon.DecoderRS;
+import dispersal.decoder.DecoderRS;
 import dispersal.reedsolomon.RsDecode;
-import dispersal.reedsolomon.EncoderRS;
+import dispersal.encoder.EncoderRS;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;

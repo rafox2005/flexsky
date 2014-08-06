@@ -4,6 +4,8 @@
  */
 package dispersal.rabin;
 
+import dispersal.decoder.DecoderRabinIDA;
+import dispersal.encoder.EncoderRabinIDA;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;

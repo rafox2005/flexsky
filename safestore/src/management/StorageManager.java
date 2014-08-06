@@ -17,15 +17,16 @@ package management;
 
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
+import com.github.sardine.impl.SardineException;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
-import dispersal.decoder.DecoderRabinIDA;
-import dispersal.encoder.EncoderRabinIDA;
 import dispersal.decoder.DecoderRS;
+import dispersal.decoder.DecoderRabinIDA;
 import dispersal.encoder.EncoderRS;
+import dispersal.encoder.EncoderRabinIDA;
 import driver.DiskDriver;
 import driver.IDriver;
 import driver.WebDavDriver;
@@ -301,22 +302,35 @@ class StorageManager {
             return sliceDriver.deleteSlice(slice, currentAccount.getAdditionalParameters());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (NoSuchMethodException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (SecurityException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (InstantiationException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (IllegalAccessException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (InvocationTargetException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         } catch (IOException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            if (ex.getClass() == SardineException.class && ex.getLocalizedMessage().contains("404"))
+            {                
+            Logger.getLogger(StorageManager.class.getName()).log(Level.WARNING, "Slice already deleted", ex);
+            return true;
+            }
+            else {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Error trying to delete file", ex);
+                return false;
+            }
         }
-
-        return false;
     }
 }

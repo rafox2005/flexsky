@@ -20,14 +20,19 @@ import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
+import dispersal.IEncoderIDA;
+import dispersal.rabin.RabinIDA;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -42,9 +47,9 @@ import pipeline.PipeTest;
 public class StoreSafeManagerTest
 {
     
-    public StoreSafeManagerTest()
-    {
-    }
+    public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/sqlitestudio-2.1.5.bin";
+    public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
+    public static final String pathToDB = "jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db";
     
     @Before
     public void setUp()
@@ -60,30 +65,28 @@ public class StoreSafeManagerTest
     /**
      * Test of getInstance method, of class StoreSafeManager.
      */
-    @Ignore @Test
+    @Test
     public void testGetInstance()
     {
         System.out.println("getInstance");
         StoreSafeManager expResult = null;
         StoreSafeManager result = StoreSafeManager.getInstance();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(result.getClass(), StoreSafeManager.class);
     }
 
     /**
      * Test of storeFile method, of class StoreSafeManager.
      */
-    @Ignore @Test
+    @Test
     public void testStoreFile()
     {
         System.out.println("storeFile");
-        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
+        String path = StoreSafeManagerTest.pathToTestFile;
         String type = "music";
-        String dispersalMethod = "rabin";
+        String dispersalMethod = "RabinIDA";
         int totalParts = 3;
         int reqParts = 2;
-        int revision = 3;
+        int revision = 0;
         StoreSafeManager instance = StoreSafeManager.getInstance();    
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
@@ -93,53 +96,72 @@ public class StoreSafeManagerTest
         assertEquals(expResult, result);
     }
     
-    @Ignore @Test
+    @Test
     public void testDownloadFile()
     {
         StoreSafeManager instance = StoreSafeManager.getInstance();  
         //Download part test
-        String pathDown = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
-        StoreSafeFile ssf =  new StoreSafeFile("sqlitestudio-2.1.5.bin", 17);
+        String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
+        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 0);
         instance.downloadFile(pathDown, ssf);        
      
     }
     
-    @Ignore @Test
-    public void testStoreAndDownloadFile()
+    @Test
+    public void testDeleteFile()
+    {
+        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        //Delete File       
+        StoreSafeFile ssf =  new StoreSafeFile(new File(StoreSafeManagerTest.pathToTestFile).getName(), 0);
+        instance.deleteFile(ssf);
+     
+    }
+    
+    @Test
+    public void testStoreAndDownloadFile() throws IOException
     {
         //Store part test
-        System.out.println("storeFileAndDownload");
-        String path = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/input/Kinowear-Bible [tahir99].pdf";
+        String path = StoreSafeManagerTest.pathToTestFile;
         String type = "book";
-        String dispersalMethod = "rabin";
+        String dispersalMethod = "RabinIDA";
         int totalParts = 3;
         int reqParts = 2;
-        int revision = 4;
+        int revision = 1;
         StoreSafeManager instance = StoreSafeManager.getInstance();    
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
         boolean expResult = true;
+        File start = new File(path);
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts);
         
         //Download part test
-        String pathDown = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/test/filesToTest/output/Kinowear-Bible [tahir99].pdf";
-        StoreSafeFile ssf =  new StoreSafeFile("Kinowear-Bible [tahir99].pdf", 4);
-        instance.downloadFile(pathDown, ssf);        
+        String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
+        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 1);
+        instance.downloadFile(pathDown, ssf);
+        
+        File end = new File(pathDown);
+        
+        assertTrue(FileUtils.contentEquals(start, end));
+        
+        //After Success, delete the file
+        instance.deleteFile(ssf);
+        
+                
      
     }
     
    @Test
-    public void testStoreAndDownloadFileWithFilePipeline()
+    public void testStoreAndDownloadFileWithFilePipeline() throws IOException
     {
         //Store part test
         System.out.println("storeFileAndDownload");
-        String path = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/sqlitestudio-2.1.5.bin";
+        String path = StoreSafeManagerTest.pathToTestFile;
         String type = "book";
-        String dispersalMethod = "rabin";
+        String dispersalMethod = "RabinIDA";
         int totalParts = 3;
         int reqParts = 2;
-        int revision = 17;
+        int revision = 2;
         StoreSafeManager instance = StoreSafeManager.getInstance();  
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
@@ -154,13 +176,21 @@ public class StoreSafeManagerTest
         StorageOptions options = new StorageOptions(filePipeline, null, param);
         
         boolean expResult = true;
+        File start = new File(path);
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
         
         //Download part test
-        String pathDown = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
-        StoreSafeFile ssf =  new StoreSafeFile("sqlitestudio-2.1.5.bin", 17);
+        String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
+        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 2);
         instance.downloadFile(pathDown, ssf);        
      
+        File end = new File(pathDown);
+        
+        assertTrue(FileUtils.contentEquals(start, end));
+        
+        //After Success, delete the file
+        instance.deleteFile(ssf);
+        
     }   
 
         

@@ -33,8 +33,7 @@ import pipeline.IPipeProcess;
  *
  * @author rafox
  */
-public class FileStore
-{
+public class FileStore {
 
     private final Connection conn;
     private String name;
@@ -42,15 +41,12 @@ public class FileStore
     /**
      * Default constructor for a FileStore, passing the DB connection object
      *
+     * @param name
      * @param conn Connection object from the Database
+     * @throws java.lang.ClassNotFoundException
      */
-    public FileStore(String name, Connection conn)
-    {
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public FileStore(String name, Connection conn) throws ClassNotFoundException {
+        Class.forName("org.sqlite.JDBC");
         this.conn = conn;
         this.name = name;
     }
@@ -60,8 +56,7 @@ public class FileStore
      *
      * @return the value of name
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
@@ -70,63 +65,62 @@ public class FileStore
      *
      * @param name new value of name
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    
-    private String serializePipeline(ArrayList<IPipeProcess> list)
-    {
-        String pipelineString = new String();
-        for (Iterator<IPipeProcess> it = list.iterator(); it.hasNext();) {
-            IPipeProcess pipe = it.next();
-            pipelineString += pipe.getClass().getName(); 
-            
-            if (it.hasNext()) {
-                pipelineString += "-";
+    private String serializePipeline(ArrayList<IPipeProcess> list) {
+        //Check if the pipeline exists
+        if (list != null && !list.isEmpty()) {
+
+            String pipelineString = new String();
+            for (Iterator<IPipeProcess> it = list.iterator(); it.hasNext();) {
+                IPipeProcess pipe = it.next();
+                pipelineString += pipe.getClass().getName();
+
+                if (it.hasNext()) {
+                    pipelineString += "-";
+                }
+
             }
-            
+
+            return pipelineString;
+        } else {
+            //If not just return an empty String
+            return "";
         }
-        
-        return pipelineString;
     }
-    
-    private ArrayList<IPipeProcess> deSerializePipeline(String pipeString)
-    {
+
+    private ArrayList<IPipeProcess> deSerializePipeline(String pipeString) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+
         ArrayList<IPipeProcess> list = new ArrayList();
-        String[] pipeStringList = pipeString.split("-");
-        
-        for (String stringPipe : pipeStringList) {
-            try {            
+        //Check to see if there is some Pipeline
+        if (!pipeString.isEmpty()) {
+            String[] pipeStringList = pipeString.split("-");
+
+            for (String stringPipe : pipeStringList) {
                 list.add((IPipeProcess) Class.forName(stringPipe).newInstance());
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InstantiationException ex) {
-                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }       
-        
+        }
+
+        //If not just return the list empty to avoid reference issues later
         return list;
     }
-    
+
     /**
      *
      * @param file
      * @return
+     * @throws java.sql.SQLException
      */
-    public boolean insertFile(StoreSafeFile file)
-    {
-        try {
-            //Get File Pipe Info            
-            byte[] parametersBlob = SerializationUtils.serialize(file.getOptions().additionalParameters);
-            String pipeString = this.serializePipeline(file.getOptions().filePipeline);
-            
-            PreparedStatement prepStatement
-                    = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision, pipeline, parameters)"
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    public boolean insertFile(StoreSafeFile file) throws SQLException {
+        //Get File Pipe Info            
+        byte[] parametersBlob = SerializationUtils.serialize(file.getOptions().additionalParameters);
+        String pipeString = this.serializePipeline(file.getOptions().filePipeline);
+
+        try (PreparedStatement prepStatement
+                = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision, pipeline, parameters)"
+                        + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             prepStatement.setString(1, file.getName());
             prepStatement.setLong(2, file.getSize());
             prepStatement.setString(3, file.getType());
@@ -142,33 +136,27 @@ public class FileStore
             prepStatement.executeUpdate();
 
             file.setId(this.getFileID(file));
-
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
+        return true;
     }
 
     /**
      *
      * @return
      */
-    public ArrayList<StoreSafeFile> getFiles()
-    {
+    public ArrayList<StoreSafeFile> getFiles() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         ResultSet rs;
-        try {
-            ArrayList<StoreSafeFile> list = new ArrayList<>();
-            PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files");
+        ArrayList<StoreSafeFile> list = new ArrayList<>();
+        try (PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files")) {
             rs = prepStatement.executeQuery();
+
             while (rs.next()) {
-                
-            //Pipeline Stuff
-            StorageOptions options = new StorageOptions();    
-            ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
-            options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
-            options.filePipeline = pipeline;                
-                
+                //Get the file pipeline and deserializes it
+                StorageOptions options = new StorageOptions();
+                ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+                options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
+                options.filePipeline = pipeline;
+
                 StoreSafeFile file = new StoreSafeFile(rs.getInt("id"),
                         rs.getString("name"),
                         rs.getLong("size"),
@@ -183,11 +171,9 @@ public class FileStore
                         options);
                 list.add(file);
             }
-            return list;
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
         }
+        return list;
+
     }
 
     /**
@@ -195,99 +181,75 @@ public class FileStore
      * @param file
      * @return
      */
-    public boolean deleteFile(StoreSafeFile file)
-    {
-        try {
-            PreparedStatement prepStatement = conn.prepareStatement("DELETE FROM files WHERE name=? AND revision=?");
+    public boolean deleteFile(StoreSafeFile file) throws SQLException {
+        try (PreparedStatement prepStatement = conn.prepareStatement("DELETE FROM files WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
             prepStatement.executeUpdate();
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
     }
 
-    public int getFileID(StoreSafeFile file)
-    {
-        try {
-            ResultSet rs;
-            PreparedStatement prepStatement = conn.prepareStatement("SELECT id FROM files WHERE name=? AND revision=?");
+    public int getFileID(StoreSafeFile file) throws SQLException {
+        ResultSet rs;
+        try (PreparedStatement prepStatement = conn.prepareStatement("SELECT id FROM files WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
             rs = prepStatement.executeQuery();
             return rs.getInt("id");
-        } catch (SQLException ex) {
-            Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
-            return -1;
+        }
+    }
+
+    public boolean getFile(StoreSafeFile file) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+        ResultSet rs;
+        PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files WHERE name=? AND revision=?");
+        prepStatement.setString(1, file.getName());
+        prepStatement.setInt(2, file.getRevision());
+        rs = prepStatement.executeQuery();
+
+        if (rs.getInt("id") < 0) {
+            new SQLException("file not found");
         }
 
-    }
-    
-    public boolean getFile(StoreSafeFile file)
-    {
-        try {
-            
-            ResultSet rs;
-            PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files WHERE name=? AND revision=?");
-            prepStatement.setString(1, file.getName());
-            prepStatement.setInt(2, file.getRevision());
-            rs = prepStatement.executeQuery();
-            if (rs.getInt("id") < 0) new SQLException("file not found");
-            
-            //Pipeline Stuff
-            StorageOptions options = new StorageOptions();    
-            ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
-            options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
-            options.filePipeline = pipeline;
-            
-            file.setDispersalMethod(rs.getString("dispersal_method"));
-            file.setHash(rs.getString("hash"));
-            file.setId(rs.getInt("id"));
-            file.setLastAccessed(rs.getDate("last_accessed"));
-            file.setLastModified(rs.getDate("last_modified"));
-            file.setReqParts(rs.getInt("req_parts"));
-            file.setSize(rs.getLong("size"));
-            file.setTotalParts(rs.getInt("total_parts"));
-            file.setType(rs.getString("type"));           
-            
-            file.setOptions(options);
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(FileStore.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
+        //Pipeline Stuff
+        StorageOptions options = new StorageOptions();
+        ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+        options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
+        options.filePipeline = pipeline;
+
+        file.setDispersalMethod(rs.getString("dispersal_method"));
+        file.setHash(rs.getString("hash"));
+        file.setId(rs.getInt("id"));
+        file.setLastAccessed(rs.getDate("last_accessed"));
+        file.setLastModified(rs.getDate("last_modified"));
+        file.setReqParts(rs.getInt("req_parts"));
+        file.setSize(rs.getLong("size"));
+        file.setTotalParts(rs.getInt("total_parts"));
+        file.setType(rs.getString("type"));
+
+        file.setOptions(options);
+        return true;
 
     }
 
-    public boolean updateHash(StoreSafeFile file)
-    {
-        try {
-            PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET hash=? WHERE name=? AND revision=?");
+    public boolean updateHash(StoreSafeFile file) throws SQLException {
+        try (PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET hash=? WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getHash());
             prepStatement.setString(2, file.getName());
             prepStatement.setInt(3, file.getRevision());
             prepStatement.executeUpdate();
+
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
     }
-    
-    public boolean updateLastAccessedDate(StoreSafeFile file)
-    {
-        try {
-            PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET last_accessed=? WHERE name=? AND revision=?");
+
+    public boolean updateLastAccessedDate(StoreSafeFile file) throws SQLException {
+        try (PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET last_accessed=? WHERE name=? AND revision=?")) {
             prepStatement.setDate(1, file.getLastAccessed());
             prepStatement.setString(2, file.getName());
             prepStatement.setInt(3, file.getRevision());
             prepStatement.executeUpdate();
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(AccountStore.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
     }
 }

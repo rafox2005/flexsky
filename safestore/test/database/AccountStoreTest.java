@@ -56,7 +56,7 @@ public class AccountStoreTest
     }
     
     @Before
-    public void setUp()
+    public void setUp() throws ClassNotFoundException
     {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -145,7 +145,7 @@ public class AccountStoreTest
      * Test some operations of class AccountStore.
      */
     @Test
-    public void testOperations()
+    public void testOperations() throws SQLException
     {
         System.out.println("testOperations");
         AccountStore instance = this.as;

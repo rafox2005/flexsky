@@ -46,7 +46,7 @@ public class FileStoreTest
     }
     
     @Before
-    public void setUp()
+    public void setUp() throws ClassNotFoundException
     {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -72,7 +72,7 @@ public class FileStoreTest
     }
 
     @Test
-    public void testOperations()
+    public void testOperations() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException
     {
         System.out.println("testOperations");
         FileStore instance = this.fs;
@@ -108,7 +108,7 @@ public class FileStoreTest
     }
     
     @Test
-    public void testInsertSameFiles()
+    public void testInsertSameFiles() throws SQLException
     {
         FileStore instance = this.fs;
         StoreSafeFile file1 = new StoreSafeFile("teste5",
@@ -128,7 +128,7 @@ public class FileStoreTest
     }
     
     @Test
-    public void testGetFile()
+    public void testGetFile() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
     {
         FileStore instance = this.fs;
         StoreSafeFile file1 = new StoreSafeFile("book.pdf", 0);

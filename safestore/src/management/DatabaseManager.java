@@ -44,23 +44,32 @@ class DatabaseManager
     {
         try {
             Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
+            
             this.conn = DriverManager.getConnection("jdbc:sqlite:" + pathToDB);
+            
+            this.as = new AccountStore(this.conn);
+            this.fs = new FileStore("TestFS", this.conn);
+            this.ss = new SliceStore("TestFS", this.conn);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: jdbc adapter driver not found", ex);
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: not able to connect with the DB", ex);
         }
-        this.as = new AccountStore(this.conn);
-        this.fs = new FileStore("TestFS", this.conn);
-        this.ss = new SliceStore("TestFS", this.conn);
     }
     
     public int insertFile(StoreSafeFile ssf)
     {
-        this.fs.insertFile(ssf);
-        return this.fs.getFileID(ssf);
+        try {
+            this.fs.insertFile(ssf);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: not able to insert file in the database", ex);
+        }
+        try {
+            return this.fs.getFileID(ssf);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: not able to retrieve file ID when inserting file", ex);
+        }
+        return 0;
     }
     
     public boolean insertSlice(StoreSafeSlice sss) 
@@ -72,12 +81,28 @@ class DatabaseManager
     
     public ArrayList listFiles()
     {
-        return this.fs.getFiles();
+        try {
+            return this.fs.getFiles();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when listing files", ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: pipeline class retrieval error when listing files DB", ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: instatiation class error when retrieving files from DB", ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: illegal access when listing files", ex);
+        }
+        return null;
     }
     
     public ArrayList listAccounts()
     {
-        return this.as.getAccounts();
+        try {
+            return this.as.getAccounts();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when listing accounts", ex);
+        }
+        return null;
     }
     
     public boolean deleteFile(StoreSafeFile file) {
@@ -85,45 +110,76 @@ class DatabaseManager
         for (StoreSafeSlice slice : slicesToDelete) {
             this.ss.deleteSlice(slice);
         }
-        return this.fs.deleteFile(file);
+        try {
+            return this.fs.deleteFile(file);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when deleting file", ex);
+        }
+        return false;
         
     }
     
     public boolean updateFileHash(StoreSafeFile file)
     {
-        return this.fs.updateHash(file);
+        try {
+            return this.fs.updateHash(file);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when updating hash of the file", ex);
+        }
+        return false;
     }
     
     public ArrayList<StoreSafeSlice> getFileSlices(StoreSafeFile file)
     {
-        this.fs.getFile(file);
-        return this.ss.getSlicesFromFile(file);        
+        try {
+            this.fs.getFile(file);        
+            return this.ss.getSlicesFromFile(file);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when getting file slices", ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: Error instantiating pipeline classes from files", ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: Illegal access error getting file slices", ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: Pipeline class not found while getting file slices", ex);
+        }
+        return null;
         
     }
     
     public ArrayList<StoreSafeAccount> getSlicesAccount(ArrayList<StoreSafeSlice> listSlices)
     {
-        ArrayList<StoreSafeAccount> listAccounts = new ArrayList<>();
-        
-        //Get all Accounts
-        ArrayList<StoreSafeAccount> listAccountsAux = this.as.getAccounts();
-        
-        //Get Slices Accounts
-        for (StoreSafeSlice slice : listSlices)
-        {
-            for (StoreSafeAccount account : listAccountsAux)
+        try {
+            ArrayList<StoreSafeAccount> listAccounts = new ArrayList<>();
+            
+            //Get all Accounts
+            ArrayList<StoreSafeAccount> listAccountsAux = this.as.getAccounts();
+            
+            //Get Slices Accounts
+            for (StoreSafeSlice slice : listSlices)
             {
-                if (slice.getAccount().equals(account.getName())) listAccounts.add(account);                
-            }
+                for (StoreSafeAccount account : listAccountsAux)
+                {
+                    if (slice.getAccount().equals(account.getName())) listAccounts.add(account);
+                }
                 
+            }
+            
+            return listAccounts;
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL Error when retrieving slices account", ex);
         }
-        
-        return listAccounts;
+        return null;
     }
     
     public boolean updateFileLastAccessedDate(StoreSafeFile file)
     {
-        return this.fs.updateHash(file);
+        try {
+            return this.fs.updateHash(file);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error trying to update last accessed file date", ex);
+            return false;
+        }
     }   
     
 }

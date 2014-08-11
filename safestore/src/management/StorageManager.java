@@ -58,10 +58,14 @@ import util.StoreSafeLogger;
 class StorageManager {
 
     public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
-        try {
             IEncoderIDA ida = null;
             StorageOptions options = ssf.getOptions();
-            InputStream fileInputStream = new FileInputStream(file);
+            InputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
+        }
 
             ArrayList<OutputStream> outputStreams = new ArrayList<>();
             //Get the upload streams for each driver
@@ -70,10 +74,30 @@ class StorageManager {
                 StoreSafeSlice currentSlice = slices.get(i);
                 StoreSafeAccount currentAccount = listAccounts.get(i);
 
-                sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                try {
+                    sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                } catch (NoSuchMethodException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the constructor for the driver to store", ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the constructor for the driver to store", ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the driver class to store", ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the driver class to store", ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the driver class to store", ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the driver class to store", ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the driver class to store", ex);
+                }
 
-                //Add outputstream to list
-                outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                try {
+                    //Add outputstream to list
+                    outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                } catch (IOException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the upload stream to store", ex);
+                }
 
             }
 
@@ -83,13 +107,22 @@ class StorageManager {
                 ArrayList<InputStream> listPipesIn = new ArrayList<>();
                 ArrayList<OutputStream> listPipesOut = new ArrayList<>();
 
-                //Adding the first
-                listPipesIn.add(new FileInputStream(file));
+                try {
+                    //Adding the first
+                    listPipesIn.add(new FileInputStream(file));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
+                }
 
                 //Creating and connecting the pipes
                 for (int i = 0; i < options.filePipeline.size(); i++) {
                     PipedOutputStream out = new PipedOutputStream();
-                    PipedInputStream in = new PipedInputStream(out);
+                    PipedInputStream in = null;
+                    try {
+                        in = new PipedInputStream(out);
+                    } catch (IOException ex) {
+                        Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
+                    }
 
                     listPipesIn.add(in);
                     listPipesOut.add(out);
@@ -109,11 +142,11 @@ class StorageManager {
                     new Thread(
                             new Runnable() {
                                 public void run() {
+                                    pipe.process(inT, outT, options.additionalParameters);
                                     try {
-                                        pipe.process(inT, outT, options.additionalParameters);
                                         outT.close();
                                     } catch (IOException ex) {
-                                        Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+                                        Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                     }
                                 }
                             }
@@ -128,10 +161,26 @@ class StorageManager {
 
             OutputStream[] aux = new OutputStream[ssf.getTotalParts()];
 
+        try {
             //Get The Desired IDA Algorithm
             ida = (IEncoderIDA) Class.forName("dispersal.encoder.Encoder" + ssf.getDispersalMethod()).
                     getDeclaredConstructor(int.class, int.class, InputStream.class, OutputStream[].class, HashMap.class).
                     newInstance(ssf.getTotalParts(), ssf.getReqParts(), fileInputStream, outputStreams.toArray(aux), ssf.getOptions().additionalParameters);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
+        }
 
             Date start, end;
             start = new Date(System.currentTimeMillis());
@@ -151,29 +200,7 @@ class StorageManager {
 
             }
 
-            return true;
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } catch (IOException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        } catch (InstantiationException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-        }
+           
         return false;
 
     }
@@ -182,7 +209,12 @@ class StorageManager {
         try {
             IDecoderIDA ida = null;
             ArrayList<InputStream> inputStreams = new ArrayList<>();
-            OutputStream os = new FileOutputStream(file);
+            OutputStream os = null;
+            try {
+                os = new FileOutputStream(file);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to get file output", ex);
+            }
             StorageOptions options = ssf.getOptions();
 
             //Get the download streams for each driver
@@ -191,11 +223,32 @@ class StorageManager {
                 StoreSafeSlice currentSlice = slices.get(i);
                 StoreSafeAccount currentAccount = listAccounts.get(i);
 
-                sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                try {
+                    sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (NoSuchMethodException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to find the driver required", ex);
+                }
 
                 //Add inputstream to list
                 //Try to get the inputstreams
-                InputStream input = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
+                InputStream input = null;
+                try {
+                    input = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
+                } catch (IOException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Not able to retrieve the slice from the driver", ex);
+                }
 
                 if (input != null) {
                     inputStreams.add(input);
@@ -205,7 +258,7 @@ class StorageManager {
 
             //Check if got minimum req. parts
             if (inputStreams.size() < ssf.getReqParts()) {
-                throw new IOException("ERROR: Not able to retrieve the minimum amount of parts required");
+                throw new Error("ERROR: Not able to retrieve the minimum amount of parts required");
             }
 
             
@@ -219,7 +272,12 @@ class StorageManager {
                     for (int i = 0; i < options.filePipeline.size(); i++) {
                         
                         PipedOutputStream out = new PipedOutputStream();
-                        PipedInputStream in = new PipedInputStream(out);
+                        PipedInputStream in = null;
+                        try {
+                            in = new PipedInputStream(out);
+                        } catch (IOException ex) {
+                            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Problem creating the piped input stream", ex);
+                        }
                         
 
                         listPipesIn.add(in);
@@ -227,7 +285,12 @@ class StorageManager {
                     }              
                     
                     //Replace the last Output for the file writer (FileOutputStream)
-                    FileOutputStream fos = new FileOutputStream(file);
+                    FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: not found the output file", ex);
+                }
                     listPipesOut.add(fos);                   
                     
 
@@ -264,9 +327,25 @@ class StorageManager {
             
             //Get The Desired IDA Algorithm
             InputStream[] aux = new InputStream[ssf.getReqParts()];
-            ida = (IDecoderIDA) Class.forName("dispersal.decoder.Decoder" + ssf.getDispersalMethod()).
-                    getDeclaredConstructor(int.class, int.class, InputStream[].class, OutputStream.class, HashMap.class).
-                    newInstance(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os, ssf.getOptions().additionalParameters);
+            try {
+                ida = (IDecoderIDA) Class.forName("dispersal.decoder.Decoder" + ssf.getDispersalMethod()).
+                        getDeclaredConstructor(int.class, int.class, InputStream[].class, OutputStream.class, HashMap.class).
+                        newInstance(ssf.getTotalParts(), ssf.getReqParts(), inputStreams.toArray(aux), os, ssf.getOptions().additionalParameters);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (NoSuchMethodException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
+            }
 
             
             
@@ -284,9 +363,9 @@ class StorageManager {
             if (ssf.getHash().equals(ida.getFileHash())) {              
                 return true;
             } else {
-                throw new Exception("ERROR: recovered file hash differs from the original");
+                throw new Error("ERROR: recovered file hash differs from the original");
             }
-        } catch (Exception ex) {
+        } catch (Error ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
             //Delete output file
             file.deleteOnExit();
@@ -301,28 +380,28 @@ class StorageManager {
             IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
             return sliceDriver.deleteSlice(slice, currentAccount.getAdditionalParameters());
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (SecurityException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (InstantiationException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;
         } catch (IOException ex) {
-            if (ex.getClass() == SardineException.class && ex.getLocalizedMessage().contains("404"))
+            if (ex.getClass() == SardineException.class && ex.toString().contains("404"))
             {                
             Logger.getLogger(StorageManager.class.getName()).log(Level.WARNING, "Slice already deleted", ex);
             return true;

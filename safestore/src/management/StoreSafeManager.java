@@ -24,6 +24,12 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.StoreSafeLogger;
@@ -38,7 +44,10 @@ public class StoreSafeManager {
     private final DatabaseManager db;
     private final StorageManager storage;
     
-    private final StoreSafeLogger logger;
+    private static ExecutorService executor = null;
+    public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
+    
+    public final StoreSafeLogger logger;
     
     public final static boolean LOGMODE=true;
 
@@ -78,7 +87,7 @@ public class StoreSafeManager {
 
             //Store the files and finish the parts to store
             this.storage.storeFile(file, ssf, slices, listAccounts);
-
+            
             //After parts are stored insert slices into the DB
             for (int i = 0; i < totalParts; i++) {
                 this.db.insertSlice(slices.get(i));
@@ -91,6 +100,7 @@ public class StoreSafeManager {
             end = new Date(System.currentTimeMillis());
             StoreSafeLogger.addLog("file", ssf.getId(), "Upload-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
             
+           
             return true;
         } catch (Exception ex) {
             Logger.getLogger(StoreSafeManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,6 +128,9 @@ public class StoreSafeManager {
             File file = new File(path);
 
             this.storage.downloadFile(file, ssf, slicesList, accountList);
+            
+            //Wait for file download
+            //StoreSafeManager.executor.shutdown();
 
             //Update last_accessed info
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -160,6 +173,16 @@ public class StoreSafeManager {
 
     public ArrayList listAccounts() {
         return this.db.listAccounts();
+    } 
+    
+    public static ExecutorService getExecutor()
+    {
+        if (StoreSafeManager.executor == null || StoreSafeManager.executor.isShutdown()) {
+            StoreSafeManager.executor = Executors.newCachedThreadPool();
+        }
+        
+        return StoreSafeManager.executor;
+        
     }
 
 }

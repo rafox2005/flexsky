@@ -152,7 +152,7 @@ public class StoreSafeManagerTest
     }
     
    @Test
-    public void testStoreAndDownloadFileWithFilePipeline() throws IOException
+    public void testStoreAndDownloadFileWithFilePipeline() throws IOException, InterruptedException
     {
         //Store part test
         System.out.println("storeFileAndDownload");
@@ -178,6 +178,8 @@ public class StoreSafeManagerTest
         boolean expResult = true;
         File start = new File(path);
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
+        
+        Thread.sleep(1000);
         
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;

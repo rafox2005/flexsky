@@ -79,6 +79,9 @@ public class EncoderRS extends IEncoderIDA
                 } catch (IOException ex) {
                     Logger.getLogger(EncoderRS.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                //Close the input buffer
+                this.readBuffer.close();
             }            
 
         } catch (Exception e) {

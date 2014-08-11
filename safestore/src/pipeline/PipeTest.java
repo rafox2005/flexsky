@@ -32,11 +32,10 @@ public class PipeTest implements IPipeProcess {
     @Override
     public void process(InputStream io, OutputStream os, HashMap<String,String> parameters) {
         try {
-            byte[] vector = new byte[8];
-            while (io.read(vector) != -1) {
-                os.write(vector);
-                os.write(1);
-                vector = new byte[8];
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = io.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
             }
             
             //Close inputStream
@@ -50,11 +49,10 @@ public class PipeTest implements IPipeProcess {
     @Override
     public void reverseProcess(InputStream io, OutputStream os, HashMap<String,String> parameters) {
         try {
-            byte[] vector = new byte[8];
-            while (io.read(vector) != -1) {
-                os.write(vector);
-                io.read();
-                vector = new byte[8];
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = io.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
             }
             
             //Close inputStream

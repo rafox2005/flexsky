@@ -16,6 +16,7 @@
 
 package management;
 
+import data.StorageOptions;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import data.StoreSafeAccount;

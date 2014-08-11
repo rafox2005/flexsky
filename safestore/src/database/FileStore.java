@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import management.StorageOptions;
+import data.StorageOptions;
 import org.apache.commons.lang3.SerializationUtils;
 import pipeline.IPipeProcess;
 
@@ -116,11 +116,12 @@ public class FileStore {
     public boolean insertFile(StoreSafeFile file) throws SQLException {
         //Get File Pipe Info            
         byte[] parametersBlob = SerializationUtils.serialize(file.getOptions().additionalParameters);
-        String pipeString = this.serializePipeline(file.getOptions().filePipeline);
+        String pipeFileString = this.serializePipeline(file.getOptions().filePipeline);
+        String pipeSliceString = this.serializePipeline(file.getOptions().slicePipeline);
 
         try (PreparedStatement prepStatement
-                = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision, pipeline, parameters)"
-                        + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                = this.conn.prepareStatement("INSERT INTO files(name, size, type, dispersal_method, total_parts, req_parts, hash, last_accessed, last_modified, revision, pipeline_file, pipeline_slice, parameters)"
+                        + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             prepStatement.setString(1, file.getName());
             prepStatement.setLong(2, file.getSize());
             prepStatement.setString(3, file.getType());
@@ -131,8 +132,9 @@ public class FileStore {
             prepStatement.setDate(8, file.getLastAccessed());
             prepStatement.setDate(9, file.getLastModified());
             prepStatement.setInt(10, file.getRevision());
-            prepStatement.setString(11, pipeString);
-            prepStatement.setBytes(12, parametersBlob);
+            prepStatement.setString(11, pipeFileString);
+            prepStatement.setString(12, pipeSliceString);
+            prepStatement.setBytes(13, parametersBlob);
             prepStatement.executeUpdate();
 
             file.setId(this.getFileID(file));
@@ -153,9 +155,11 @@ public class FileStore {
             while (rs.next()) {
                 //Get the file pipeline and deserializes it
                 StorageOptions options = new StorageOptions();
-                ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+                ArrayList pipelineFile = this.deSerializePipeline(rs.getString("pipeline_file"));
+                ArrayList pipelineSlice = this.deSerializePipeline(rs.getString("pipeline_slice"));
                 options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
-                options.filePipeline = pipeline;
+                options.filePipeline = pipelineFile;
+                options.slicePipeline = pipelineSlice;
 
                 StoreSafeFile file = new StoreSafeFile(rs.getInt("id"),
                         rs.getString("name"),
@@ -213,9 +217,11 @@ public class FileStore {
 
         //Pipeline Stuff
         StorageOptions options = new StorageOptions();
-        ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline"));
+        ArrayList pipeline = this.deSerializePipeline(rs.getString("pipeline_file"));
+        ArrayList pipelineSlice = this.deSerializePipeline(rs.getString("pipeline_slice"));
         options.additionalParameters = SerializationUtils.deserialize(rs.getBytes("parameters"));
         options.filePipeline = pipeline;
+        options.slicePipeline = pipelineSlice;
 
         file.setDispersalMethod(rs.getString("dispersal_method"));
         file.setHash(rs.getString("hash"));

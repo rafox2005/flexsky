@@ -15,6 +15,7 @@
  */
 package management;
 
+import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;

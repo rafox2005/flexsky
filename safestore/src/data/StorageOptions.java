@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package management;
+package data;
 
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;

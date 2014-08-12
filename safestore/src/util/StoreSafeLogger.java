@@ -45,16 +45,15 @@ public class StoreSafeLogger {
         }
     }
     
-    public static void addLog(String table, int id, String action, Date start, Date end)
+    public static void addLog(String table, String id, String action, Date start, Date end)
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO " + table + "(id, action, start_time, end_time)"
-                            + " VALUES(?, ?, ?, ?)");
-            prepStatement.setInt(1, id);
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO " + table + "(id, action, requestTime)"
+                            + " VALUES(?, ?, ?)");
+            prepStatement.setString(1, id);
             prepStatement.setString(2, action);
-            prepStatement.setDate(3, start);
-            prepStatement.setDate(4, end);
+            prepStatement.setDate(3, new Date(end.getTime()-start.getTime()));            
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {

@@ -19,9 +19,14 @@ package pipeline;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import util.Utils;
 
 /**
  *
@@ -34,14 +39,22 @@ public class PipeTest implements IPipeProcess {
         try {
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = io.read(buffer)) != -1) {
-                os.write(buffer, 0, len);
+            MessageDigest mdFile = MessageDigest.getInstance("SHA1");
+            DigestInputStream disFile = new DigestInputStream(io, mdFile);
+            MessageDigest mdFileOS = MessageDigest.getInstance("SHA1");
+            DigestOutputStream osFile =  new DigestOutputStream(os, mdFileOS);
+            while ((len = disFile.read(buffer)) != -1) {
+                osFile.write(buffer, 0, len);
             }
+            
+            Logger.getLogger(PipeTest.class.getName()).log(Level.INFO, "PROCESS: Input Hash: " + Utils.getStringFromMessageDigest(disFile.getMessageDigest()) + "Output Hash: " + Utils.getStringFromMessageDigest(osFile.getMessageDigest()));
             
             //Close inputStream
             io.close();
             
         } catch (IOException ex) {
+            Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -51,14 +64,23 @@ public class PipeTest implements IPipeProcess {
         try {
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = io.read(buffer)) != -1) {
-                os.write(buffer, 0, len);
+            MessageDigest mdFile = MessageDigest.getInstance("SHA1");
+            DigestInputStream disFile = new DigestInputStream(io, mdFile);
+            MessageDigest mdFileOS = MessageDigest.getInstance("SHA1");
+            DigestOutputStream osFile =  new DigestOutputStream(os, mdFileOS);
+            
+            while ((len = disFile.read(buffer)) != -1) {
+                osFile.write(buffer, 0, len);
             }
+            
+            Logger.getLogger(PipeTest.class.getName()).log(Level.INFO, "RPROCESS: Input Hash: " + Utils.getStringFromMessageDigest(disFile.getMessageDigest()) + "Output Hash: " + Utils.getStringFromMessageDigest(osFile.getMessageDigest()));
             
             //Close inputStream
             io.close();
             
         } catch (IOException ex) {
+            Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

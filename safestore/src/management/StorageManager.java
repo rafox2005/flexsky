@@ -130,14 +130,22 @@ class StorageManager {
                         //Get the streams
                         InputStream inT = sliceListPipesIn.get(j);
                         OutputStream outT = sliceListPipesOut.get(j + 1);
+                        
+                        final String slicePath = currentSlice.getFile() + "-" + currentSlice.getPartIndex();
 
                         //Run the process for the pipes in a new thread (parallel)
                         new Thread(
                                 new Runnable() {
                                     public void run() {
+                                        Date start, end;
+                                        start = new Date(System.currentTimeMillis());
                                         pipe.process(inT, outT, options.additionalParameters);
                                         try {
                                             outT.close();
+                                            //Finish and log everything
+                                            end = new Date(System.currentTimeMillis());
+                                            StoreSafeLogger.addLog("slice", slicePath, "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+
                                         } catch (IOException ex) {
                                             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                         }
@@ -196,13 +204,20 @@ class StorageManager {
                     InputStream inT = listPipesIn.get(i);
                     OutputStream outT = listPipesOut.get(i);
 
+                    
                     //Run the process for the pipes in a new thread (parallel)
                     new Thread(
                             new Runnable() {
                                 public void run() {
+                                    Date start, end;
+                                    start = new Date(System.currentTimeMillis());
                                     pipe.process(inT, outT, options.additionalParameters);
                                     try {
                                         outT.close();
+                                        //Finish and log everything
+                                        end = new Date(System.currentTimeMillis());
+                                        StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+
                                     } catch (IOException ex) {
                                         Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                     }
@@ -246,7 +261,7 @@ class StorageManager {
 
             //Finish and log everything
             end = new Date(System.currentTimeMillis());
-            StoreSafeLogger.addLog("file", ssf.getId(), "Dispersal-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+            StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UIDA-" + ssf.getDispersalMethod(), start, end);
             //Update important values
             ssf.setHash(ida.getFileHash());
             String[] partsHash = ida.getPartsHash();
@@ -345,15 +360,24 @@ class StorageManager {
 
                             //Get the streams
                             InputStream inT = sliceListPipesIn.get(j);
-                            OutputStream outT = sliceListPipesOut.get(j);
+                            OutputStream outT = sliceListPipesOut.get(j);  
+                            
+                            final String slicePath = slices.get(i).getPath();
 
                             //Run the process for the pipes in a new thread (parallel)
                             new Thread(
                                     new Runnable() {
                                         public void run() {
-                                            pipe.process(inT, outT, options.additionalParameters);
+                                            //Start time variables
+                                            Date start, end;
+                                            start = new Date(System.currentTimeMillis());
+                                            pipe.reverseProcess(inT, outT, options.additionalParameters);
                                             try {
                                                 outT.close();
+                                                //Finish and log everything
+                                                end = new Date(System.currentTimeMillis());
+                                                StoreSafeLogger.addLog("slice", slicePath, "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+
                                             } catch (IOException ex) {
                                                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                             }
@@ -423,8 +447,17 @@ class StorageManager {
                         new Runnable() {
                             public void run() {
                                 try {
+                                    //Start time variables
+                                    Date start, end;
+                                    start = new Date(System.currentTimeMillis());
+                                    
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
                                     outT.close();
+                                    
+                                    //Finish and log everything
+                                    end = new Date(System.currentTimeMillis());
+                                    StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
                                 }
@@ -469,8 +502,15 @@ class StorageManager {
 
         //Finish and log everything
         end = new Date(System.currentTimeMillis());
-        StoreSafeLogger.addLog("file", ssf.getId(), "Retrieval-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+        StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "DIDA-" + ssf.getDispersalMethod(), start, end);
 
+        String[] teste = ida.getPartsHash();
+        
+        for (int i = 0; i < teste.length; i++) {
+            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
+        }
+
+        
         //Check if file hash match
         if (ssf.getHash().equals(ida.getFileHash())) {
             return true;

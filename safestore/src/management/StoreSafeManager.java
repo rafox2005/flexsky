@@ -99,7 +99,7 @@ public class StoreSafeManager {
             
             //Finish and log everything
             end = new Date(System.currentTimeMillis());
-            StoreSafeLogger.addLog("file", ssf.getId(), "Upload-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+            StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "U-" + ssf.getDispersalMethod(), start, end);
             
            
             return true;
@@ -141,7 +141,7 @@ public class StoreSafeManager {
 
             //Finish and log everything
             end = new Date(System.currentTimeMillis());
-            StoreSafeLogger.addLog("file", ssf.getId(), "Download-" + ssf.getDispersalMethod() + "-" + ssf.getSize(), start, end);
+            StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "D-" + ssf.getDispersalMethod(), start, end);
         
             return true;
         } catch (IOException ex) {

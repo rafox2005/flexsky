@@ -98,10 +98,13 @@ public class DecoderRabinIDA extends IDecoderIDA
             this.disFile.flush();
 
             //Close the Input Buffers
-            for (int i = 0; i < reqParts; i++) {
+            for (int i = 0; i < this.readBufs.length; i++) {
 
                 this.readBufs[i].close();
             }
+            
+            //CLose the output buffer aswell
+            this.disFile.close();
 
             }catch (IOException e) {
             System.out.println(e.getMessage());

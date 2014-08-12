@@ -48,8 +48,10 @@ import pipeline.PipeTest;
 public class StoreSafeManagerTest
 {
     
-    public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/sqlitestudio-2.1.5.bin";
-    public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/sqlitestudio-2.1.5.bin";
+    public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/ubuntu.iso";
+    //public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/screen.png";
+    public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/ubuntu.iso";
+    //public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/screen.png";
     public static final String pathToDB = "jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db";
     
     @Before
@@ -168,19 +170,24 @@ public class StoreSafeManagerTest
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
         PipeTest pt = new PipeTest();
+        PipeTest pt2 = new PipeTest();
         HashMap<String,String> param = new HashMap<String, String>();
         param.put("chave-geral", "ronaldo");
         param.put("metodoTeste", "chupetinha");
         
         ArrayList filePipeline = new ArrayList();
         filePipeline.add(pt);
-        StorageOptions options = new StorageOptions(filePipeline, null, param);
+        
+        ArrayList slicePipeline = new ArrayList();
+        slicePipeline.add(pt2);
+        
+        StorageOptions options = new StorageOptions(filePipeline, slicePipeline, param);
         
         boolean expResult = true;
         File start = new File(path);
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
         
-        Thread.sleep(1000);
+        Thread.sleep(8000);
         
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
@@ -192,7 +199,7 @@ public class StoreSafeManagerTest
         assertTrue(FileUtils.contentEquals(start, end));
         
         //After Success, delete the file
-        instance.deleteFile(ssf);
+        //instance.deleteFile(ssf);
         
     }   
 

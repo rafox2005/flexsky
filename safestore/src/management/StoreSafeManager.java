@@ -19,6 +19,7 @@ import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
+import dispersal.IEncoderIDA;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +27,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +35,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.reflections.Reflections;
+import pipeline.IPipeProcess;
 import util.StoreSafeLogger;
 
 /**
@@ -184,6 +188,20 @@ public class StoreSafeManager {
         
         return StoreSafeManager.executor;
         
+    }
+    
+    public Set getIDAList()
+    {
+        Reflections reflections = new Reflections("java.io.Serializable");   
+        Set<Class<? extends IEncoderIDA>> idaList = reflections.getSubTypesOf(IEncoderIDA.class);
+        return idaList;
+    }
+    
+    public Set getPipeList()
+    {
+        Reflections reflections = new Reflections("pipeline.pipe");    
+        Set<Class<? extends IPipeProcess>> pipeList = reflections.getSubTypesOf(IPipeProcess.class);
+        return pipeList;
     }
 
 }

@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import pipeline.PipeTest;
+import pipeline.pipe.PipeTest;
 
 /**
  *
@@ -48,10 +48,10 @@ import pipeline.PipeTest;
 public class StoreSafeManagerTest
 {
     
-    public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/ubuntu.iso";
-    //public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/screen.png";
-    public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/ubuntu.iso";
-    //public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/screen.png";
+    //public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/ubuntu.iso";
+    public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/screen.png";
+    //public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/ubuntu.iso";
+    public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/screen.png";
     public static final String pathToDB = "jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db";
     
     @Before

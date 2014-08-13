@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pipeline;
+package pipeline.pipe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pipeline.IPipeProcess;
 import util.Utils;
 
 /**

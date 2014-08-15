@@ -148,6 +148,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         jScrollPane6 = new javax.swing.JScrollPane();
         filesToDownloadJList = new javax.swing.JList();
         setDownloadPathjButton = new javax.swing.JButton();
+        jDownloadRefreshListButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -528,6 +529,13 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
             }
         });
 
+        jDownloadRefreshListButton.setText("Refresh");
+        jDownloadRefreshListButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jDownloadRefreshListButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelDownloadLayout = new javax.swing.GroupLayout(jPanelDownload);
         jPanelDownload.setLayout(jPanelDownloadLayout);
         jPanelDownloadLayout.setHorizontalGroup(
@@ -541,10 +549,13 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                     .addGroup(jPanelDownloadLayout.createSequentialGroup()
                         .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelDownloadLayout.createSequentialGroup()
+                                .addComponent(pathToDownloadFolderjLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(jPanelDownloadLayout.createSequentialGroup()
                                 .addComponent(setDownloadPathjButton)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(pathToDownloadFolderjLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jDownloadRefreshListButton)
+                                .addGap(21, 21, 21)))
                         .addComponent(downloadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(114, 114, 114))))
         );
@@ -557,7 +568,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(downloadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanelDownloadLayout.createSequentialGroup()
-                        .addComponent(setDownloadPathjButton)
+                        .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(setDownloadPathjButton)
+                            .addComponent(jDownloadRefreshListButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(pathToDownloadFolderjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -784,6 +797,16 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_downloadJButtonMouseClicked
 
+    private void jDownloadRefreshListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDownloadRefreshListButtonActionPerformed
+        // TODO add your handling code here:
+        List listFiles = ssm.listFiles();
+        JList aux = new JList(listFiles.toArray());
+        
+        this.filesToDownloadJList.setModel(aux.getModel());
+        
+        
+    }//GEN-LAST:event_jDownloadRefreshListButtonActionPerformed
+
  
     /**
      * @param args the command line arguments
@@ -842,6 +865,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
+    private javax.swing.JButton jDownloadRefreshListButton;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelDownload;

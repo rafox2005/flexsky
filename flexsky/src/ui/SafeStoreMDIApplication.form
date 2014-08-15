@@ -681,13 +681,17 @@
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="setDownloadPathjButton" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="pathToDownloadFolderjLabel" max="32767" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="pathToDownloadFolderjLabel" max="32767" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="setDownloadPathjButton" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
+                                          <Component id="jDownloadRefreshListButton" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="downloadJButton" min="-2" pref="157" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="114" max="-2" attributes="0"/>
                               </Group>
@@ -704,7 +708,10 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="downloadJButton" min="-2" pref="47" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Component id="setDownloadPathjButton" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="setDownloadPathjButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jDownloadRefreshListButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="pathToDownloadFolderjLabel" min="-2" pref="25" max="-2" attributes="0"/>
                               </Group>
@@ -758,6 +765,14 @@
                   </AccessibilityProperties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="setDownloadPathjButtonActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="jDownloadRefreshListButton">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Refresh"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jDownloadRefreshListButtonActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

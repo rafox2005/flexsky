@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GaloisField.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;safestore&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">util</a> &gt; <span class="el_source">GaloisField.java</span></div><h1>GaloisField.java</h1><pre class="source lang-java linenums">/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Implementation of Galois field arithmetics with 2^p elements. The input must
+ * be unsigned integers.
+ */
+<span class="pc bpc" id="L14" title="1 of 2 branches missed.">public class GaloisField {</span>
+
+    private final int[] logTable;
+    private final int[] powTable;
+    private final int[] invTable;
+    private final int[][] mulTable;
+    private final int[][] divTable;
+    private final int fieldSize;
+    private final int primitivePeriod;
+    private final int primitivePolynomial;
+    // Field size 256 is good for byte based system
+    private static final int DEFAULT_FIELD_SIZE = 256;
+    // primitive polynomial 1 + X^2 + X^3 + X^4 + X^8
+    private static final int DEFAULT_PRIMITIVE_POLYNOMIAL = 285;
+<span class="fc" id="L28">    static private final Map&lt;Integer, GaloisField&gt; instances =</span>
+            new HashMap&lt;Integer, GaloisField&gt;();
+
+    /**
+     * Get the object performs Galois field arithmetics
+     *
+     * @param fieldSize size of the field
+     * @param primitivePolynomial a primitive polynomial corresponds to the size
+     */
+    public static GaloisField getInstance(int fieldSize,
+            int primitivePolynomial) {
+<span class="fc" id="L39">        int key = ((fieldSize &lt;&lt; 16) &amp; 0xFFFF0000) + (primitivePolynomial &amp; 0x0000FFFF);</span>
+        GaloisField gf;
+<span class="fc" id="L41">        synchronized (instances) {</span>
+<span class="fc" id="L42">            gf = instances.get(key);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            if (gf == null) {</span>
+<span class="fc" id="L44">                gf = new GaloisField(fieldSize, primitivePolynomial);</span>
+<span class="fc" id="L45">                instances.put(key, gf);</span>
+            }
+<span class="pc" id="L47">        }</span>
+<span class="fc" id="L48">        return gf;</span>
+    }
+
+    /**
+     * Get the object performs Galois field arithmetics with default setting
+     */
+    public static GaloisField getInstance() {
+<span class="fc" id="L55">        return getInstance(DEFAULT_FIELD_SIZE, DEFAULT_PRIMITIVE_POLYNOMIAL);</span>
+    }
+
+<span class="fc" id="L58">    private GaloisField(int fieldSize, int primitivePolynomial) {</span>
+<span class="pc bpc" id="L59" title="2 of 4 branches missed.">        assert fieldSize &gt; 0;</span>
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">        assert primitivePolynomial &gt; 0;</span>
+
+<span class="fc" id="L62">        this.fieldSize = fieldSize;</span>
+<span class="fc" id="L63">        this.primitivePeriod = fieldSize - 1;</span>
+<span class="fc" id="L64">        this.primitivePolynomial = primitivePolynomial;</span>
+<span class="fc" id="L65">        logTable = new int[fieldSize];</span>
+<span class="fc" id="L66">        powTable = new int[fieldSize];</span>
+<span class="fc" id="L67">        mulTable = new int[fieldSize][fieldSize];</span>
+<span class="fc" id="L68">        divTable = new int[fieldSize][fieldSize];</span>
+<span class="fc" id="L69">        invTable = new int[fieldSize];</span>
+<span class="fc" id="L70">        int value = 1;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        for (int pow = 0; pow &lt; fieldSize - 1; pow++) {</span>
+<span class="fc" id="L72">            powTable[pow] = value;</span>
+<span class="fc" id="L73">            logTable[value] = pow;</span>
+<span class="fc" id="L74">            value = value * 2;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (value &gt;= fieldSize) {</span>
+<span class="fc" id="L76">                value = value ^ primitivePolynomial;</span>
+            }
+        }
+        // building multiplication table
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (int i = 0; i &lt; fieldSize; i++) {</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            for (int j = 0; j &lt; fieldSize; j++) {</span>
+<span class="fc bfc" id="L82" title="All 4 branches covered.">                if (i == 0 || j == 0) {</span>
+<span class="fc" id="L83">                    mulTable[i][j] = 0;</span>
+<span class="fc" id="L84">                    continue;</span>
+                }
+<span class="fc" id="L86">                int z = logTable[i] + logTable[j];</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                z = z &gt;= primitivePeriod ? z - primitivePeriod : z;</span>
+<span class="fc" id="L88">                z = powTable[z];</span>
+<span class="fc" id="L89">                mulTable[i][j] = z;</span>
+            }
+        }
+        // building division table
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        for (int i = 0; i &lt; fieldSize; i++) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            for (int j = 1; j &lt; fieldSize; j++) {</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                if (i == 0) {</span>
+<span class="fc" id="L96">                    divTable[i][j] = 0;</span>
+<span class="fc" id="L97">                    continue;</span>
+                }
+<span class="fc" id="L99">                int z = logTable[i] - logTable[j];</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">                z = z &lt; 0 ? z + primitivePeriod : z;</span>
+<span class="fc" id="L101">                z = powTable[z];</span>
+<span class="fc" id="L102">                divTable[i][j] = z;</span>
+            }
+        }
+        
+        //Compute multiplicative inverses
+<span class="fc bfc" id="L107" title="All 2 branches covered.">	for(int a=1; a&lt;fieldSize; a++)</span>
+	{
+<span class="fc bfc" id="L109" title="All 2 branches covered.">		if(invTable[a]==0)</span>
+		{
+<span class="fc bfc" id="L111" title="All 2 branches covered.">			for(int b=1; b&lt;fieldSize; b++)</span>
+			{
+<span class="fc bfc" id="L113" title="All 2 branches covered.">				if (mulTable[a][b]==1) {</span>
+<span class="fc" id="L114">					invTable[a]=b;</span>
+<span class="fc" id="L115">					invTable[b]=a;</span>
+				}
+			}
+		}
+	}
+<span class="fc" id="L120">    }</span>
+
+    /**
+     * Return number of elements in the field
+     *
+     * @return number of elements in the field
+     */
+    public int getFieldSize() {
+<span class="fc" id="L128">        return fieldSize;</span>
+    }
+
+    /**
+     * Return the primitive polynomial in GF(2)
+     *
+     * @return primitive polynomial as a integer
+     */
+    public int getPrimitivePolynomial() {
+<span class="nc" id="L137">        return primitivePolynomial;</span>
+    }
+
+    /**
+     * Compute the sum of two fields
+     *
+     * @param x input field
+     * @param y input field
+     * @return result of addition
+     */
+    public int add(int x, int y) {
+<span class="pc bpc" id="L148" title="5 of 10 branches missed.">        assert (x &gt;= 0 &amp;&amp; x &lt; getFieldSize() &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; getFieldSize());</span>
+<span class="fc" id="L149">        return x ^ y;</span>
+    }
+
+    /**
+     * Compute the multiplication of two fields
+     *
+     * @param x input field
+     * @param y input field
+     * @return result of multiplication
+     */
+    public int multiply(int x, int y) {
+<span class="pc bpc" id="L160" title="5 of 10 branches missed.">        assert (x &gt;= 0 &amp;&amp; x &lt; getFieldSize() &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; getFieldSize());</span>
+<span class="fc" id="L161">        return mulTable[x][y];</span>
+    }
+
+    /**
+     * Compute the division of two fields
+     *
+     * @param x input field
+     * @param y input field
+     * @return x/y
+     */
+    public int divide(int x, int y) {
+<span class="nc bnc" id="L172" title="All 10 branches missed.">        assert (x &gt;= 0 &amp;&amp; x &lt; getFieldSize() &amp;&amp; y &gt; 0 &amp;&amp; y &lt; getFieldSize());</span>
+<span class="nc" id="L173">        return divTable[x][y];</span>
+    }
+
+    /**
+     * Compute power n of a field
+     *
+     * @param x input field
+     * @param n power
+     * @return x^n
+     */
+    public int power(int x, int n) {
+<span class="pc bpc" id="L184" title="3 of 6 branches missed.">        assert (x &gt;= 0 &amp;&amp; x &lt; getFieldSize());</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">        if (n == 0) {</span>
+<span class="fc" id="L186">            return 1;</span>
+        }
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (x == 0) {</span>
+<span class="nc" id="L189">            return 0;</span>
+        }
+<span class="fc" id="L191">        x = logTable[x] * n;</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (x &lt; primitivePeriod) {</span>
+<span class="fc" id="L193">            return powTable[x];</span>
+        }
+<span class="nc" id="L195">        x = x % primitivePeriod;</span>
+<span class="nc" id="L196">        return powTable[x];</span>
+    }
+
+    /**
+     * Given a Vandermonde matrix V[i][j]=x[j]^i and vector y, solve for z such
+     * that Vz=y. The output z will be placed in y.
+     *
+     * @param x the vector which describe the Vandermonde matrix
+     * @param y right-hand side of the Vandermonde system equation. will be
+     * replaced the output in this vector
+     */
+    public void solveVandermondeSystem(int[] x, int[] y) {
+<span class="nc" id="L208">        solveVandermondeSystem(x, y, x.length);</span>
+<span class="nc" id="L209">    }</span>
+
+    /**
+     * Given a Vandermonde matrix V[i][j]=x[j]^i and vector y, solve for z such
+     * that Vz=y. The output z will be placed in y.
+     *
+     * @param x the vector which describe the Vandermonde matrix
+     * @param y right-hand side of the Vandermonde system equation. will be
+     * replaced the output in this vector
+     * @param len consider x and y only from 0...len-1
+     */
+    public void solveVandermondeSystem(int[] x, int[] y, int len) {
+<span class="nc bnc" id="L221" title="All 6 branches missed.">        assert (x.length &lt;= len &amp;&amp; y.length &lt;= len);</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        for (int i = 0; i &lt; len - 1; i++) {</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">            for (int j = len - 1; j &gt; i; j--) {</span>
+<span class="nc" id="L224">                y[j] = y[j] ^ mulTable[x[i]][y[j - 1]];</span>
+            }
+        }
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        for (int i = len - 1; i &gt;= 0; i--) {</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">            for (int j = i + 1; j &lt; len; j++) {</span>
+<span class="nc" id="L229">                y[j] = divTable[y[j]][x[j] ^ x[j - i - 1]];</span>
+            }
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            for (int j = i; j &lt; len - 1; j++) {</span>
+<span class="nc" id="L232">                y[j] = y[j] ^ y[j + 1];</span>
+            }
+        }
+<span class="nc" id="L235">    }</span>
+    
+    /**
+     * Compute the inverse of a Vandermonde matrix. The e array represent the index of the Vandermonde matrix
+     *
+     * @param e input array that describes Vandermonde matrix
+     * @return inverse of Vandermonde matrix
+     */
+    public int[][] vandermondeInverse(int[] e){
+<span class="fc" id="L244">        int m = e.length;</span>
+<span class="fc" id="L245">        int[] ak1 = new int[m+1];</span>
+<span class="fc" id="L246">        int[] ak2 = new int[m+1];</span>
+<span class="fc" id="L247">        int[][] inv = new int[m][m];</span>
+        
+<span class="fc" id="L249">        int[] a = ak1;</span>
+<span class="fc" id="L250">        ak1[0] = e[0];</span>
+<span class="fc" id="L251">        ak1[1] = 1;</span>
+        
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        for (int k=1; k&lt;m; k++){</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">            for (int i=0; i&lt;=k+1; i++){</span>
+<span class="fc bfc" id="L255" title="All 4 branches covered.">                ak2[i] = this.add(i&gt;0?ak1[i-1]:0, this.multiply(e[k], i&lt;=k?ak1[i]:0));                </span>
+            }
+<span class="fc" id="L257">            System.arraycopy(ak2, 0, ak1, 0, k+2);</span>
+        }
+        
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        for (int j=0; j&lt;m; j++){</span>
+<span class="fc" id="L261">            int p = e[j];</span>
+<span class="fc" id="L262">            int q = inv[m-1][j]=1;</span>
+<span class="fc" id="L263">            int r = a[1];</span>
+            
+<span class="fc bfc" id="L265" title="All 2 branches covered.">            for (int k=1; k&lt;m; k++, p=this.multiply(p, e[j])){</span>
+<span class="fc" id="L266">                q = inv[m-1-k][j] = this.add(this.multiply(e[j], q), a[m-k]);</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">                if ((k&amp;1)==0) r = this.add(r, this.multiply(p, a[k+1]));</span>
+                
+            }
+            
+<span class="fc bfc" id="L271" title="All 2 branches covered.">            for (int k=0; k&lt;m; k++) inv[k][j] = this.multiply(inv[k][j], invTable[r]);</span>
+                       
+        }
+        
+<span class="fc" id="L275">        return inv;</span>
+    }
+
+    /**
+     * Compute the multiplication of two polynomials. The index in the array
+     * corresponds to the power of the entry. For example p[0] is the constant
+     * term of the polynomial p.
+     *
+     * @param p input polynomial
+     * @param q input polynomial
+     * @return polynomial represents p*q
+     */
+    public int[] multiply(int[] p, int[] q) {
+<span class="nc" id="L288">        int len = p.length + q.length - 1;</span>
+<span class="nc" id="L289">        int[] result = new int[len];</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="nc" id="L291">            result[i] = 0;</span>
+        }
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        for (int i = 0; i &lt; p.length; i++) {</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">            for (int j = 0; j &lt; q.length; j++) {</span>
+<span class="nc" id="L295">                result[i + j] = add(result[i + j], multiply(p[i], q[j]));</span>
+            }
+        }
+<span class="nc" id="L298">        return result;</span>
+    }
+
+    /**
+     * Compute the remainder of a dividend and divisor pair. The index in the
+     * array corresponds to the power of the entry. For example p[0] is the
+     * constant term of the polynomial p.
+     *
+     * @param dividend dividend polynomial, the remainder will be placed here
+     * when return
+     * @param divisor divisor polynomial
+     */
+    public void remainder(int[] dividend, int[] divisor) {
+<span class="nc bnc" id="L311" title="All 2 branches missed.">        for (int i = dividend.length - divisor.length; i &gt;= 0; i--) {</span>
+<span class="nc" id="L312">            int ratio =</span>
+                    divTable[dividend[i + divisor.length - 1]][divisor[divisor.length - 1]];
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            for (int j = 0; j &lt; divisor.length; j++) {</span>
+<span class="nc" id="L315">                int k = j + i;</span>
+<span class="nc" id="L316">                dividend[k] = dividend[k] ^ mulTable[ratio][divisor[j]];</span>
+            }
+        }
+<span class="nc" id="L319">    }</span>
+
+    /**
+     * Compute the sum of two polynomials. The index in the array corresponds to
+     * the power of the entry. For example p[0] is the constant term of the
+     * polynomial p.
+     *
+     * @param p input polynomial
+     * @param q input polynomial
+     * @return polynomial represents p+q
+     */
+    public int[] add(int[] p, int[] q) {
+<span class="nc" id="L331">        int len = Math.max(p.length, q.length);</span>
+<span class="nc" id="L332">        int[] result = new int[len];</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">        for (int i = 0; i &lt; len; i++) {</span>
+<span class="nc bnc" id="L334" title="All 4 branches missed.">            if (i &lt; p.length &amp;&amp; i &lt; q.length) {</span>
+<span class="nc" id="L335">                result[i] = add(p[i], q[i]);</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">            } else if (i &lt; p.length) {</span>
+<span class="nc" id="L337">                result[i] = p[i];</span>
+            } else {
+<span class="nc" id="L339">                result[i] = q[i];</span>
+            }
+        }
+<span class="nc" id="L342">        return result;</span>
+    }
+
+    /**
+     * Substitute x into polynomial p(x).
+     *
+     * @param p input polynomial
+     * @param x input field
+     * @return p(x)
+     */
+    public int substitute(int[] p, int x) {
+<span class="nc" id="L353">        int result = 0;</span>
+<span class="nc" id="L354">        int y = 1;</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">        for (int i = 0; i &lt; p.length; i++) {</span>
+<span class="nc" id="L356">            result = result ^ mulTable[p[i]][y];</span>
+<span class="nc" id="L357">            y = mulTable[x][y];</span>
+        }
+<span class="nc" id="L359">        return result;</span>
+    }
+
+     /**
+     * Multiply Matrix in the GF field chosen
+     *
+     * @param A first matrix
+     * @param B second matrix
+     * @return p(x)
+     */
+    public int[][] multiplyMatrix(int[][] A, int[][] B) {
+
+        try {
+<span class="fc" id="L372">        int nlinhasA = A.length;</span>
+<span class="fc" id="L373">        int nlinhasB = B.length;</span>
+<span class="fc" id="L374">        int ncolsA = A[0].length;</span>
+<span class="fc" id="L375">        int ncolsB = B[0].length;</span>
+
+<span class="fc" id="L377">        int sum = 0;</span>
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">        if (ncolsA != nlinhasB) {</span>
+<span class="nc" id="L379">            throw new Exception(&quot;Matrices with entered orders can't be multiplied with each other.&quot;);</span>
+        } else {
+<span class="fc" id="L381">            int multiply[][] = new int[nlinhasA][ncolsB];</span>
+
+<span class="fc bfc" id="L383" title="All 2 branches covered.">            for (int c = 0; c &lt; nlinhasA; c++) {</span>
+<span class="fc bfc" id="L384" title="All 2 branches covered.">                for (int d = 0; d &lt; ncolsB; d++) {</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">                    for (int k = 0; k &lt; nlinhasB; k++) {</span>
+<span class="fc" id="L386">                        int auxsum = this.multiply(A[c][k], B[k][d]);</span>
+<span class="fc" id="L387">                        sum = this.add(sum, auxsum);</span>
+                    }
+
+<span class="fc" id="L390">                    multiply[c][d] = sum;</span>
+<span class="fc" id="L391">                    sum = 0;</span>
+                }
+            }
+<span class="fc" id="L394">            return multiply;</span>
+        }
+<span class="nc" id="L396">        } catch (Exception e) {</span>
+<span class="nc" id="L397">            System.out.println(e.getMessage());</span>
+        }
+<span class="nc" id="L399">        return null;</span>
+        
+        
+    }
+    /**
+     * Multiply Matrix by Vector in the GF field chosen
+     *
+     * @param A matrix
+     * @param B vector
+     * @return multiplied matrix
+     */
+    public int[] multiplyMatrix(int[][] A, int[] B) {
+        int[][] matrixB;
+<span class="fc" id="L412">        matrixB = new int[B.length][1];</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">        for (int i=0; i&lt; B.length; i++) matrixB[i][0] = B[i];</span>
+<span class="fc" id="L414">        int[][] resultMatrix = this.multiplyMatrix(A, matrixB);</span>
+<span class="fc" id="L415">        return Utils.transposeMatrix(resultMatrix)[0];</span>
+        
+        
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

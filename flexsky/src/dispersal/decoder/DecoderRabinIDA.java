@@ -77,25 +77,13 @@ public class DecoderRabinIDA extends IDecoderIDA
         try {
             byte[] input = new byte[reqParts];
             int[] indexes = this.readPartsIndex();
-            int remaining;
-            while ((remaining = this.readParts(input)) != -1) {
-                int countBytes = reqParts;
+            int len;
+            while ((len = this.readParts(input)) != -1) {
                 Monitor.getInstance().startTimeToDecode();
                 byte[] decrypt = this.rabin.decodeEachEnough(input, indexes);
                 Monitor.getInstance().stopTimeToDecode();
-                if (remaining == 0) {
-                    for (int i = decrypt.length - 1; i >= 0; i--) {
-                        if (decrypt[i] == 0) {
-                            countBytes--;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                this.disFile.write(decrypt, 0, countBytes);
+                this.disFile.write(decrypt, 0, len);
             }
-            this.disFile.flush();
 
             //Close the Input Buffers
             for (int i = 0; i < this.readBufs.length; i++) {

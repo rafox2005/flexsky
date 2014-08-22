@@ -179,13 +179,16 @@ public abstract class IDecoderIDA
     {
         try {
             byte[] eachpart = new byte[this.reqParts];
+            int len = 0;
+            int read = 0;
             for (int i = 0; i < this.reqParts; i++) {
-                if (this.disParts[i].read(eachpart, i, 1) == -1) {
+                if ((len = this.disParts[i].read(eachpart, i, 1)) == -1) {
                     throw new EOFException();
                 }
+                read++;
             }
             System.arraycopy(eachpart, 0, eachout, 0, eachpart.length);
-            return this.disParts[0].available();
+            return read;
         } catch (Exception e) {
             return -1;
         }

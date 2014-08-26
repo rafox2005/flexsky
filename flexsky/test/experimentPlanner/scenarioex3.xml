@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2014 Rafox.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<scenario name="backupOnly">
+ <repeat>10</repeat>
+ <db resetOnStart="true">pathToDB</db>
+ <log_db>pathToLogDB</log_db>
+ <providerList>
+ <account name="box">
+  <type>driver.WebDavDriver</type>
+   <path>https://dav.box.com</path>
+   <parameters>
+    <param key="user" value="ra"></param>
+    <param key="pass" value="un"></param>
+   </parameters>
+ </account>
+  <account name="4shared">
+   <type>driver.WebDavDriver</type>
+   <path>https://webdav.4shared.com</path>
+   <parameters>
+    <param key="user" value="ra"></param>
+    <param key="pass" value="un"></param>
+   </parameters>
+ </account>
+ </providerList>
+ <operationList>
+  <operation action="upload">
+   <file>
+    <path>/home/flexsy/document.pdf</path>
+    <revision>1</revision>
+    <type>text</type>
+    <options>
+  <filePipeline>
+   <pipe name="pipe.PipeTest"></pipe>
+  </filePipeline>
+  <slicePipeline>
+   <pipe name="pipe.PipeTest"></pipe>
+  </slicePipeline>
+  <parameters>
+   <param key="p1" value="v1"></param>
+   <param key="p" value="v2"></param>
+  </parameters>
+  </options>
+   </file>
+   <totalParts>2</totalParts>
+   <reqParts>1</reqParts>
+   <idaMethod>RabinIDA</idaMethod>
+  </operation>
+ </operationList>
+</scenario>

@@ -4,6 +4,7 @@
  */
 package dispersal.encoder;
 
+import com.google.common.primitives.Ints;
 import dispersal.IEncoderIDA;
 import dispersal.rabin.RabinIDA;
 import dispersal.reedsolomon.RsEncode;
@@ -13,6 +14,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import util.Monitor;
@@ -31,8 +36,18 @@ public class EncoderRS extends IEncoderIDA
     public EncoderRS(int totalParts, int reqParts, File fileToDisperse, OutputStream[] dispersalStreams)
     {
         
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, fileToDisperse, dispersalStreams);
-        this.parParts = (totalParts - reqParts) * 2;
+        //super(((totalParts - reqParts) * 2) + reqParts, reqParts, fileToDisperse, dispersalStreams);
+        super(totalParts, reqParts, fileToDisperse, dispersalStreams);
+        this.parParts = (totalParts - reqParts);
+        this.ida = new RsEncode(parParts);
+    }
+    
+    public EncoderRS(int totalParts, int reqParts, InputStream fileToDisperse, OutputStream[] dispersalStreams, HashMap parameters)
+    {
+        
+        //super(((totalParts - reqParts) * 2) + reqParts, reqParts, fileToDisperse, dispersalStreams);
+        super(totalParts, reqParts, fileToDisperse, dispersalStreams, parameters);
+        this.parParts = (totalParts - reqParts);
         this.ida = new RsEncode(parParts);
     }
 
@@ -50,14 +65,15 @@ public class EncoderRS extends IEncoderIDA
         try {
             byte[] input = new byte[reqParts];
 
-            int[] parity = new int[reqParts + parParts];
+            int[] parity = new int[parParts];
             while (this.disFile.read(input, 0, reqParts) != -1) {
                 int[] inputInt = Utils.bytesToInts(input);
-                System.arraycopy(inputInt, 0, parity, 0, inputInt.length);
+                //System.arraycopy(inputInt, 0, parity, 0, inputInt.length);
                 Monitor.getInstance().startTimeToEncode();
-                this.ida.encode(parity);
-                Monitor.getInstance().stopTimeToEncode();
-                byte[] crypt = Utils.intsToBytes(parity);
+                this.ida.encode(inputInt, parity);
+                Monitor.getInstance().stopTimeToEncode();             
+                                                               
+                byte[] crypt = Utils.intsToBytes(Ints.concat(inputInt, parity));
                 for (int i = 0; i < reqParts + parParts; i++) {
                     this.disParts[i].write(crypt[i]);
                 }

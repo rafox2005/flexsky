@@ -30,24 +30,24 @@ public class DecoderRS extends IDecoderIDA
 
     public DecoderRS(int totalParts, int reqParts, InputStream[] parts, OutputStream file, HashMap additionalOptions)
     {
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, file, additionalOptions);
-        this.parParts = (totalParts - reqParts) * 2;
+        super(totalParts, reqParts, parts, file, additionalOptions);
+        this.parParts = totalParts - reqParts;
         this.reed = new RsDecode(parParts);
 
     }
 
     public DecoderRS(int totalParts, int reqParts, File[] parts, File file)
     {
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, file);
-        this.parParts = (totalParts - reqParts) * 2;
+        super(totalParts, reqParts, parts, file);
+        this.parParts = totalParts - reqParts;
         this.reed = new RsDecode(parParts);
 
     }
 
     public DecoderRS(int totalParts, int reqParts, File[] parts, OutputStream fileOs, HashMap additionalOptions)
     {
-        super(((totalParts - reqParts) * 2) + reqParts, reqParts, parts, fileOs, additionalOptions);
-        this.parParts = (totalParts - reqParts) * 2;
+        super(totalParts, reqParts, parts, fileOs, additionalOptions);
+        this.parParts = totalParts - reqParts;
         this.reed = new RsDecode(parParts);
 
     }

@@ -19,6 +19,13 @@ public class Scenario {
     
     ArrayList<StoreSafeAccount> providerList;
     ArrayList<ScenarioOperation> operationList;
+
+    public Scenario() {
+        this.providerList = new ArrayList<StoreSafeAccount>();
+        this.operationList = new ArrayList<>();
+    }
+    
+    
    
     
     

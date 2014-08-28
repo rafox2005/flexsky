@@ -102,7 +102,7 @@ public class StoreSafeManagerTest
     @Test
     public void testDownloadFile()
     {
-        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, );  
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
         StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 0);

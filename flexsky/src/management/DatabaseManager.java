@@ -181,5 +181,17 @@ class DatabaseManager
             return false;
         }
     }   
+
+    public boolean insertAccount(StoreSafeAccount ssa) {
+        try
+        {
+            this.as.insertAccount(ssa);
+            return true;
+        } catch (SQLException ex)
+        {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
     
 }

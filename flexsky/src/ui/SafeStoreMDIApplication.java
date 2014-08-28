@@ -32,6 +32,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -47,6 +48,8 @@ import management.StoreSafeManager;
 public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
     private StoreSafeManager ssm;
+    private String db_path;
+    private String logDB_path;
     /**
      * Creates new form SafeStoreMDIApplication
      */
@@ -56,8 +59,28 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
     }
     
+    private void getDBPaths() {
+        int returnVal = jFileChooserDB.showOpenDialog(desktopPane);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooserDB.getSelectedFile();
+            this.db_path = file.getAbsolutePath();
+        }
+        
+        
+        jFileChooserDB.setDialogTitle("Choose the SQLite LOG Database File");
+        returnVal = jFileChooserDB.showOpenDialog(desktopPane);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooserDB.getSelectedFile();
+            this.logDB_path = file.getAbsolutePath();
+        }
+    }
+    
     private void populateComponents() {
-        ssm = StoreSafeManager.getInstance();
+        this.getDBPaths();       
+        
+        ssm = StoreSafeManager.getInstance(this.db_path, this.logDB_path);
         
         //Retrieve the lists
         Set listIDA = ssm.getIDAList();
@@ -111,6 +134,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         jDialog1 = new javax.swing.JDialog();
         jPanel2 = new javax.swing.JPanel();
         jFileChooser1 = new javax.swing.JFileChooser();
+        jDialogDB = new javax.swing.JDialog();
+        jFileChooserDB = new javax.swing.JFileChooser();
+        jLabelChooseDB = new javax.swing.JLabel();
         desktopPane = new javax.swing.JDesktopPane();
         mainPanel = new javax.swing.JTabbedPane();
         jScrollPaneUpload = new javax.swing.JScrollPane();
@@ -149,6 +175,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         filesToDownloadJList = new javax.swing.JList();
         setDownloadPathjButton = new javax.swing.JButton();
         jDownloadRefreshListButton = new javax.swing.JButton();
+        deleteJButton = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -168,7 +195,6 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         jDialog1.setMinimumSize(jFileChooser1.getMinimumSize());
 
         jPanel2.setMinimumSize(jFileChooser1.getMinimumSize());
-        jPanel2.setPreferredSize(jFileChooser1.getPreferredSize());
 
         jFileChooser1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,6 +242,37 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                     .addGap(0, 0, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        jFileChooserDB.setDialogType(javax.swing.JFileChooser.CUSTOM_DIALOG);
+        jFileChooserDB.setDialogTitle("Select the SQLite File Database");
+        jFileChooserDB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFileChooserDBActionPerformed(evt);
+            }
+        });
+
+        jLabelChooseDB.setText("Select the location of the SQLite Database");
+
+        javax.swing.GroupLayout jDialogDBLayout = new javax.swing.GroupLayout(jDialogDB.getContentPane());
+        jDialogDB.getContentPane().setLayout(jDialogDBLayout);
+        jDialogDBLayout.setHorizontalGroup(
+            jDialogDBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogDBLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jFileChooserDB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jDialogDBLayout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(jLabelChooseDB))
+        );
+        jDialogDBLayout.setVerticalGroup(
+            jDialogDBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogDBLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabelChooseDB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jFileChooserDB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -315,10 +372,8 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 ""
             }
         ));
-        filePipelinejTable.setColumnSelectionAllowed(false);
         filePipelinejTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         filePipelinejTable.setFocusCycleRoot(true);
-        filePipelinejTable.setRowSelectionAllowed(true);
         jScrollPane3.setViewportView(filePipelinejTable);
 
         slicePipelinejTable.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
@@ -432,12 +487,11 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                     .addGroup(uploadPanelLayout.createSequentialGroup()
                         .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(slicePipelineLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(uploadPanelLayout.createSequentialGroup()
-                                    .addComponent(totalPartsLabel)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(totalPartsTextField))
-                                .addComponent(filePipelineLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(uploadPanelLayout.createSequentialGroup()
+                                .addComponent(totalPartsLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(totalPartsTextField))
+                            .addComponent(filePipelineLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(68, 68, 68)
@@ -536,6 +590,18 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
             }
         });
 
+        deleteJButton.setText("Delete");
+        deleteJButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                deleteJButtonMouseClicked(evt);
+            }
+        });
+        deleteJButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteJButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelDownloadLayout = new javax.swing.GroupLayout(jPanelDownload);
         jPanelDownload.setLayout(jPanelDownloadLayout);
         jPanelDownloadLayout.setHorizontalGroup(
@@ -545,7 +611,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelDownloadLayout.createSequentialGroup()
                         .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 890, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelDownloadLayout.createSequentialGroup()
                         .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelDownloadLayout.createSequentialGroup()
@@ -557,7 +623,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addComponent(jDownloadRefreshListButton)
                                 .addGap(21, 21, 21)))
                         .addComponent(downloadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(114, 114, 114))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanelDownloadLayout.setVerticalGroup(
             jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -566,7 +634,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(downloadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(downloadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(deleteJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelDownloadLayout.createSequentialGroup()
                         .addGroup(jPanelDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(setDownloadPathjButton)
@@ -576,7 +646,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        mainPanel.addTab("Download", jPanelDownload);
+        mainPanel.addTab("Files Stored", jPanelDownload);
 
         desktopPane.add(mainPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 8, -1, 470));
 
@@ -656,125 +726,18 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jFileChooser1ActionPerformed
 
-    private void uploadJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonActionPerformed
+    private void jFileChooserDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFileChooserDBActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_uploadJButtonActionPerformed
+    }//GEN-LAST:event_jFileChooserDBActionPerformed
 
-    private void ProviderListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ProviderListMouseClicked
+    private void jDownloadRefreshListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDownloadRefreshListButtonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_ProviderListMouseClicked
+        List listFiles = ssm.listFiles();
+        JList aux = new JList(listFiles.toArray());
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        jDialog1.setVisible(true);
-        jDialog1.toFront();
+        this.filesToDownloadJList.setModel(aux.getModel());
 
-        int returnVal = jFileChooser1.showOpenDialog(jPanel2);
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = jFileChooser1.getSelectedFile();
-            this.pathToFileLabel.setText(file.getAbsolutePath());
-            jDialog1.setVisible(false);
-        }
-        else jDialog1.setVisible(false);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void uploadJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadJButtonMouseClicked
-
-        //Get the Dispersal algorithm
-        String dispersalMethod = this.IDAList.getSelectedValue().toString().substring(31);
-        
-        
-        //Get the file path
-        String path = this.pathToFileLabel.getText();
-        
-        //Get the type
-        String type = this.typeTextField.getText();
-        
-        //Get the parts and revision
-        int totalParts = Integer.parseInt(this.totalPartsTextField.getText());
-        int reqParts = Integer.parseInt(this.reqPartsTextField.getText());
-        int revision = Integer.parseInt(this.revTextBox.getText());
-        
-        StoreSafeManager instance = StoreSafeManager.getInstance();
-        ArrayList listAccounts = new ArrayList(this.ProviderList1.getSelectedValuesList());
-        
-        //Get file Pipeline
-        ArrayList filePipeline = new ArrayList();
-        TableModel  fileTM = this.filePipelinejTable.getModel();
-        
-        for (int i = 0; i < this.filePipelinejTable.getModel().getRowCount(); i++) {
-            if (fileTM.getValueAt(i, 0) != null)
-            {
-                try {
-                    Class aux = (Class) fileTM.getValueAt(i, 0);
-                    
-                    filePipeline.add(aux.getConstructor().newInstance());
-                } catch (NoSuchMethodException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SecurityException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        
-        //Get slice Pipeline
-        ArrayList slicePipeline = new ArrayList();
-        TableModel  sliceTM = this.slicePipelinejTable.getModel();
-        
-        for (int i = 0; i < sliceTM.getRowCount(); i++) {
-            if (sliceTM.getValueAt(i, 0) != null)
-            {
-                try {
-                    Class aux = (Class) sliceTM.getValueAt(i, 0);
-                    
-                    slicePipeline.add(aux.getConstructor().newInstance());
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NoSuchMethodException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SecurityException ex) {
-                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        
-        //Get additionalk paramteres
-        HashMap<String,String> param = new HashMap<String, String>();
-        
-        TableModel paramTM = this.parametersjTable.getModel();
-        
-        for (int i = 0; i < paramTM.getRowCount(); i++) {
-            if (paramTM.getValueAt(i, 0) != null && paramTM.getValueAt(i, 1) != null) 
-            {
-                param.put(paramTM.getValueAt(i, 0).toString(), paramTM.getValueAt(i, 1).toString());
-            }
-        }
-        
-        StorageOptions options = new StorageOptions(filePipeline, slicePipeline, param);
-        
-        boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
-        
-        if (result == true)
-        {
-            JOptionPane.showMessageDialog(this.desktopPane, "Upload success!");
-        }
-        
-    }//GEN-LAST:event_uploadJButtonMouseClicked
+    }//GEN-LAST:event_jDownloadRefreshListButtonActionPerformed
 
     private void setDownloadPathjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setDownloadPathjButtonActionPerformed
         // TODO add your handling code here:
@@ -797,15 +760,136 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_downloadJButtonMouseClicked
 
-    private void jDownloadRefreshListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDownloadRefreshListButtonActionPerformed
+    private void uploadJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonActionPerformed
         // TODO add your handling code here:
-        List listFiles = ssm.listFiles();
-        JList aux = new JList(listFiles.toArray());
-        
-        this.filesToDownloadJList.setModel(aux.getModel());
-        
-        
-    }//GEN-LAST:event_jDownloadRefreshListButtonActionPerformed
+    }//GEN-LAST:event_uploadJButtonActionPerformed
+
+    private void uploadJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadJButtonMouseClicked
+
+        //Get the Dispersal algorithm
+        String dispersalMethod = this.IDAList.getSelectedValue().toString().substring(31);
+
+        //Get the file path
+        String path = this.pathToFileLabel.getText();
+
+        //Get the type
+        String type = this.typeTextField.getText();
+
+        //Get the parts and revision
+        int totalParts = Integer.parseInt(this.totalPartsTextField.getText());
+        int reqParts = Integer.parseInt(this.reqPartsTextField.getText());
+        int revision = Integer.parseInt(this.revTextBox.getText());
+
+        StoreSafeManager instance = this.ssm;
+        ArrayList listAccounts = new ArrayList(this.ProviderList1.getSelectedValuesList());
+
+        //Get file Pipeline
+        ArrayList filePipeline = new ArrayList();
+        TableModel  fileTM = this.filePipelinejTable.getModel();
+
+        for (int i = 0; i < this.filePipelinejTable.getModel().getRowCount(); i++) {
+            if (fileTM.getValueAt(i, 0) != null)
+            {
+                try {
+                    Class aux = (Class) fileTM.getValueAt(i, 0);
+
+                    filePipeline.add(aux.getConstructor().newInstance());
+                } catch (NoSuchMethodException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        //Get slice Pipeline
+        ArrayList slicePipeline = new ArrayList();
+        TableModel  sliceTM = this.slicePipelinejTable.getModel();
+
+        for (int i = 0; i < sliceTM.getRowCount(); i++) {
+            if (sliceTM.getValueAt(i, 0) != null)
+            {
+                try {
+                    Class aux = (Class) sliceTM.getValueAt(i, 0);
+
+                    slicePipeline.add(aux.getConstructor().newInstance());
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NoSuchMethodException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        //Get additionalk paramteres
+        HashMap<String,String> param = new HashMap<String, String>();
+
+        TableModel paramTM = this.parametersjTable.getModel();
+
+        for (int i = 0; i < paramTM.getRowCount(); i++) {
+            if (paramTM.getValueAt(i, 0) != null && paramTM.getValueAt(i, 1) != null)
+            {
+                param.put(paramTM.getValueAt(i, 0).toString(), paramTM.getValueAt(i, 1).toString());
+            }
+        }
+
+        StorageOptions options = new StorageOptions(filePipeline, slicePipeline, param);
+
+        boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
+
+        if (result == true)
+        {
+            JOptionPane.showMessageDialog(this.desktopPane, "Upload success!");
+        }
+
+    }//GEN-LAST:event_uploadJButtonMouseClicked
+
+    private void ProviderListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ProviderListMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ProviderListMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        jDialog1.setVisible(true);
+        jDialog1.toFront();
+
+        int returnVal = jFileChooser1.showOpenDialog(jPanel2);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser1.getSelectedFile();
+            this.pathToFileLabel.setText(file.getAbsolutePath());
+            jDialog1.setVisible(false);
+        }
+        else jDialog1.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void deleteJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteJButtonMouseClicked
+        List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
+
+        for (StoreSafeFile storeSafeFile : ssfList) {
+            ssm.deleteFile(storeSafeFile);
+        }
+    }//GEN-LAST:event_deleteJButtonMouseClicked
+
+    private void deleteJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteJButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteJButtonActionPerformed
 
  
     /**
@@ -853,6 +937,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem contentMenuItem;
     private javax.swing.JMenuItem copyMenuItem;
     private javax.swing.JMenuItem cutMenuItem;
+    private javax.swing.JButton deleteJButton;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JDesktopPane desktopPane;
     private javax.swing.JButton downloadJButton;
@@ -865,8 +950,11 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
+    private javax.swing.JDialog jDialogDB;
     private javax.swing.JButton jDownloadRefreshListButton;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JFileChooser jFileChooserDB;
+    private javax.swing.JLabel jLabelChooseDB;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelDownload;
     private javax.swing.JScrollPane jScrollPane1;

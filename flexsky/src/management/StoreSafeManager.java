@@ -55,17 +55,16 @@ public class StoreSafeManager {
     
     public final StoreSafeLogger logger;
     
-    public final static boolean LOGMODE=true;
 
-    protected StoreSafeManager() {
-        this.db = new DatabaseManager("/home/rlibardi/NetBeansProjects/safestore-leicester/flexsky/db/safestore_test.db");
+    protected StoreSafeManager(String pathToDB, String pathToLogDB) {
+        this.db = new DatabaseManager(pathToDB);
         this.storage = new StorageManager();
-        if (StoreSafeManager.LOGMODE) this.logger = new StoreSafeLogger("/home/rlibardi/NetBeansProjects/safestore-leicester/flexsky/db/safestore_log.db"); 
+        this.logger = new StoreSafeLogger(pathToLogDB); 
     }
 
-    public static StoreSafeManager getInstance() {
+    public static StoreSafeManager getInstance(String pathToDB, String pathToLogDB) {
         if (instance == null) {
-            instance = new StoreSafeManager();
+            instance = new StoreSafeManager(pathToDB, pathToLogDB);
         }
         return instance;
     }
@@ -209,6 +208,11 @@ public class StoreSafeManager {
     public List getProviders()
     {
         return this.db.listAccounts();
+    }
+    
+    public boolean addProvider(StoreSafeAccount ssa)
+    {
+        return this.db.insertAccount(ssa);
     }
 
 }

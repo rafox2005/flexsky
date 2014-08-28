@@ -46,10 +46,10 @@ limitations under the License.
     <type>text</type>
     <options>
   <filePipeline>
-   <pipe name="pipe.PipeTest"></pipe>
+   <pipe name="pipeline.pipe.PipeTest"></pipe>
   </filePipeline>
   <slicePipeline>
-   <pipe name="pipe.PipeTest"></pipe>
+   <pipe name="pipeline.pipe.PipeTest"></pipe>
   </slicePipeline>
   <parameters>
    <param key="p1" value="v1"></param>

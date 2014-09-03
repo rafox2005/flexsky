@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.util.Dictionary;
 import java.util.HashMap;
 
-/**
+/** Interface to implement a Pipe Process in the FlexSky
  *
  * @author rlibardi
  */

@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 
 
-public class ISelector {
-    public abstract DispersalMethod select(ArrayList<DispersalMethod> methods, HashMap<String, int> userProfile);
+public abstract class ISelector {
+    public abstract void select(ArrayList<DispersalMethod> methods, HashMap<String, Integer> userProfile);
 
 }

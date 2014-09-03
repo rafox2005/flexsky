@@ -22,6 +22,7 @@ import data.StoreSafeSlice;
 import dispersal.IEncoderIDA;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Date;
@@ -49,6 +50,7 @@ public class StoreSafeManager {
     private static StoreSafeManager instance = null;
     private final DatabaseManager db;
     private final StorageManager storage;
+    public static final int bufferSize = 1024 * 100;
     
     private static ExecutorService executor = null;
     public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
@@ -71,7 +73,7 @@ public class StoreSafeManager {
 
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
         Date start, end;
-        start = new Date(System.currentTimeMillis());
+        start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
         StoreSafeFile ssf = null;
         try {
             if (totalParts != listAccounts.size()) {
@@ -102,7 +104,7 @@ public class StoreSafeManager {
             this.db.updateFileHash(ssf);
             
             //Finish and log everything
-            end = new Date(System.currentTimeMillis());
+            end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
             StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "U-" + ssf.getDispersalMethod(), start, end);
             
            

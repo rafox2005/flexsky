@@ -760,6 +760,18 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_downloadJButtonMouseClicked
 
+    private void deleteJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteJButtonMouseClicked
+        List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
+
+        for (StoreSafeFile storeSafeFile : ssfList) {
+            ssm.deleteFile(storeSafeFile);
+        }
+    }//GEN-LAST:event_deleteJButtonMouseClicked
+
+    private void deleteJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteJButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteJButtonActionPerformed
+
     private void uploadJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_uploadJButtonActionPerformed
@@ -857,7 +869,6 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         {
             JOptionPane.showMessageDialog(this.desktopPane, "Upload success!");
         }
-
     }//GEN-LAST:event_uploadJButtonMouseClicked
 
     private void ProviderListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ProviderListMouseClicked
@@ -878,18 +889,6 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         }
         else jDialog1.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void deleteJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteJButtonMouseClicked
-        List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
-
-        for (StoreSafeFile storeSafeFile : ssfList) {
-            ssm.deleteFile(storeSafeFile);
-        }
-    }//GEN-LAST:event_deleteJButtonMouseClicked
-
-    private void deleteJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteJButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_deleteJButtonActionPerformed
 
  
     /**

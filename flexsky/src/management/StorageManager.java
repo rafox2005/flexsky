@@ -15,10 +15,10 @@
  */
 package management;
 
-import data.StorageOptions;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import com.github.sardine.impl.SardineException;
+import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.sql.Date;
@@ -51,6 +52,8 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import pipeline.IPipeProcess;
 import util.StoreSafeLogger;
+import util.monitor.RTInputStream;
+import util.monitor.RTOutputStream;
 
 /**
  *
@@ -109,7 +112,7 @@ class StorageManager {
                         PipedOutputStream out = new PipedOutputStream();
                         PipedInputStream in = null;
                         try {
-                            in = new PipedInputStream(out);
+                            in = new PipedInputStream(out, StoreSafeManager.bufferSize);
                         } catch (IOException ex) {
                             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
                         }
@@ -129,7 +132,7 @@ class StorageManager {
 
                         //Get the streams
                         InputStream inT = sliceListPipesIn.get(j);
-                        OutputStream outT = sliceListPipesOut.get(j + 1);
+                        RTOutputStream outT = new RTOutputStream(sliceListPipesOut.get(j + 1));
                         
                         final String slicePath = currentSlice.getFile() + "-" + currentSlice.getPartIndex();
 
@@ -138,12 +141,12 @@ class StorageManager {
                                 new Runnable() {
                                     public void run() {
                                         Date start, end;
-                                        start = new Date(System.currentTimeMillis());
+                                        start = new Date(0);
                                         pipe.process(inT, outT, options.additionalParameters);
                                         try {
                                             outT.close();
                                             //Finish and log everything
-                                            end = new Date(System.currentTimeMillis());
+                                            end = new Date(outT.totalTime());
                                             StoreSafeLogger.addLog("slice", slicePath, "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
 
                                         } catch (IOException ex) {
@@ -155,11 +158,11 @@ class StorageManager {
                     }
 
                     //Add first OutputStream to list
-                    outputStreams.add(sliceListPipesOut.get(0));
+                    outputStreams.add(new RTOutputStream(sliceListPipesOut.get(0)));
                 }
                 //If no slice pipeline
                 else {
-                    outputStreams.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                    outputStreams.add(new RTOutputStream(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters())));
                 }
                 }catch (IOException ex) {
                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the upload stream to store", ex);
@@ -185,7 +188,7 @@ class StorageManager {
                     PipedOutputStream out = new PipedOutputStream();
                     PipedInputStream in = null;
                     try {
-                        in = new PipedInputStream(out);
+                        in = new PipedInputStream(out, StoreSafeManager.bufferSize);
                     } catch (IOException ex) {
                         Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
                     }
@@ -202,7 +205,7 @@ class StorageManager {
 
                     //Get the streams
                     InputStream inT = listPipesIn.get(i);
-                    OutputStream outT = listPipesOut.get(i);
+                    RTOutputStream outT = new RTOutputStream(listPipesOut.get(i));
 
                     
                     //Run the process for the pipes in a new thread (parallel)
@@ -210,12 +213,12 @@ class StorageManager {
                             new Runnable() {
                                 public void run() {
                                     Date start, end;
-                                    start = new Date(System.currentTimeMillis());
+                                    start = new Date(0);
                                     pipe.process(inT, outT, options.additionalParameters);
                                     try {
                                         outT.close();
                                         //Finish and log everything
-                                        end = new Date(System.currentTimeMillis());
+                                        end = new Date(outT.totalTime());
                                         StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
 
                                     } catch (IOException ex) {
@@ -256,11 +259,11 @@ class StorageManager {
             }
 
             Date start, end;
-            start = new Date(System.currentTimeMillis());
+            start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
             long sliceSize = ida.encode();
 
             //Finish and log everything
-            end = new Date(System.currentTimeMillis());
+            end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
             StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UIDA-" + ssf.getDispersalMethod(), start, end);
             //Update important values
             ssf.setHash(ida.getFileHash());
@@ -343,7 +346,7 @@ class StorageManager {
                             PipedOutputStream out = new PipedOutputStream();
                             PipedInputStream in = null;
                             try {
-                                in = new PipedInputStream(out);
+                                in = new PipedInputStream(out, StoreSafeManager.bufferSize);
                             } catch (IOException ex) {
                                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
                             }
@@ -370,12 +373,13 @@ class StorageManager {
                                         public void run() {
                                             //Start time variables
                                             Date start, end;
-                                            start = new Date(System.currentTimeMillis());
+                                            start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
                                             pipe.reverseProcess(inT, outT, options.additionalParameters);
                                             try {
                                                 outT.close();
                                                 //Finish and log everything
-                                                end = new Date(System.currentTimeMillis());
+                                                end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
+                                                
                                                 StoreSafeLogger.addLog("slice", slicePath, "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
 
                                             } catch (IOException ex) {
@@ -414,7 +418,7 @@ class StorageManager {
                 PipedOutputStream out = new PipedOutputStream();
                 PipedInputStream in = null;
                 try {
-                    in = new PipedInputStream(out);
+                    in = new PipedInputStream(out, StoreSafeManager.bufferSize);
                 } catch (IOException ex) {
                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Problem creating the piped input stream", ex);
                 }
@@ -449,13 +453,13 @@ class StorageManager {
                                 try {
                                     //Start time variables
                                     Date start, end;
-                                    start = new Date(System.currentTimeMillis());
+                                    start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
                                     
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
                                     outT.close();
                                     
                                     //Finish and log everything
-                                    end = new Date(System.currentTimeMillis());
+                                    end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
                                     StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
 
                                 } catch (IOException ex) {
@@ -495,7 +499,7 @@ class StorageManager {
         }
 
         Date start, end;
-        start = new Date(System.currentTimeMillis());
+        start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
 
         //Decode
         ida.decode();

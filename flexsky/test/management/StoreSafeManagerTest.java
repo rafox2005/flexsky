@@ -52,7 +52,8 @@ public class StoreSafeManagerTest
     public static final String pathToTestFile = "/home/rlibardi/rlibardi-local/safestore/filesToTest/input/screen.png";
     //public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/ubuntu.iso";
     public static final String pathToTestFileOutput = "/home/rlibardi/rlibardi-local/safestore/filesToTest/output/screen.png";
-    public static final String pathToDB = "jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db";
+    public static final String pathToDB = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db";
+    public static final String pathToLogDB = "/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_log.db";
     
     @Before
     public void setUp()
@@ -73,7 +74,7 @@ public class StoreSafeManagerTest
     {
         System.out.println("getInstance");
         StoreSafeManager expResult = null;
-        StoreSafeManager result = StoreSafeManager.getInstance();
+        StoreSafeManager result = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);
         assertEquals(result.getClass(), StoreSafeManager.class);
     }
 
@@ -90,7 +91,7 @@ public class StoreSafeManagerTest
         int totalParts = 3;
         int reqParts = 2;
         int revision = 0;
-        StoreSafeManager instance = StoreSafeManager.getInstance();    
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);    
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
@@ -102,7 +103,7 @@ public class StoreSafeManagerTest
     @Test
     public void testDownloadFile()
     {
-        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, );  
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
         StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 0);
@@ -113,7 +114,7 @@ public class StoreSafeManagerTest
     @Test
     public void testDeleteFile()
     {
-        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         //Delete File       
         StoreSafeFile ssf =  new StoreSafeFile(new File(StoreSafeManagerTest.pathToTestFile).getName(), 0);
         instance.deleteFile(ssf);
@@ -130,7 +131,7 @@ public class StoreSafeManagerTest
         int totalParts = 3;
         int reqParts = 2;
         int revision = 1;
-        StoreSafeManager instance = StoreSafeManager.getInstance();    
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);    
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         
@@ -165,7 +166,7 @@ public class StoreSafeManagerTest
         int totalParts = 3;
         int reqParts = 2;
         int revision = 2;
-        StoreSafeManager instance = StoreSafeManager.getInstance();  
+        StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         instance.deleteAllFiles();
         ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
         

@@ -168,10 +168,10 @@ public abstract class IDecoderIDA
     }
 
     /**
-     * Read the parts into the readBuffers and get each byte from the parts to
+     * Read the parts into the readBuffers and get each (one) byte from the parts to
      * be multiplied later
      *
-     * @param eachout Byte vector to be written into with eachbyte from the
+     * @param eachout Byte vector to be written into with each byte from the
      * parts
      * @return 1 for success, -1 for failure
      */

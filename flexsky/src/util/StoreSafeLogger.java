@@ -16,6 +16,8 @@
 
 package util;
 
+import data.StoreSafeFile;
+import data.StoreSafeSlice;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -45,15 +47,110 @@ public class StoreSafeLogger {
         }
     }
     
-    public static void addLog(String table, String id, String action, Date start, Date end)
+    public static void addFileLog(StoreSafeFile file, String action, double time, double throughput, double size)
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO " + table + "(id, action, requestTime)"
-                            + " VALUES(?, ?, ?)");
-            prepStatement.setString(1, id);
-            prepStatement.setString(2, action);
-            prepStatement.setDate(3, new Date(end.getTime()-start.getTime()));            
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO file" + "(file, revision, ida, action, time, throughput, size, log_time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+           prepStatement.setString(1, file.getName());
+            prepStatement.setInt(2, file.getRevision());
+            prepStatement.setString(3, file.getDispersalMethod());
+            prepStatement.setString(4, action);
+            prepStatement.setDouble(5, time); 
+            prepStatement.setDouble(6, throughput);
+            prepStatement.setDouble(7, size);
+            prepStatement.setDate(8, new Date(System.currentTimeMillis()));
+            prepStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+        }    
+    }
+    
+    public static void addIDALog(StoreSafeFile file, String action, double time, double throughput, double size)
+    {
+        try {
+            PreparedStatement prepStatement
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO ida" + "(file, revision, ida, action, time, throughput, size, log_time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+           prepStatement.setString(1, file.getName());
+            prepStatement.setInt(2, file.getRevision());
+            prepStatement.setString(3, file.getDispersalMethod());
+            prepStatement.setString(4, action);
+            prepStatement.setDouble(5, time); 
+            prepStatement.setDouble(6, throughput);
+            prepStatement.setDouble(7, size);
+            prepStatement.setDate(8, new Date(System.currentTimeMillis()));
+            prepStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+        }    
+    }  
+ 
+    
+    public static void addSliceLog(StoreSafeFile file, StoreSafeSlice slice, String action, double time, double throughput, double size)
+    {
+        try {
+            PreparedStatement prepStatement
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO slice" + "(file, revision, slice_index, account, ida, action, time, throughput, size, log_time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStatement.setString(1, file.getName());
+            prepStatement.setInt(2, file.getRevision());
+            prepStatement.setInt(3, slice.getPartIndex());
+            prepStatement.setString(4, slice.getAccount());
+            prepStatement.setString(5, file.getDispersalMethod());
+            prepStatement.setString(6, action);
+            prepStatement.setDouble(7, time); 
+            prepStatement.setDouble(8, throughput);
+            prepStatement.setDouble(9, size);
+            prepStatement.setDate(10, new Date(System.currentTimeMillis()));
+            prepStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void addFilePipeLog(StoreSafeFile file, String pipe, String action, double time, double throughput, double size)
+    {
+        try {
+            PreparedStatement prepStatement
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO file_pipe" + "(file, revision, ida, pipe, action, time, throughput, size, log_time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStatement.setString(1, file.getName());
+            prepStatement.setInt(2, file.getRevision());
+            prepStatement.setString(3, file.getDispersalMethod());
+            prepStatement.setString(4, pipe);
+            prepStatement.setString(5, action);
+            prepStatement.setDouble(6, time); 
+            prepStatement.setDouble(7, throughput);
+            prepStatement.setDouble(8, size);
+            prepStatement.setDate(9, new Date(System.currentTimeMillis()));
+            prepStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void addSlicePipeLog(StoreSafeFile file, StoreSafeSlice slice, String pipe, String action, double time, double throughput, double size)
+    {
+        try {
+            PreparedStatement prepStatement
+                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO slice_pipe" + "(file, revision, slice_index, ida, pipe, action, time, throughput, size, log_time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStatement.setString(1, file.getName());
+            prepStatement.setInt(2, file.getRevision());
+            prepStatement.setInt(3, slice.getPartIndex());
+            prepStatement.setString(4, file.getDispersalMethod());
+            prepStatement.setString(5, pipe);
+            prepStatement.setString(6, action);
+            prepStatement.setDouble(7, time); 
+            prepStatement.setDouble(8, throughput);
+            prepStatement.setDouble(9, size);
+            prepStatement.setDate(10, new Date(System.currentTimeMillis()));
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {

@@ -6,41 +6,41 @@ import java.util.Date;
 import java.io.IOException;
 
 public class RTOutputStream extends FilterOutputStream {
-  DataMonitor monitor;
+  long byteCount = 0;
+  long timeCount = 0;
 
   public RTOutputStream(OutputStream out) {
     super(out);
-    monitor = new DataMonitor();
   }
 
   public void write(int b) throws IOException {
-    Date start = new Date();
+    long start = System.currentTimeMillis();
     super.write(b);
-    monitor.addSample(1, start, new Date());
+    byteCount++;
+    timeCount += System.currentTimeMillis() - start;
   }
 
   public void write(byte data[]) throws IOException {
-    Date start = new Date();
     super.write(data);
-    monitor.addSample(data.length, start, new Date());
   }
 
   public void write(byte data[], int off, int len)
     throws IOException {
-    Date start = new Date();
     super.write(data, off, len);
-    monitor.addSample(data.length, start, new Date());
   }
 
-  public long averageRate() {
-    return monitor.getAverageRate();
-  }
-
-  public long lastRate() {
-    return monitor.getLastRate();
-  }
+  //Kbyte/s
+  public double averageRate() {
+    return ( (byteCount/1024.0) / (timeCount/1000.0) );
+  } 
   
-   public long totalTime() {
-    return monitor.getTotalTime();
+  //ms
+   public double totalTime() {
+    return timeCount;
+  }
+   
+   //ms
+   public double totalBytes() {
+    return (byteCount/1024.0);
   }
 }

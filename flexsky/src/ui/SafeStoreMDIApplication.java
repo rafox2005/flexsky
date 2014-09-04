@@ -84,7 +84,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
         //Retrieve the lists
         Set listIDA = ssm.getIDAList();
+        listIDA.add(null);
         Set listPipe = ssm.getPipeList();
+        listPipe.add(null);
         
         JList aux = new JList(listIDA.toArray());
         this.IDAList.setModel(aux.getModel());
@@ -96,7 +98,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         aux = new JList(ssm.getProviders().toArray());               
         this.ProviderList1.setModel(aux.getModel());
         
-        JComboBox comboBox = new JComboBox(listPipe.toArray());
+        JComboBox comboBox = new JComboBox(listPipe.toArray());        
         
         TableColumn filePipeColumn = this.filePipelinejTable.getColumnModel().getColumn(0);
         filePipeColumn.setCellEditor(new DefaultCellEditor(comboBox));
@@ -278,7 +280,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        desktopPane.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        desktopPane.setLayout(new javax.swing.OverlayLayout(desktopPane));
 
         jButton1.setText("Choose the file");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -648,7 +650,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         mainPanel.addTab("Files Stored", jPanelDownload);
 
-        desktopPane.add(mainPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 8, -1, 470));
+        desktopPane.add(mainPanel);
 
         getContentPane().add(desktopPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 970, 498));
 

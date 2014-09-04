@@ -64,14 +64,16 @@ class StorageManager {
     public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
         IEncoderIDA ida = null;
         StorageOptions options = ssf.getOptions();
-        InputStream fileInputStream = null;
+        RTInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream(file);
+            fileInputStream = new RTInputStream(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
         }
 
         ArrayList<OutputStream> outputStreams = new ArrayList<>();
+        ArrayList<RTOutputStream> outputStreamsOriginal = new ArrayList<>();
+        
         //Get the upload streams for each driver
         for (int i = 0; i < slices.size(); i++) {
             IDriver sliceDriver = null;
@@ -122,7 +124,10 @@ class StorageManager {
                     }
 
                     //Add the last OutputStream for the driver
-                    sliceListPipesOut.add(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                    RTOutputStream driverOutput = new RTOutputStream(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                    sliceListPipesOut.add(driverOutput);
+                    outputStreamsOriginal.add(driverOutput);
+                    
 
                     //Now that we already have a pipeline, just need to send the right Streams for each PipeProcess
                     for (int j = 0; j < options.slicePipeline.size(); j++) {
@@ -140,14 +145,11 @@ class StorageManager {
                         new Thread(
                                 new Runnable() {
                                     public void run() {
-                                        Date start, end;
-                                        start = new Date(0);
                                         pipe.process(inT, outT, options.additionalParameters);
                                         try {
                                             outT.close();
                                             //Finish and log everything
-                                            end = new Date(outT.totalTime());
-                                            StoreSafeLogger.addLog("slice", slicePath, "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+                                            StoreSafeLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
 
                                         } catch (IOException ex) {
                                             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -162,7 +164,9 @@ class StorageManager {
                 }
                 //If no slice pipeline
                 else {
-                    outputStreams.add(new RTOutputStream(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters())));
+                    RTOutputStream driverOutput = new RTOutputStream(sliceDriver.getSliceUploadStream(currentSlice, currentAccount.getAdditionalParameters()));
+                    outputStreams.add(driverOutput);
+                    outputStreamsOriginal.add(driverOutput);
                 }
                 }catch (IOException ex) {
                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the upload stream to store", ex);
@@ -212,15 +216,11 @@ class StorageManager {
                     new Thread(
                             new Runnable() {
                                 public void run() {
-                                    Date start, end;
-                                    start = new Date(0);
                                     pipe.process(inT, outT, options.additionalParameters);
                                     try {
                                         outT.close();
-                                        //Finish and log everything
-                                        end = new Date(outT.totalTime());
-                                        StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
-
+                                        //Finish and log everything                                     
+                                        StoreSafeLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
                                     } catch (IOException ex) {
                                         Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                     }
@@ -231,7 +231,7 @@ class StorageManager {
                 }
 
                 //Get Last InputStream
-                fileInputStream = listPipesIn.get(listPipesIn.size() - 1);
+                fileInputStream = new RTInputStream(listPipesIn.get(listPipesIn.size() - 1));
 
             }
 
@@ -258,13 +258,10 @@ class StorageManager {
                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
             }
 
-            Date start, end;
-            start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
             long sliceSize = ida.encode();
-
             //Finish and log everything
-            end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-            StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "UIDA-" + ssf.getDispersalMethod(), start, end);
+            StoreSafeLogger.addIDALog(ssf, "UP", fileInputStream.totalTime(), fileInputStream.averageRate(), fileInputStream.totalBytes());
+            
             //Update important values
             ssf.setHash(ida.getFileHash());
             String[] partsHash = ida.getPartsHash();
@@ -275,6 +272,13 @@ class StorageManager {
                 currentSlice.setSize(sliceSize);
 
             }
+            
+            //Log the slices outputs
+        for (int i = 0; i < outputStreamsOriginal.size(); i++)
+        {
+            RTOutputStream os = outputStreamsOriginal.get(i);
+            StoreSafeLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalBytes()); 
+        }
 
             return false;
 
@@ -287,9 +291,10 @@ class StorageManager {
     public boolean downloadFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
             IDecoderIDA ida = null;
             ArrayList<InputStream> inputStreams = new ArrayList<>();
-            OutputStream os = null;
+            ArrayList<RTInputStream> inputStreamsOriginal = new ArrayList<>();
+            RTOutputStream os = null;
             try {
-                os = new FileOutputStream(file);
+                os = new RTOutputStream(new FileOutputStream(file));
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to get file output", ex);
             }
@@ -330,7 +335,8 @@ class StorageManager {
 
                 if (input != null) {
                     
-                    InputStream sliceInputStream = input;
+                    RTInputStream sliceInputStream = new RTInputStream(input);
+                    inputStreamsOriginal.add(sliceInputStream);
 
                     if (options.slicePipeline.size() > 0) {
 
@@ -363,24 +369,18 @@ class StorageManager {
 
                             //Get the streams
                             InputStream inT = sliceListPipesIn.get(j);
-                            OutputStream outT = sliceListPipesOut.get(j);  
-                            
-                            final String slicePath = slices.get(i).getPath();
+                            RTOutputStream outT = new RTOutputStream(sliceListPipesOut.get(j));  
 
                             //Run the process for the pipes in a new thread (parallel)
                             new Thread(
                                     new Runnable() {
                                         public void run() {
                                             //Start time variables
-                                            Date start, end;
-                                            start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
                                             pipe.reverseProcess(inT, outT, options.additionalParameters);
                                             try {
                                                 outT.close();
                                                 //Finish and log everything
-                                                end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-                                                
-                                                StoreSafeLogger.addLog("slice", slicePath, "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+                                                StoreSafeLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
 
                                             } catch (IOException ex) {
                                                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -392,7 +392,7 @@ class StorageManager {
                         }
 
                         //Get Last InputStream
-                        sliceInputStream = sliceListPipesIn.get(sliceListPipesIn.size() - 1);
+                        sliceInputStream = new RTInputStream(sliceListPipesIn.get(sliceListPipesIn.size() - 1));
 
                     }
                     //Add the inputStream to the list of InputStreams
@@ -444,23 +444,17 @@ class StorageManager {
 
                 //Get the streams
                 InputStream inT = listPipesIn.get(i);
-                OutputStream outT = listPipesOut.get(i + 1);
+                RTOutputStream outT = new RTOutputStream(listPipesOut.get(i + 1));
 
                 //Run the process for the pipes in a new thread (parallel)
                 new Thread(
                         new Runnable() {
                             public void run() {
                                 try {
-                                    //Start time variables
-                                    Date start, end;
-                                    start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-                                    
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
-                                    outT.close();
-                                    
+                                    outT.close();                                    
                                     //Finish and log everything
-                                    end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-                                    StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "DP-" + pipe.getClass().getName() + "-" + ssf.getDispersalMethod(), start, end);
+                                    StoreSafeLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
 
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -472,7 +466,7 @@ class StorageManager {
             }
 
             //Get First OutputStream
-            os = listPipesOut.get(0);
+            os = new RTOutputStream(listPipesOut.get(0));
 
         }
 
@@ -498,20 +492,21 @@ class StorageManager {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
         }
 
-        Date start, end;
-        start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-
         //Decode
         ida.decode();
 
         //Finish and log everything
-        end = new Date(System.currentTimeMillis());
-        StoreSafeLogger.addLog("file", Integer.toString(ssf.getId()), "DIDA-" + ssf.getDispersalMethod(), start, end);
-
+        StoreSafeLogger.addIDALog(ssf, "DOWN", os.totalTime(), os.averageRate(), os.totalBytes());
         String[] teste = ida.getPartsHash();
         
         for (int i = 0; i < teste.length; i++) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
+        }
+        
+        for (int i = 0; i < inputStreamsOriginal.size(); i++)
+        {
+            RTInputStream is = inputStreamsOriginal.get(i);
+            StoreSafeLogger.addSliceLog(ssf, slices.get(i), "DOWN", is.totalTime(), is.averageRate(), is.totalBytes()); 
         }
 
         

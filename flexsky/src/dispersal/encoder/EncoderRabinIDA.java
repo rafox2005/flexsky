@@ -68,17 +68,8 @@ public class EncoderRabinIDA extends IEncoderIDA {
             }
             
             //Flush at the end
-            this.flush();
-            
-            //Close the Output Buffers
-            for (int i = 0; i < totalParts; i++) {
-                try {
-                    this.writeBufs[i].close();
-                } catch (IOException ex) {
-                    Logger.getLogger(EncoderRabinIDA.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }      
-            
+            this.cleanUp();           
+                         
 
 
         } catch (Exception e) {

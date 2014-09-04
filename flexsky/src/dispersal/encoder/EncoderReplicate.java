@@ -64,16 +64,7 @@ public class EncoderReplicate extends IEncoderIDA {
         }
 
         //Flush at the end - Very important to make sure the buffers are writen
-        this.flush();
-
-        //Close the Output Buffers
-        for (int i = 0; i < totalParts; i++) {
-            try {
-                this.writeBufs[i].close();
-            } catch (IOException ex) {
-                Logger.getLogger(EncoderRabinIDA.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        this.cleanUp(); 
 
         return sliceSize;
     }

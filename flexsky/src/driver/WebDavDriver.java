@@ -83,13 +83,8 @@ public class WebDavDriver implements IDriver {
                                 sardine.enablePreemptiveAuthentication(url.getHost());
                                 //Set the remotePath WebDav
                                 String remotePath = pathT + slice.getFile() + "-" + String.valueOf(slice.getPartIndex());
-                                Date start = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
                                 //Send the Stream
                                 sardine.put(remotePath, in);
-                                Date end = new Date(ManagementFactory.getThreadMXBean( ).getCurrentThreadUserTime()/1000);
-                                StoreSafeLogger.addLog("slice", slice.getPath(), "UPDAV-" + "-", start, end);
-                                
-                                
                             } catch (MalformedURLException ex) {
                                 Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav URL incorrectly created", ex);
                             } catch (IOException ex) {

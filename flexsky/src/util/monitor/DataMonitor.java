@@ -20,16 +20,38 @@ class DataSample {
 public class DataMonitor {
   protected ArrayList<DataSample> samples;
   protected Date epoch;
+  public long avgRate;
+  public long totalTime;
 
   public DataMonitor() {
-    samples = new ArrayList();
+    samples = new ArrayList();    
     epoch = new Date();
+    avgRate = 0;
+    totalTime = 0;
+    
   }
 
+//  // Add a sample with a start and finish time.
+//  public void addSample(long bcount, Date ts, Date tf) {
+//      if (samples.size() > 1000000)
+//      {
+//          this.avgRate = (this.avgRate + this.getAverageRate())/2;
+//          this.totalTime = (this.totalTime + this.getTotalTime())/2;
+//          samples.clear();          
+//      }
+//    samples.add(new DataSample(bcount, ts, tf));
+//  }
+  
   // Add a sample with a start and finish time.
   public void addSample(long bcount, Date ts, Date tf) {
-    samples.add(new DataSample(bcount, ts, tf));
-  }
+          long msCount = tf.getTime()-ts.getTime();
+          long rate = 0;
+          if (msCount > 0) {
+            rate = 1000 * (long)bcount / (long)msCount;
+          }
+          this.avgRate = (this.avgRate + rate)/2;
+          this.totalTime = (this.totalTime + msCount);        
+ }
 
   // Get the data rate of a given sample.
   public long getRateFor(int sidx) {

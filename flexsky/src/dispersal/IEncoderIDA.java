@@ -5,6 +5,7 @@
  */
 package dispersal;
 
+import dispersal.encoder.EncoderRabinIDA;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -29,7 +30,7 @@ import util.Utils;
 public abstract class IEncoderIDA
 {
 
-    protected final int bufSize = 8 * 1024;
+    protected final int bufSize = 50 * 1024;
     protected OutputStream[] filesWriteBufs;
     protected BufferedInputStream readBuffer;
     protected int reqParts;
@@ -100,15 +101,16 @@ public abstract class IEncoderIDA
      */
     abstract public long encode();
 
-     protected void flush()
+     protected void cleanUp()
     {
         for (int i = 0; i < totalParts; i++) {
             try {
                 this.writeBufs[i].flush();
+                this.writeBufs[i].close();                
             } catch (IOException ex) {
                 Logger.getLogger(IEncoderIDA.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }  
     }
     
      

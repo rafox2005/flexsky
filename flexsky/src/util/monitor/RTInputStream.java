@@ -14,44 +14,50 @@ import java.io.IOException;
 
 
 public class RTInputStream extends FilterInputStream {
-  DataMonitor monitor;
+  long byteCount = 0;
+  long timeCount = 0;
 
   public RTInputStream(InputStream in) {
     super(in);
-    monitor = new DataMonitor();
   }
 
   public int read() throws IOException {
-    Date start = new Date();
+    long start = System.currentTimeMillis();
     int b = super.read();
-    monitor.addSample(1, start, new Date());
+    byteCount++;
+    timeCount += System.currentTimeMillis() - start;
     return b;
   }
 
   public int read(byte data[]) throws IOException {
-    Date start = new Date();
+    long start = System.currentTimeMillis();
     int cnt = super.read(data);
-    monitor.addSample(cnt, start, new Date());
+    byteCount += data.length;
+    timeCount += System.currentTimeMillis() - start;
     return cnt;
   }
 
   public int read(byte data[], int off, int len)
     throws IOException {
-    Date start = new Date();
+    long start = System.currentTimeMillis();
     int cnt = super.read(data, off, len);
-    monitor.addSample(cnt, start, new Date());
+    byteCount += len;
+    timeCount += System.currentTimeMillis() - start;
     return cnt;
   }
 
-  public long averageRate() {
-    return monitor.getAverageRate();
-  }
+  //Kbyte/s
+  public double averageRate() {      
+    return (double) ( (byteCount/1024.0) / (timeCount/1000.0) );
+  } 
   
-  public long totalTime() {
-    return monitor.getTotalTime();
+  //ms
+   public double totalTime() {
+    return timeCount;
   }
-
-  public long lastRate() {
-    return monitor.getLastRate();
+   
+   //k
+   public double totalBytes() {
+    return (byteCount/1024.0);
   }
 }

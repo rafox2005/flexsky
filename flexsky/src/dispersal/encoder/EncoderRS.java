@@ -85,20 +85,7 @@ public class EncoderRS extends IEncoderIDA
                 }
                         */
             }
-            //Flush at the end
-            this.flush();
-            
-            //Close the Output Buffers
-            for (int i = 0; i < totalParts; i++) {
-                try {
-                    this.writeBufs[i].close();
-                } catch (IOException ex) {
-                    Logger.getLogger(EncoderRS.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                //Close the input buffer
-                this.readBuffer.close();
-            }            
+            this.cleanUp();           
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

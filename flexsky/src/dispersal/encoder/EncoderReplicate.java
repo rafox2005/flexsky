@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import management.StoreSafeManager;
 
 /** Class example to the Dispersal Module Encoder
  *
@@ -38,7 +39,7 @@ public class EncoderReplicate extends IEncoderIDA {
     public long encode() {
         
         //Create variables to handle the encoding process.
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[StoreSafeManager.bufferSize];
         int len = 0;
         int sliceSize = 0; //Variable to handle
         

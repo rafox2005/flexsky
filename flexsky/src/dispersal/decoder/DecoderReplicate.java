@@ -51,17 +51,7 @@ public class DecoderReplicate extends IDecoderIDA {
                     this.disFile.write(input, 0, 1);
             }
             
-            //Flush the outputstream, important to ensure that all bytes are written
-            this.disFile.flush ();
-            
-            //Close the Input Buffers
-            for (int i = 0; i < this.readBufs.length; i++) {
-
-                this.readBufs[i].close();
-            }
-            
-            //CLose the output buffer
-            this.disFile.close();
+            this.cleanUp();
             
         } catch (IOException ex) {
             Logger.getLogger(DecoderReplicate.class.getName()).log(Level.SEVERE, null, ex);

@@ -28,9 +28,9 @@ import dispersal.decoder.DecoderRS;
 import dispersal.decoder.DecoderRabinIDA;
 import dispersal.encoder.EncoderRS;
 import dispersal.encoder.EncoderRabinIDA;
-import driver.DiskDriver;
-import driver.IDriver;
-import driver.WebDavDriver;
+import storage.driver.DiskDriver;
+import storage.IDriver;
+import storage.driver.WebDavDriver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -332,12 +332,12 @@ class StorageManager {
                 } catch (IOException ex) {
                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Not able to retrieve the slice from the driver", ex);
                 }
-
-                if (input != null) {
-                    
-                    RTInputStream sliceInputStream = new RTInputStream(input);
+                
+                RTInputStream sliceInputStream = new RTInputStream(input);
                     inputStreamsOriginal.add(sliceInputStream);
 
+                if (input != null) {                 
+                    
                     if (options.slicePipeline.size() > 0) {
 
                         //Implement Pipeline using Java Pipes
@@ -519,10 +519,18 @@ class StorageManager {
         }
 }
 
-public boolean deleteSlice(StoreSafeSlice slice, StoreSafeAccount currentAccount) {
+public boolean deleteSlice(StoreSafeFile file, StoreSafeSlice slice, StoreSafeAccount currentAccount) {
         try {
+            long start = System.currentTimeMillis();
             IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
-            return sliceDriver.deleteSlice (slice, currentAccount.getAdditionalParameters());
+            boolean result = sliceDriver.deleteSlice (slice, currentAccount.getAdditionalParameters());
+            
+            //Finish and log everything
+            double time = System.currentTimeMillis() - start;
+            double rate = (slice.getSize() / 1024.0) / ( time/1000.0 );
+            StoreSafeLogger.addSliceLog(file, slice, "DEL", time, rate, slice.getSize()/1024.0);
+            
+            return result;
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: Not able to retrieve the driver to delete the file", ex);
             return false;

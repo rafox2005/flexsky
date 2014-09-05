@@ -118,13 +118,8 @@ public class DecoderRS extends IDecoderIDA
                 byte[] decrypt = Utils.intsToBytes(finalInt);
                 this.disFile.write(decrypt);
             }
-            this.disFile.flush();
-
-            //Close the Input Buffers
-            for (int i = 0; i < reqParts; i++) {
-
-                this.readBufs[i].close();
-            }
+            
+            this.cleanUp();
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

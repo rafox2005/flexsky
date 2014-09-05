@@ -17,7 +17,7 @@
 package database;
 
 import data.StoreSafeAccount;
-import driver.WebDavDriver;
+import storage.driver.WebDavDriver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

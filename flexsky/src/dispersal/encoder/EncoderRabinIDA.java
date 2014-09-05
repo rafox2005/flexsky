@@ -49,7 +49,9 @@ public class EncoderRabinIDA extends IEncoderIDA {
      */
     @Override
     public long encode() {
-        long sliceCount = 0;
+        
+        long sliceCount = 0;        
+        
         try {
 
             byte[] input = new byte[reqParts];
@@ -58,6 +60,7 @@ public class EncoderRabinIDA extends IEncoderIDA {
                 byte[] crypt = this.ida.encodeEach(input);
                 Monitor.getInstance().stopTimeToEncode();
                 for (int i=0; i < totalParts; i++) {
+                    
                     this.disParts[i].write(crypt[i]);                    
                 }
                 sliceCount++;
@@ -75,7 +78,6 @@ public class EncoderRabinIDA extends IEncoderIDA {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        
         return sliceCount;
     }
     

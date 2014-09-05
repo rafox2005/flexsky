@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package driver;
+package storage.driver;
 
+import storage.IDriver;
 import data.StoreSafeSlice;
 import java.io.BufferedOutputStream;
 import java.io.File;

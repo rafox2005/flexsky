@@ -85,14 +85,7 @@ public class DecoderRabinIDA extends IDecoderIDA
                 this.disFile.write(decrypt, 0, len);
             }
 
-            //Close the Input Buffers
-            for (int i = 0; i < this.readBufs.length; i++) {
-
-                this.readBufs[i].close();
-            }
-            
-            //CLose the output buffer aswell
-            this.disFile.close();
+            this.cleanUp();
 
             }catch (IOException e) {
             System.out.println(e.getMessage());

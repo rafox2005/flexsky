@@ -273,6 +273,11 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
+                                      <Component id="jButton1" min="-2" pref="135" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                                      <Component id="pathToFileLabel" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
                                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                           <Component id="jScrollPane1" alignment="0" pref="145" max="32767" attributes="0"/>
                                           <Group type="102" alignment="0" attributes="0">
@@ -282,7 +287,7 @@
                                           </Group>
                                           <Component id="IDALabel" max="32767" attributes="0"/>
                                       </Group>
-                                      <EmptySpace type="separate" max="32767" attributes="0"/>
+                                      <EmptySpace type="separate" pref="46" max="32767" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="ProviderLabel" alignment="0" max="32767" attributes="0"/>
                                           <Group type="102" alignment="0" attributes="0">
@@ -290,13 +295,14 @@
                                               <EmptySpace max="-2" attributes="0"/>
                                               <Component id="typeTextField" max="32767" attributes="0"/>
                                           </Group>
-                                          <Component id="jScrollPane2" alignment="0" min="-2" pref="144" max="-2" attributes="0"/>
+                                          <Group type="102" attributes="0">
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="delProviderjButton" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="jScrollPane2" min="-2" pref="144" max="-2" attributes="0"/>
+                                              </Group>
+                                              <EmptySpace min="0" pref="36" max="32767" attributes="0"/>
+                                          </Group>
                                       </Group>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="jButton1" min="-2" pref="135" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                                      <Component id="pathToFileLabel" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
@@ -340,7 +346,7 @@
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                               <Component id="totalPartsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -382,8 +388,10 @@
                                               <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
+                                      <Component id="uploadJButton" min="-2" pref="42" max="-2" attributes="0"/>
+                                      <EmptySpace min="30" pref="30" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="typeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="typeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -392,11 +400,11 @@
                                       <Component id="ProviderLabel" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jScrollPane2" min="-2" pref="246" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="delProviderjButton" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="uploadJButton" min="-2" pref="42" max="-2" attributes="0"/>
-                              <EmptySpace min="30" pref="30" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -684,6 +692,14 @@
                     </Component>
                     <Component class="javax.swing.JTextField" name="typeTextField">
                     </Component>
+                    <Component class="javax.swing.JButton" name="delProviderjButton">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Del"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="delProviderjButtonActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
               </SubComponents>
@@ -812,6 +828,177 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteJButtonActionPerformed"/>
                   </Events>
                 </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JScrollPane" name="jScrollPaneAccount">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Account">
+                    <Property name="tabTitle" type="java.lang.String" value="Account"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanelAccount">
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="providerPathAddjLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="providerPathAddjTextField" min="-2" pref="376" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Component id="providerNameAddjLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="providerNameAddjTextField" min="-2" pref="88" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="providerTypeAddjLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="driverTypejComboBox" min="-2" pref="226" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="parametersProviderLabel" alignment="0" min="-2" pref="154" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane8" alignment="0" min="-2" pref="163" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace pref="341" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="providerAddjButton" min="-2" pref="71" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="78" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="parametersProviderLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                                      <Component id="jScrollPane8" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="providerNameAddjLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="providerNameAddjTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="providerPathAddjLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="providerPathAddjTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="providerTypeAddjLabel" min="-2" max="-2" attributes="0"/>
+                                          <Component id="driverTypejComboBox" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="0" pref="305" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="providerAddjButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JLabel" name="providerNameAddjLabel">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Name"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="providerNameAddjTextField">
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="providerTypeAddjLabel">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Type"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="providerPathAddjLabel">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Path"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JTextField" name="providerPathAddjTextField">
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="parametersProviderLabel">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Additional Parameters"/>
+                      </Properties>
+                    </Component>
+                    <Container class="javax.swing.JScrollPane" name="jScrollPane8">
+                      <AuxValues>
+                        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                      </AuxValues>
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                      <SubComponents>
+                        <Component class="javax.swing.JTable" name="parametersProviderjTable">
+                          <Properties>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="Ubuntu" size="10" style="0"/>
+                            </Property>
+                            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+                              <Table columnCount="2" rowCount="12">
+                                <Column editable="true" title="Name" type="java.lang.String"/>
+                                <Column editable="true" title="Value" type="java.lang.String"/>
+                              </Table>
+                            </Property>
+                            <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
+                              <TableColumnModel selectionModel="0">
+                                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="false">
+                                  <Title/>
+                                  <Editor/>
+                                  <Renderer/>
+                                </Column>
+                                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="false">
+                                  <Title/>
+                                  <Editor/>
+                                  <Renderer/>
+                                </Column>
+                              </TableColumnModel>
+                            </Property>
+                            <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+                              <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Component class="javax.swing.JButton" name="providerAddjButton">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Add"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="providerAddjButtonActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JComboBox" name="driverTypejComboBox">
+                      <Properties>
+                        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                          <StringArray count="4">
+                            <StringItem index="0" value="Item 1"/>
+                            <StringItem index="1" value="Item 2"/>
+                            <StringItem index="2" value="Item 3"/>
+                            <StringItem index="3" value="Item 4"/>
+                          </StringArray>
+                        </Property>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
               </SubComponents>
             </Container>
           </SubComponents>

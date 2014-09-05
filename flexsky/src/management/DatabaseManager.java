@@ -194,4 +194,16 @@ class DatabaseManager
         }
     }
     
+    public boolean deleteAccount(StoreSafeAccount ssa) {
+        try
+        {
+            this.as.deleteAccountByName(ssa.getName());
+            return true;
+        } catch (SQLException ex)
+        {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+    
 }

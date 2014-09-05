@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import management.StoreSafeManager;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import util.Utils;
 
@@ -30,7 +31,7 @@ import util.Utils;
 public abstract class IEncoderIDA
 {
 
-    protected final int bufSize = 50 * 1024;
+    protected final int bufSize = StoreSafeManager.bufferSize;
     protected OutputStream[] filesWriteBufs;
     protected BufferedInputStream readBuffer;
     protected int reqParts;

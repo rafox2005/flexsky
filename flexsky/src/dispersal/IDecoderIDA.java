@@ -18,6 +18,9 @@ import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import management.StoreSafeManager;
 import util.Utils;
 
 /**
@@ -31,7 +34,7 @@ public abstract class IDecoderIDA
     protected BufferedOutputStream writeBuffer;
     protected int totalParts;
     protected int reqParts;
-    protected final int bufSize = 8 * 1024;
+    protected final int bufSize = StoreSafeManager.bufferSize;
     protected MessageDigest[] mdParts;
     protected MessageDigest mdFile;
     protected DigestInputStream[] disParts;
@@ -225,6 +228,23 @@ public abstract class IDecoderIDA
             hashStringArray[i] = Utils.getStringFromMessageDigest(mdParts[i]);
         }
         return hashStringArray;
+    }
+    
+    public void cleanUp()
+    {
+        try
+        {
+            //Close the Input Buffers
+            for (int i = 0; i < this.readBufs.length; i++) {                
+                    this.readBufs[i].close();                
+            }      
+            
+            this.writeBuffer.flush();
+            
+        } catch (IOException ex)
+        {
+            Logger.getLogger(IDecoderIDA.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

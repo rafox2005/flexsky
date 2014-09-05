@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package driver;
+package storage.driver;
 
+import storage.IDriver;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import data.StoreSafeSlice;

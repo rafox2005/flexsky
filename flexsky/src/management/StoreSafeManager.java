@@ -50,7 +50,7 @@ public class StoreSafeManager {
     private static StoreSafeManager instance = null;
     private final DatabaseManager db;
     private final StorageManager storage;
-    public static final int bufferSize = 1024*50;
+    public static final int bufferSize = 1024*8;
     
     private static ExecutorService executor = null;
     public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
@@ -160,15 +160,22 @@ public class StoreSafeManager {
     }
 
     public boolean deleteFile(StoreSafeFile ssf) {
+        double start = System.currentTimeMillis();
         ArrayList<StoreSafeSlice> slices = this.db.getFileSlices(ssf);
         ArrayList<StoreSafeAccount> accounts = this.db.getSlicesAccount(slices);
         
         //Delete the slices
         for (int i = 0; i < slices.size(); i++) {
-            this.storage.deleteSlice(slices.get(i), accounts.get(i));
+            this.storage.deleteSlice(ssf, slices.get(i), accounts.get(i));
         }
         //Delete the file from DB
         this.db.deleteFile(ssf);
+        
+        //Finish and log everything
+            double time = System.currentTimeMillis() - start;
+            double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
+            StoreSafeLogger.addFileLog(ssf, "DEL", time, rate, ssf.getSize()/1024.0);
+        
         return true;
     }
     
@@ -209,14 +216,27 @@ public class StoreSafeManager {
         
     }
     
-    public List getProviders()
+    public Set getDriverList()
+    {
+        
+        Set driverList = util.Utils.getClassesInPackage("storage.driver");
+        return driverList;
+        
+    }
+    
+    public List getAccounts()
     {
         return this.db.listAccounts();
     }
     
-    public boolean addProvider(StoreSafeAccount ssa)
+    public boolean addAccount(StoreSafeAccount ssa)
     {
         return this.db.insertAccount(ssa);
+    }
+    
+    public boolean delAccount(StoreSafeAccount ssa)
+    {
+        return this.db.deleteAccount(ssa);
     }
 
 }

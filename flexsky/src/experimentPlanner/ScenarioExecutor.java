@@ -42,7 +42,7 @@ public class ScenarioExecutor {
       System.out.println("Adding accounts...");
         for (StoreSafeAccount ssa : scenario.providerList)
         {
-            instance.addProvider(ssa);
+            instance.addAccount(ssa);
         }
         
         //Repetitions

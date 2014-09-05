@@ -40,6 +40,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import management.StoreSafeManager;
+import storage.IDriver;
 
 /**
  *
@@ -92,11 +93,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         this.IDAList.setModel(aux.getModel());
         
         //aux = new JList(listPipe.toArray());
-        //this.filePipelinejTable.setModel(aux.getModel());
+        //this.filePipelinejTable.setModel(aux.getModel());       
         
-        //Easy bind for providers
-        aux = new JList(ssm.getProviders().toArray());               
-        this.ProviderList1.setModel(aux.getModel());
+        this.updateAccounts();
         
         JComboBox comboBox = new JComboBox(listPipe.toArray());        
         
@@ -120,6 +119,16 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         aux = new JList(listFiles.toArray());
         
         this.filesToDownloadJList.setModel(aux.getModel());
+        
+        //Accounts
+        
+        Set listDriver = ssm.getDriverList();
+        JComboBox aux2 = new JComboBox(listDriver.toArray());
+        
+        this.driverTypejComboBox.setModel(aux2.getModel());
+        
+        
+        
         
 
     }
@@ -170,6 +179,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         pathToFileLabel = new javax.swing.JLabel();
         typeLabel = new javax.swing.JLabel();
         typeTextField = new javax.swing.JTextField();
+        delProviderjButton = new javax.swing.JButton();
         jPanelDownload = new javax.swing.JPanel();
         pathToDownloadFolderjLabel = new javax.swing.JLabel();
         downloadJButton = new javax.swing.JButton();
@@ -178,6 +188,18 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         setDownloadPathjButton = new javax.swing.JButton();
         jDownloadRefreshListButton = new javax.swing.JButton();
         deleteJButton = new javax.swing.JButton();
+        jScrollPaneAccount = new javax.swing.JScrollPane();
+        jPanelAccount = new javax.swing.JPanel();
+        providerNameAddjLabel = new javax.swing.JLabel();
+        providerNameAddjTextField = new javax.swing.JTextField();
+        providerTypeAddjLabel = new javax.swing.JLabel();
+        providerPathAddjLabel = new javax.swing.JLabel();
+        providerPathAddjTextField = new javax.swing.JTextField();
+        parametersProviderLabel = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        parametersProviderjTable = new javax.swing.JTable();
+        providerAddjButton = new javax.swing.JButton();
+        driverTypejComboBox = new javax.swing.JComboBox();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -456,6 +478,13 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         typeLabel.setText("Type");
 
+        delProviderjButton.setText("Del");
+        delProviderjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delProviderjButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout uploadPanelLayout = new javax.swing.GroupLayout(uploadPanel);
         uploadPanel.setLayout(uploadPanelLayout);
         uploadPanelLayout.setHorizontalGroup(
@@ -464,6 +493,10 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(uploadPanelLayout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(pathToFileLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(uploadPanelLayout.createSequentialGroup()
                         .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
                             .addGroup(uploadPanelLayout.createSequentialGroup()
@@ -471,18 +504,18 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addGap(26, 26, 26)
                                 .addComponent(revTextBox, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(IDALabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addGap(18, 46, Short.MAX_VALUE)
                         .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(ProviderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(uploadPanelLayout.createSequentialGroup()
                                 .addComponent(typeLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(typeTextField))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(uploadPanelLayout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
-                        .addComponent(pathToFileLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(uploadPanelLayout.createSequentialGroup()
+                                .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(delProviderjButton)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 36, Short.MAX_VALUE)))))
                 .addGap(31, 31, 31)
                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(uploadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -546,7 +579,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addComponent(IDALabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(34, 34, 34))))
+                                .addGap(34, 34, 34)))
+                        .addComponent(uploadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30))
                     .addGroup(uploadPanelLayout.createSequentialGroup()
                         .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(typeLabel)
@@ -555,9 +590,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                         .addComponent(ProviderLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(uploadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(delProviderjButton)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         jScrollPaneUpload.setViewportView(uploadPanel);
@@ -649,6 +684,117 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         );
 
         mainPanel.addTab("Files Stored", jPanelDownload);
+
+        providerNameAddjLabel.setText("Name");
+
+        providerTypeAddjLabel.setText("Type");
+
+        providerPathAddjLabel.setText("Path");
+
+        parametersProviderLabel.setText("Additional Parameters");
+
+        parametersProviderjTable.setFont(new java.awt.Font("Ubuntu", 0, 10)); // NOI18N
+        parametersProviderjTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Name", "Value"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        parametersProviderjTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane8.setViewportView(parametersProviderjTable);
+        if (parametersProviderjTable.getColumnModel().getColumnCount() > 0) {
+            parametersProviderjTable.getColumnModel().getColumn(0).setResizable(false);
+            parametersProviderjTable.getColumnModel().getColumn(1).setResizable(false);
+        }
+
+        providerAddjButton.setText("Add");
+        providerAddjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                providerAddjButtonActionPerformed(evt);
+            }
+        });
+
+        driverTypejComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        javax.swing.GroupLayout jPanelAccountLayout = new javax.swing.GroupLayout(jPanelAccount);
+        jPanelAccount.setLayout(jPanelAccountLayout);
+        jPanelAccountLayout.setHorizontalGroup(
+            jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelAccountLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelAccountLayout.createSequentialGroup()
+                        .addComponent(providerPathAddjLabel)
+                        .addGap(18, 18, 18)
+                        .addComponent(providerPathAddjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelAccountLayout.createSequentialGroup()
+                        .addComponent(providerNameAddjLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(providerNameAddjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelAccountLayout.createSequentialGroup()
+                        .addComponent(providerTypeAddjLabel)
+                        .addGap(18, 18, 18)
+                        .addComponent(driverTypejComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(parametersProviderLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(341, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAccountLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(providerAddjButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(78, 78, 78))
+        );
+        jPanelAccountLayout.setVerticalGroup(
+            jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelAccountLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelAccountLayout.createSequentialGroup()
+                        .addComponent(parametersProviderLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanelAccountLayout.createSequentialGroup()
+                        .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(providerNameAddjLabel)
+                            .addComponent(providerNameAddjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(providerPathAddjLabel)
+                            .addComponent(providerPathAddjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(providerTypeAddjLabel)
+                            .addComponent(driverTypejComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 305, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(providerAddjButton))
+        );
+
+        jScrollPaneAccount.setViewportView(jPanelAccount);
+
+        mainPanel.addTab("Account", jScrollPaneAccount);
 
         desktopPane.add(mainPanel);
 
@@ -892,6 +1038,43 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         else jDialog1.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void delProviderjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delProviderjButtonActionPerformed
+        List<StoreSafeAccount> accounts = this.ProviderList1.getSelectedValuesList();
+        
+        for (StoreSafeAccount account : accounts)
+        {
+            this.ssm.delAccount(account);
+        }
+        
+        this.updateAccounts();
+        
+    }//GEN-LAST:event_delProviderjButtonActionPerformed
+
+    private void providerAddjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_providerAddjButtonActionPerformed
+        String name = providerNameAddjTextField.getText();
+        String path = providerPathAddjTextField.getText();
+        String type = driverTypejComboBox.getSelectedItem().toString();
+
+        //Get additionalk paramteres
+        HashMap<String,String> param = new HashMap<String, String>();
+
+        TableModel paramTM = this.parametersProviderjTable.getModel();
+
+        for (int i = 0; i < paramTM.getRowCount(); i++) {
+            if (paramTM.getValueAt(i, 0) != null && paramTM.getValueAt(i, 1) != null)
+            {
+                param.put(paramTM.getValueAt(i, 0).toString(), paramTM.getValueAt(i, 1).toString());
+            }
+        }
+
+        StoreSafeAccount account = new StoreSafeAccount(name, type, path);
+        account.setAdditionalParameters(param);
+
+        this.ssm.addAccount(account);
+
+        this.updateAccounts();
+    }//GEN-LAST:event_providerAddjButtonActionPerformed
+
  
     /**
      * @param args the command line arguments
@@ -938,10 +1121,12 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem contentMenuItem;
     private javax.swing.JMenuItem copyMenuItem;
     private javax.swing.JMenuItem cutMenuItem;
+    private javax.swing.JButton delProviderjButton;
     private javax.swing.JButton deleteJButton;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JDesktopPane desktopPane;
     private javax.swing.JButton downloadJButton;
+    private javax.swing.JComboBox driverTypejComboBox;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JMenu fileMenu;
@@ -957,6 +1142,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JFileChooser jFileChooserDB;
     private javax.swing.JLabel jLabelChooseDB;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanelAccount;
     private javax.swing.JPanel jPanelDownload;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -964,15 +1150,25 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPaneAccount;
     private javax.swing.JScrollPane jScrollPaneUpload;
     private javax.swing.JTabbedPane mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
     private javax.swing.JLabel parametersLabel;
+    private javax.swing.JLabel parametersProviderLabel;
+    private javax.swing.JTable parametersProviderjTable;
     private javax.swing.JTable parametersjTable;
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JLabel pathToDownloadFolderjLabel;
     private javax.swing.JLabel pathToFileLabel;
+    private javax.swing.JButton providerAddjButton;
+    private javax.swing.JLabel providerNameAddjLabel;
+    private javax.swing.JTextField providerNameAddjTextField;
+    private javax.swing.JLabel providerPathAddjLabel;
+    private javax.swing.JTextField providerPathAddjTextField;
+    private javax.swing.JLabel providerTypeAddjLabel;
     private javax.swing.JLabel reqPartsLabel;
     private javax.swing.JTextField reqPartsTextField;
     private javax.swing.JLabel revLabel;
@@ -989,5 +1185,12 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JButton uploadJButton;
     private javax.swing.JPanel uploadPanel;
     // End of variables declaration//GEN-END:variables
+
+    private void updateAccounts() {
+        //Easy bind for providers
+        JList aux = new JList(ssm.getAccounts().toArray());               
+        this.ProviderList1.setModel(aux.getModel());
+    
+    }
 
 }

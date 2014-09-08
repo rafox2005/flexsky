@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import util.Monitor;
 import util.Utils;
 
 /**
@@ -69,9 +68,7 @@ public class EncoderRS extends IEncoderIDA
             while (this.disFile.read(input, 0, reqParts) != -1) {
                 int[] inputInt = Utils.bytesToInts(input);
                 //System.arraycopy(inputInt, 0, parity, 0, inputInt.length);
-                Monitor.getInstance().startTimeToEncode();
-                this.ida.encode(inputInt, parity);
-                Monitor.getInstance().stopTimeToEncode();             
+                this.ida.encode(inputInt, parity);    
                                                                
                 byte[] crypt = Utils.intsToBytes(Ints.concat(inputInt, parity));
                 for (int i = 0; i < reqParts + parParts; i++) {

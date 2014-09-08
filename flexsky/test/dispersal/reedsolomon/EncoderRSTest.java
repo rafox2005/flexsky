@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import util.Monitor;
 
 /**
  *
@@ -122,6 +121,5 @@ public class EncoderRSTest {
         
         
         
-        System.out.println("E: " + Monitor.getInstance().getTimeToEncode() + " D: " + Monitor.getInstance().getTimeToDecode());
-    }   
+        }   
 }

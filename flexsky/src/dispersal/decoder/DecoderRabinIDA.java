@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import util.Monitor;
 
 /**
  * Class that takes the parts and decode into one file using Rabin IDA
@@ -79,10 +78,8 @@ public class DecoderRabinIDA extends IDecoderIDA
             int[] indexes = this.readPartsIndex();
             int len;
             while ((len = this.readParts(input)) != -1) {
-                Monitor.getInstance().startTimeToDecode();
                 byte[] decrypt = this.rabin.decodeEachEnough(input, indexes);
-                Monitor.getInstance().stopTimeToDecode();
-                this.disFile.write(decrypt, 0, len);
+                this.disFile.write(decrypt, 0, len);                
             }
 
             this.cleanUp();

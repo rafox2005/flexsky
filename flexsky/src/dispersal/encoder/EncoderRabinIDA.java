@@ -6,14 +6,18 @@ package dispersal.encoder;
 
 import dispersal.IEncoderIDA;
 import dispersal.rabin.RabinIDA;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import util.Monitor;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  *  Class that take a file and code into multiple parts using Rabin IDA
@@ -53,12 +57,13 @@ public class EncoderRabinIDA extends IEncoderIDA {
         long sliceCount = 0;        
         
         try {
-
             byte[] input = new byte[reqParts];
-            while (disFile.read(input, 0, reqParts) != -1) {
-                Monitor.getInstance().startTimeToEncode();
+            long size = 0;
+            int len = 0;
+
+            while (( len = disFile.read(input, 0, reqParts) ) != -1) {
+                size += len;
                 byte[] crypt = this.ida.encodeEach(input);
-                Monitor.getInstance().stopTimeToEncode();
                 for (int i=0; i < totalParts; i++) {
                     
                     this.disParts[i].write(crypt[i]);                    
@@ -69,6 +74,11 @@ public class EncoderRabinIDA extends IEncoderIDA {
                 //Check if the buffers are full to flush them
                 //if (this.writeBufs[0].size() == this.bufSize) this.flush();
             }
+            
+            int padding = (int) (size % reqParts);
+            byte[] toPadding = new byte[padding];
+            disFile.getMessageDigest().update(toPadding);
+            
             
             //Flush at the end
             this.cleanUp();           

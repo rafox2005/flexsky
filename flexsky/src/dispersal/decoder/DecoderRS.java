@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import util.Monitor;
 import util.Utils;
 
 /**
@@ -107,9 +106,7 @@ public class DecoderRS extends IDecoderIDA
 
                 }
                 int[] inputInt = Utils.bytesToInts(finalInput);
-                Monitor.getInstance().startTimeToDecode();
                 int nerrors = this.reed.decode(inputInt);
-                Monitor.getInstance().stopTimeToDecode();
                 int msgindex[] = new int[reqParts];
                 for (int k = 0; k < reqParts; k++) {
                     msgindex[k] = k;

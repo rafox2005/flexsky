@@ -1053,7 +1053,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private void providerAddjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_providerAddjButtonActionPerformed
         String name = providerNameAddjTextField.getText();
         String path = providerPathAddjTextField.getText();
-        String type = driverTypejComboBox.getSelectedItem().toString();
+        String type = driverTypejComboBox.getSelectedItem().toString().substring(6);
 
         //Get additionalk paramteres
         HashMap<String,String> param = new HashMap<String, String>();

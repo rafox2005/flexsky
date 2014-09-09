@@ -306,14 +306,10 @@ class StorageManager {
         tmx.setThreadCpuTimeEnabled(true);
 
         long start = tmx.getCurrentThreadUserTime();
-        long startWait = tmx.getThreadInfo(Thread.currentThread().getId()).getWaitedTime();
-
         long sliceSize = ida.encode();
-        long stopWait = tmx.getThreadInfo(Thread.currentThread().getId()).getWaitedTime();
-        long waitTime = stopWait - startWait;
         long time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "UP", time, (ssf.getSize() / 1024) / (time / 1000), ssf.getSize() / 1024);
+        FlexSkyLogger.addIDALog(ssf, "UP", time, (ssf.getSize() / 1000) / (time / 1000), ssf.getSize() / 1000);
 
         //Update important values
         ssf.setHash(ida.getFileHash());
@@ -387,87 +383,119 @@ class StorageManager {
 
                 //Add inputstream to list
             //Try to get the inputstreams
-            InputStream input = null;
+               InputStream sliceInputStream = null;
             try
             {
-                input = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
+                if (sliceDriver != null) sliceInputStream = sliceDriver.getSliceDownloadStream(currentSlice, currentAccount.getAdditionalParameters());
+                                         
             } catch (IOException ex)
             {
-                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Not able to retrieve the slice from the driver", ex);
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Not able to retrieve the slice from the driver " + currentAccount.getName(), ex);
             }
 
-            RTInputStream sliceInputStream = new RTInputStream(input);
-            inputStreamsOriginal.add(sliceInputStream);
+            
+            if (sliceInputStream != null && inputStreams.size() < ssf.getReqParts())
+            {                
 
-            if (input != null)
-            {
-
-                if (options.slicePipeline.size() > 0)
-                {
-
-                    //Implement Pipeline using Java Pipes
-                    ArrayList<InputStream> sliceListPipesIn = new ArrayList<>();
-                    ArrayList<OutputStream> sliceListPipesOut = new ArrayList<>();
-
-                    //Add the first InputStream from driver
-                    sliceListPipesIn.add(input);
-
-                    //Creating and connecting the pipes
-                    for (int j = 0; j < options.slicePipeline.size(); j++)
+                try {
+                    //Create the pipes to run the upload process in parallel
+                    final InputStream sliceInputStreamThread = sliceInputStream;
+                    PipedInputStream pipedInputStreamSlice = new PipedInputStream(StoreSafeManager.bufferSize);
+                    PipedOutputStream pipedOutputStreamSlice = new PipedOutputStream(pipedInputStreamSlice);
+                    
+                    new Thread(
+                            new Runnable() {
+                                public void run() {
+                                    try
+                                    {
+                                        byte[] buffer = new byte[StoreSafeManager.bufferSize];
+                                        int len = 0;
+                                        while ((len = sliceInputStreamThread.read(buffer)) != -1)
+                                        {
+                                            pipedOutputStreamSlice.write(buffer, 0, len);
+                                        }
+                                        
+                                        pipedOutputStreamSlice.close();
+                                        
+                                    } catch (IOException ex)
+                                    {
+                                        Logger.getLogger(DiskDriver.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream for the slice", ex);
+                                    }
+                                    
+                                }
+                            }).start();
+                    
+                            RTInputStream sliceRTInputStream = new RTInputStream(pipedInputStreamSlice);
+                            inputStreamsOriginal.add(sliceRTInputStream);
+                            
+                    if (options.slicePipeline.size() > 0)
                     {
-                        PipedOutputStream out = new PipedOutputStream();
-                        PipedInputStream in = null;
-                        try
+                        
+                        //Implement Pipeline using Java Pipes
+                        ArrayList<InputStream> sliceListPipesIn = new ArrayList<>();
+                        ArrayList<OutputStream> sliceListPipesOut = new ArrayList<>();
+                        
+                        //Add the first InputStream from driver
+                        sliceListPipesIn.add(sliceInputStream);
+                        
+                        //Creating and connecting the pipes
+                        for (int j = 0; j < options.slicePipeline.size(); j++)
                         {
-                            in = new PipedInputStream(out, StoreSafeManager.bufferSize);
-                        } catch (IOException ex)
-                        {
-                            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
+                            PipedOutputStream out = new PipedOutputStream();
+                            PipedInputStream in = null;
+                            try
+                            {
+                                in = new PipedInputStream(out, StoreSafeManager.bufferSize);
+                            } catch (IOException ex)
+                            {
+                                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream", ex);
+                            }
+                            
+                            sliceListPipesIn.add(in);
+                            sliceListPipesOut.add(out);
                         }
-
-                        sliceListPipesIn.add(in);
-                        sliceListPipesOut.add(out);
-                    }
-
-                    //Now that we already have a pipeline, just need to send the right Streams for each PipeProcess
-                    for (int j = 0; j < options.slicePipeline.size(); j++)
-                    {
-
-                        //Get actual Pipe
-                        IPipeProcess pipe = options.slicePipeline.get(j);
-
-                        //Get the streams
-                        InputStream inT = sliceListPipesIn.get(j);
-                        RTOutputStream outT = new RTOutputStream(sliceListPipesOut.get(j));
-
-                        //Run the process for the pipes in a new thread (parallel)
-                        new Thread(
-                                new Runnable() {
-                                    public void run() {
-                                        //Start time variables
-                                        pipe.reverseProcess(inT, outT, options.additionalParameters);
-                                        try
-                                        {
-                                            outT.close();
-                                            //Finish and log everything
-                                            FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
-
-                                        } catch (IOException ex)
-                                        {
-                                            Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
+                        
+                        //Now that we already have a pipeline, just need to send the right Streams for each PipeProcess
+                        for (int j = 0; j < options.slicePipeline.size(); j++)
+                        {
+                            
+                            //Get actual Pipe
+                            IPipeProcess pipe = options.slicePipeline.get(j);
+                            
+                            //Get the streams
+                            InputStream inT = sliceListPipesIn.get(j);
+                            RTOutputStream outT = new RTOutputStream(sliceListPipesOut.get(j));
+                            
+                            //Run the process for the pipes in a new thread (parallel)
+                            new Thread(
+                                    new Runnable() {
+                                        public void run() {
+                                            //Start time variables
+                                            pipe.reverseProcess(inT, outT, options.additionalParameters);
+                                            try
+                                            {
+                                                outT.close();
+                                                //Finish and log everything
+                                                FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
+                                                
+                                            } catch (IOException ex)
+                                            {
+                                                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
+                                            }
                                         }
                                     }
-                                }
-                        ).start();
-
-                    }
-
-                    //Get Last InputStream
-                    sliceInputStream = new RTInputStream(sliceListPipesIn.get(sliceListPipesIn.size() - 1));
-
-                }
-                //Add the inputStream to the list of InputStreams
-                inputStreams.add(sliceInputStream);
+                            ).start();
+                            
+                        }
+                        
+                        //Get Last InputStream
+                        sliceRTInputStream = new RTInputStream(sliceListPipesIn.get(sliceListPipesIn.size() - 1));
+                        
+                    }   //Add the inputStream to the list of InputStreams
+                    inputStreams.add(sliceRTInputStream);
+                } catch (IOException ex) {
+                    Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+                } 
             }
 
         }
@@ -580,23 +608,33 @@ class StorageManager {
         {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
         }
+        
+        ThreadMXBean tmx = ManagementFactory.getThreadMXBean();
+        tmx.setThreadContentionMonitoringEnabled(true);
+        tmx.setThreadCpuTimeEnabled(true);
+
+        long start = tmx.getCurrentThreadUserTime();
 
         //Decode
         ida.decode();
+        long time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
 
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "DOWN", os.totalTime(), os.averageRate(), os.totalBytes());
-        String[] teste = ida.getPartsHash();
+        FlexSkyLogger.addIDALog(ssf, "DOWN", time, os.totalBytes() / (time / 1000), os.totalBytes());
 
-        for (int i = 0; i < teste.length; i++)
-        {
-            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
-        }
+
+//        String[] teste = ida.getPartsHash();
+//
+//        for (int i = 0; i < teste.length; i++)
+//        {
+//            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
+//        }
 
         for (int i = 0; i < inputStreamsOriginal.size(); i++)
         {
             RTInputStream is = inputStreamsOriginal.get(i);
-            FlexSkyLogger.addSliceLog(ssf, slices.get(i), "DOWN", is.totalTime(), is.averageRate(), is.totalBytes());
+            if (is.totalTime() > 0)
+            FlexSkyLogger.addSliceLog(ssf, slices.get(i), "DOWN", is.totalTime(), is.averageRate(), is.totalKBytes());
         }
 
         //Check if file hash match
@@ -605,7 +643,7 @@ class StorageManager {
             return true;
         } else
         {
-            file.deleteOnExit();
+            file.renameTo(new File(file.getAbsolutePath() + "-failed"));
             throw new Error("ERROR: recovered file hash differs from the original");
         }
     }

@@ -235,7 +235,7 @@ public abstract class IDecoderIDA
         try
         {
             //Close the Input Buffers
-            for (int i = 0; i < this.readBufs.length; i++) {                
+            for (int i = 0; i < this.readBufs.length; i++) {    
                     this.readBufs[i].close();                
             }      
             

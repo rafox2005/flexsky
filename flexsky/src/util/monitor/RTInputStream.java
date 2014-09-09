@@ -48,7 +48,7 @@ public class RTInputStream extends FilterInputStream {
 
   //Kbyte/s
   public double averageRate() {      
-    return (double) ( (byteCount/1024.0) / (timeCount/1000.0) );
+    return (double) ( (byteCount/1000.0) / (timeCount/1000.0) );
   } 
   
   //ms
@@ -57,7 +57,7 @@ public class RTInputStream extends FilterInputStream {
   }
    
    //k
-   public double totalBytes() {
-    return (byteCount/1024.0);
+   public double totalKBytes() {
+    return (byteCount/1000.0);
   }
 }

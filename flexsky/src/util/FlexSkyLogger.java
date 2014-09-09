@@ -30,20 +30,20 @@ import java.util.logging.Logger;
  *
  * @author rlibardi
  */
-public class StoreSafeLogger {
+public class FlexSkyLogger {
     
     private static Connection conn;
 
-    public StoreSafeLogger(String log_db_path) {
+    public FlexSkyLogger(String log_db_path) {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            StoreSafeLogger.conn = DriverManager.getConnection("jdbc:sqlite:" + log_db_path);
+            FlexSkyLogger.conn = DriverManager.getConnection("jdbc:sqlite:" + log_db_path);
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -51,7 +51,7 @@ public class StoreSafeLogger {
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO file" + "(file, revision, ida, action, time, throughput, size, log_time)"
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO file" + "(file, revision, ida, action, time, throughput, size, log_time)"
                             + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
            prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -64,7 +64,7 @@ public class StoreSafeLogger {
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }    
     }
     
@@ -72,7 +72,7 @@ public class StoreSafeLogger {
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO ida" + "(file, revision, ida, action, time, throughput, size, log_time)"
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO ida" + "(file, revision, ida, action, time, throughput, size, log_time)"
                             + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
            prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -85,7 +85,7 @@ public class StoreSafeLogger {
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }    
     }  
  
@@ -94,7 +94,7 @@ public class StoreSafeLogger {
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO slice" + "(file, revision, slice_index, account, ida, action, time, throughput, size, log_time)"
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO slice" + "(file, revision, slice_index, account, ida, action, time, throughput, size, log_time)"
                             + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -109,7 +109,7 @@ public class StoreSafeLogger {
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -117,7 +117,7 @@ public class StoreSafeLogger {
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO file_pipe" + "(file, revision, ida, pipe, action, time, throughput, size, log_time)"
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO file_pipe" + "(file, revision, ida, pipe, action, time, throughput, size, log_time)"
                             + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -131,7 +131,7 @@ public class StoreSafeLogger {
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -139,7 +139,7 @@ public class StoreSafeLogger {
     {
         try {
             PreparedStatement prepStatement
-                    = StoreSafeLogger.conn.prepareStatement("INSERT INTO slice_pipe" + "(file, revision, slice_index, ida, pipe, action, time, throughput, size, log_time)"
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO slice_pipe" + "(file, revision, slice_index, ida, pipe, action, time, throughput, size, log_time)"
                             + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -154,7 +154,7 @@ public class StoreSafeLogger {
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {
-            Logger.getLogger(StoreSafeLogger.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

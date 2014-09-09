@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import pipeline.IPipeProcess;
-import util.StoreSafeLogger;
+import util.FlexSkyLogger;
 
 /**
  *
@@ -55,13 +55,13 @@ public class StoreSafeManager {
     private static ExecutorService executor = null;
     public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
     
-    public final StoreSafeLogger logger;
+    public final FlexSkyLogger logger;
     
 
     protected StoreSafeManager(String pathToDB, String pathToLogDB) {
         this.db = new DatabaseManager(pathToDB);
         this.storage = new StorageManager();
-        this.logger = new StoreSafeLogger(pathToLogDB); 
+        this.logger = new FlexSkyLogger(pathToLogDB); 
     }
 
     public static StoreSafeManager getInstance(String pathToDB, String pathToLogDB) {
@@ -106,7 +106,7 @@ public class StoreSafeManager {
             //Finish and log everything
             double time = System.currentTimeMillis() - start;
             double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
-            StoreSafeLogger.addFileLog(ssf, "UP", time, rate, ssf.getSize()/1000.0);
+            FlexSkyLogger.addFileLog(ssf, "UP", time, rate, ssf.getSize()/1000.0);
             
            
             return true;
@@ -149,7 +149,7 @@ public class StoreSafeManager {
             long time = System.currentTimeMillis() - start;
             long rate = (ssf.getSize() / 1024) / ( time/1000 );
             
-            StoreSafeLogger.addFileLog(ssf, "DOWN", time, rate, ssf.getSize());
+            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, ssf.getSize());
             
             return true;
         } catch (IOException ex) {
@@ -174,7 +174,7 @@ public class StoreSafeManager {
         //Finish and log everything
             double time = System.currentTimeMillis() - start;
             double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
-            StoreSafeLogger.addFileLog(ssf, "DEL", time, rate, ssf.getSize()/1024.0);
+            FlexSkyLogger.addFileLog(ssf, "DEL", time, rate, ssf.getSize()/1024.0);
         
         return true;
     }

@@ -54,12 +54,12 @@ public class EncoderRabinIDA extends IEncoderIDA {
     @Override
     public long encode() {
         
-        long sliceCount = 0;        
+        long sliceCount = 0;     
+        long size = 0;
         
         try {
             byte[] input = new byte[reqParts];
-            long size = 0;
-            int len = 0;
+            int len = 0;            
 
             while (( len = disFile.read(input, 0, reqParts) ) != -1) {
                 size += len;

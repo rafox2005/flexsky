@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import management.StoreSafeManager;
-import util.StoreSafeLogger;
+import util.FlexSkyLogger;
 
 /**
  *
@@ -85,6 +85,7 @@ public class WebDavDriver implements IDriver {
                                 //Set the remotePath WebDav
                                 String remotePath = pathT + slice.getFile() + "-" + String.valueOf(slice.getPartIndex());
                                 //Send the Stream
+                                sardine.exists(remotePath);
                                 sardine.put(remotePath, in);
                             } catch (MalformedURLException ex) {
                                 Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav URL incorrectly created", ex);

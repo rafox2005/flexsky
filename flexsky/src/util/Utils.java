@@ -251,7 +251,7 @@ public class Utils {
                     // Remove the .class extension  
                     fileName = fileName.substring(0, fileName.length() - 6);
                     try {
-                        classes.add(Class.forName(packageName + "." + fileName));
+                        if (!fileName.contains("$")) classes.add(Class.forName(packageName + "." + fileName));
                     } catch (ClassNotFoundException e) {
                         Logger.getLogger(Utils.class.getName()).log(Level.WARNING, packageName + "." + fileName + " does not appear to be a valid class.", e);
                     }

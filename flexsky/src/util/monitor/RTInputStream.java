@@ -16,7 +16,6 @@ import java.io.IOException;
 public class RTInputStream extends FilterInputStream {
   long byteCount = 0;
   long timeCount = 0;
-  private boolean closed = false;
 
   public RTInputStream(InputStream in) {
     super(in);
@@ -25,16 +24,16 @@ public class RTInputStream extends FilterInputStream {
   public int read() throws IOException {
     long start = System.currentTimeMillis();
     int b = super.read();
-    byteCount++;
     timeCount += System.currentTimeMillis() - start;
+    byteCount++;    
     return b;
   }
 
   public int read(byte data[]) throws IOException {
     long start = System.currentTimeMillis();
     int cnt = super.read(data);
-    byteCount += data.length;
     timeCount += System.currentTimeMillis() - start;
+    if (cnt > 0) byteCount += cnt;    
     return cnt;
   }
 
@@ -42,15 +41,9 @@ public class RTInputStream extends FilterInputStream {
     throws IOException {
     long start = System.currentTimeMillis();
     int cnt = super.read(data, off, len);
-    byteCount += len;
     timeCount += System.currentTimeMillis() - start;
+    if (cnt > 0) byteCount += cnt;    
     return cnt;
-  }
-  
-  public void close() throws IOException
-  {
-      this.closed=true;
-      super.close();
   }
 
   //Kbyte/s
@@ -67,9 +60,5 @@ public class RTInputStream extends FilterInputStream {
    public double totalKBytes() {
     return (byteCount/1000.0);
   }
-   
-   public boolean isClosed()
-   {
-       return this.closed;
-   }
+
 }

@@ -75,10 +75,14 @@ public class EncoderRabinIDA extends IEncoderIDA {
                 //if (this.writeBufs[0].size() == this.bufSize) this.flush();
             }
             
+            
+            //Check if need to add 0 to the file
+            if (size % reqParts != 0)
+            {
             int padding = reqParts - (int) (size % reqParts);
             byte[] toPadding = new byte[padding];
             disFile.getMessageDigest().update(toPadding);
-            
+            }
             
             //Flush at the end
             this.cleanUp();           

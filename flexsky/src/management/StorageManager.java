@@ -28,9 +28,6 @@ import dispersal.decoder.DecoderRS;
 import dispersal.decoder.DecoderRabinIDA;
 import dispersal.encoder.EncoderRS;
 import dispersal.encoder.EncoderRabinIDA;
-import storage.driver.DiskDriver;
-import storage.IDriver;
-import storage.driver.WebDavDriver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,6 +39,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -52,6 +50,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import pipeline.IPipeProcess;
+import storage.IDriver;
+import storage.driver.DiskDriver;
+import storage.driver.WebDavDriver;
 import util.FlexSkyLogger;
 import util.monitor.RTInputStream;
 import util.monitor.RTOutputStream;
@@ -283,10 +284,10 @@ class StorageManager {
         }
 
         //Log the slices outputs
+        while (tmx.getThreadCount() > 10);
         for (int i = 0; i < outputStreamsOriginal.size(); i++) {
             RTOutputStream os = outputStreamsOriginal.get(i);
             if (os.totalTime() > 0) {
-                while (!os.isClosed());
                 FlexSkyLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalBytes());
             }
             }
@@ -548,6 +549,7 @@ class StorageManager {
 //        {
 //            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
 //        }
+        while (tmx.getThreadCount() > 10);
         for (int i = 0; i < inputStreamsOriginal.size(); i++) {
             RTInputStream is = inputStreamsOriginal.get(i);
             if (is.totalTime() > 0) {
@@ -572,8 +574,8 @@ class StorageManager {
 
             //Finish and log everything
             double time = System.currentTimeMillis() - start;
-            double rate = (slice.getSize() / 1024.0) / (time / 1000.0);
-            FlexSkyLogger.addSliceLog(file, slice, "DEL", time, rate, slice.getSize() / 1024.0);
+            double rate = (slice.getSize() / 1000.0) / (time / 1000.0);
+            FlexSkyLogger.addSliceLog(file, slice, "DEL", time, rate, slice.getSize() / 1000.0);
 
             return result;
         } catch (ClassNotFoundException ex) {

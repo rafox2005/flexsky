@@ -284,7 +284,7 @@ class StorageManager {
         }
 
         //Log the slices outputs
-        while (tmx.getThreadCount() > 10);
+        while (tmx.getThreadCount() - tmx.getDaemonThreadCount() > 3);
         for (int i = 0; i < outputStreamsOriginal.size(); i++) {
             RTOutputStream os = outputStreamsOriginal.get(i);
             if (os.totalTime() > 0) {
@@ -549,7 +549,7 @@ class StorageManager {
 //        {
 //            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
 //        }
-        while (tmx.getThreadCount() > 10);
+        while (tmx.getThreadCount() - tmx.getDaemonThreadCount() > 3);
         for (int i = 0; i < inputStreamsOriginal.size(); i++) {
             RTInputStream is = inputStreamsOriginal.get(i);
             if (is.totalTime() > 0) {

@@ -239,7 +239,7 @@ public abstract class IDecoderIDA
                     this.readBufs[i].close();                
             }      
             
-            this.writeBuffer.flush();
+            this.writeBuffer.close();
             
         } catch (IOException ex)
         {

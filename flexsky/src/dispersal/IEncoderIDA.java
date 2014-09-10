@@ -106,7 +106,6 @@ public abstract class IEncoderIDA
     {
         for (int i = 0; i < totalParts; i++) {
             try {
-                this.writeBufs[i].flush();
                 this.writeBufs[i].close();                
             } catch (IOException ex) {
                 Logger.getLogger(IEncoderIDA.class.getName()).log(Level.SEVERE, null, ex);

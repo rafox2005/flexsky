@@ -91,7 +91,7 @@ public class WebDavDriver implements IDriver {
                             } catch (MalformedURLException ex) {
                                 Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav URL incorrectly created", ex);
                             } catch (IOException ex) {
-                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav Upload IO error", ex);
+                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav Upload IO error ", ex);
                             }
                         }
                     }

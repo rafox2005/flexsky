@@ -8,6 +8,7 @@ import java.io.IOException;
 public class RTOutputStream extends FilterOutputStream {
   long byteCount = 0;
   long timeCount = 0;
+    private boolean closed = false;
 
   public RTOutputStream(OutputStream out) {
     super(out);
@@ -28,6 +29,12 @@ public class RTOutputStream extends FilterOutputStream {
     throws IOException {
     super.write(data, off, len);
   }
+  
+  public void close() throws IOException
+  {
+      this.closed = true;
+      super.close();
+  }
 
   //Kbyte/s
   public double averageRate() {
@@ -43,5 +50,10 @@ public class RTOutputStream extends FilterOutputStream {
    public double totalBytes() {
     return (byteCount/1024.0);
   }
+   
+   public boolean isClosed()
+   {
+       return this.closed;
+   }
  
 }

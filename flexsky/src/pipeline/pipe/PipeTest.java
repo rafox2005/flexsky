@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import management.StoreSafeManager;
 import pipeline.IPipeProcess;
 import util.Utils;
 
@@ -49,7 +50,7 @@ public class PipeTest implements IPipeProcess {
         try {           
             
             //Create variables to handle the desired operation, in this case the MessageDigest objects for Hash
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[StoreSafeManager.bufferSize];
             int len;
             MessageDigest mdFile = MessageDigest.getInstance("SHA1");
             DigestInputStream disFile = new DigestInputStream(io, mdFile);
@@ -92,7 +93,7 @@ public class PipeTest implements IPipeProcess {
     public void reverseProcess(InputStream io, OutputStream os, HashMap<String,String> parameters) {
         try {
             //Create variables to handle the desired operation, in this case the MessageDigest objects for Hash
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[StoreSafeManager.bufferSize];
             int len;
             MessageDigest mdFile = MessageDigest.getInstance("SHA1");
             DigestInputStream disFile = new DigestInputStream(io, mdFile);

@@ -50,7 +50,7 @@ public class StoreSafeManager {
     private static StoreSafeManager instance = null;
     private final DatabaseManager db;
     private final StorageManager storage;
-    public static final int bufferSize = 1024*8;
+    public static int bufferSize = 1024*8;
     
     private static ExecutorService executor = null;
     public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
@@ -64,15 +64,19 @@ public class StoreSafeManager {
         this.logger = new FlexSkyLogger(pathToLogDB); 
     }
 
+
     public static StoreSafeManager getInstance(String pathToDB, String pathToLogDB) {
         if (instance == null) {
             instance = new StoreSafeManager(pathToDB, pathToLogDB);
         }
         return instance;
     }
-
+    
+    
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
         long start, end;
+        //Buffer size must be compatible with reqParts for the Dispersal to work
+        StoreSafeManager.bufferSize = StoreSafeManager.bufferSize + (reqParts - StoreSafeManager.bufferSize % reqParts);
         start = System.currentTimeMillis();
         StoreSafeFile ssf = null;
         try {
@@ -129,6 +133,7 @@ public class StoreSafeManager {
 
     public boolean downloadFile(String path, StoreSafeFile ssf) {
         try {
+            StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - (ssf.getReqParts() - StoreSafeManager.bufferSize%ssf.getReqParts());
             long start = System.currentTimeMillis();
             ArrayList<StoreSafeSlice> slicesList = this.db.getFileSlices(ssf);
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);

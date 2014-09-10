@@ -5,8 +5,6 @@
  */
 package dispersal;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +29,7 @@ public abstract class IDecoderIDA
 {
 
     protected InputStream[] readBufs;
-    protected BufferedOutputStream writeBuffer;
+    protected OutputStream writeBuffer;
     protected int totalParts;
     protected int reqParts;
     protected final int bufSize = StoreSafeManager.bufferSize;
@@ -64,7 +62,7 @@ public abstract class IDecoderIDA
                 this.mdParts[i] = MessageDigest.getInstance("SHA1");
                 this.disParts[i] = new DigestInputStream(this.readBufs[i], this.mdParts[i]);
             }
-            this.writeBuffer = new BufferedOutputStream(file, this.bufSize);
+            this.writeBuffer = file;
             //Create Hash for the file
             this.mdFile = MessageDigest.getInstance("SHA1");
             this.disFile = new DigestOutputStream(this.writeBuffer, this.mdFile);
@@ -85,12 +83,12 @@ public abstract class IDecoderIDA
     {
         try {
             InputStream[] in = new InputStream[parts.length];
-            BufferedInputStream[] readBuffers = new BufferedInputStream[parts.length];
-            BufferedOutputStream fileBos = new BufferedOutputStream(new FileOutputStream(file), this.bufSize);
+            InputStream[] readBuffers = new InputStream[parts.length];
+            OutputStream fileBos = new FileOutputStream(file);
 
             for (int i = 0; i < parts.length; i++) {
                 in[i] = new FileInputStream(parts[i]);
-                readBuffers[i] = new BufferedInputStream(in[i], this.bufSize);
+                readBuffers[i] = in[i];
             }
 
             this.totalParts = totalParts;
@@ -125,13 +123,13 @@ public abstract class IDecoderIDA
     {
         try {
             InputStream[] in = new InputStream[parts.length];
-            BufferedInputStream[] readBuffers = new BufferedInputStream[parts.length];
-            BufferedOutputStream fileBos = new BufferedOutputStream(fileOs, this.bufSize);
+            InputStream[] readBuffers = new InputStream[parts.length];
+            OutputStream fileBos = fileOs;
             this.additionalOptions = additionalOptions;
 
             for (int i = 0; i < parts.length; i++) {
                 in[i] = new FileInputStream(parts[i]);
-                readBuffers[i] = new BufferedInputStream(in[i], this.bufSize);
+                readBuffers[i] = in[i];
             }
 
             this.totalParts = totalParts;
@@ -165,7 +163,7 @@ public abstract class IDecoderIDA
      *
      * @return Write buffer of the file complete
      */
-    public BufferedOutputStream getWriteBuffer()
+    public OutputStream getWriteBuffer()
     {
         return writeBuffer;
     }

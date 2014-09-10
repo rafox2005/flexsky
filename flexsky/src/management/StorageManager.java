@@ -67,7 +67,7 @@ class StorageManager {
         StorageOptions options = ssf.getOptions();
         InputStream fileInputStream = null;
         try {
-            fileInputStream = new RTInputStream(new FileInputStream(file));
+            fileInputStream = new FileInputStream(file);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
         }
@@ -189,12 +189,7 @@ class StorageManager {
             ArrayList<InputStream> listPipesIn = new ArrayList<>();
             ArrayList<OutputStream> listPipesOut = new ArrayList<>();
 
-            try {
-                //Adding the first
-                listPipesIn.add(new FileInputStream(file));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
-            }
+            listPipesIn.add(fileInputStream);
 
             //Creating and connecting the pipes
             for (int i = 0; i < options.filePipeline.size(); i++) {

@@ -6,8 +6,6 @@
 package dispersal;
 
 import dispersal.encoder.EncoderRabinIDA;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,10 +31,10 @@ public abstract class IEncoderIDA
 
     protected final int bufSize = StoreSafeManager.bufferSize;
     protected OutputStream[] filesWriteBufs;
-    protected BufferedInputStream readBuffer;
+    protected InputStream readBuffer;
     protected int reqParts;
     protected int totalParts;
-    protected BufferedOutputStream[] writeBufs;
+    protected OutputStream[] writeBufs;
     protected MessageDigest[] mdParts;
     protected MessageDigest mdFile;
     protected DigestOutputStream[] disParts;
@@ -50,15 +48,15 @@ public abstract class IEncoderIDA
         this.filesWriteBufs = dispersalStreams;
         try {
             InputStream in = new FileInputStream(fileToDisperse);
-            this.readBuffer = new BufferedInputStream(in, this.bufSize);
-            this.writeBufs = new BufferedOutputStream[totalParts];
+            this.readBuffer = in;
+            this.writeBufs = new OutputStream[totalParts];
             this.mdParts = new MessageDigest[totalParts];
             this.disParts = new DigestOutputStream[totalParts];
             //Create Hash for the file
             this.mdFile = MessageDigest.getInstance("SHA1");
             this.disFile = new DigestInputStream(this.readBuffer, this.mdFile);
             for (int i = 0; i < totalParts; i++) {
-                writeBufs[i] = new BufferedOutputStream(filesWriteBufs[i], this.bufSize);
+                writeBufs[i] = filesWriteBufs[i];
                 //Create Hashes for the parts
                 this.mdParts[i] = MessageDigest.getInstance("SHA1");
                 this.disParts[i] = new DigestOutputStream(writeBufs[i], this.mdParts[i]);
@@ -77,15 +75,15 @@ public abstract class IEncoderIDA
         this.additionalOptions = additionalOptions;
         try {
             InputStream in = inputStreamToDisperse;
-            this.readBuffer = new BufferedInputStream(in, this.bufSize);
-            this.writeBufs = new BufferedOutputStream[totalParts];
+            this.readBuffer = in;
+            this.writeBufs = new OutputStream[totalParts];
             this.mdParts = new MessageDigest[totalParts];
             this.disParts = new DigestOutputStream[totalParts];
             //Create Hash for the file
             this.mdFile = MessageDigest.getInstance("SHA1");
             this.disFile = new DigestInputStream(this.readBuffer, this.mdFile);
             for (int i = 0; i < totalParts; i++) {
-                writeBufs[i] = new BufferedOutputStream(filesWriteBufs[i], this.bufSize);
+                writeBufs[i] = filesWriteBufs[i];
                 //Create Hashes for the parts
                 this.mdParts[i] = MessageDigest.getInstance("SHA1");
                 this.disParts[i] = new DigestOutputStream(writeBufs[i], this.mdParts[i]);
@@ -119,7 +117,7 @@ public abstract class IEncoderIDA
      *
      * @return Write buffer of the file complete
      */
-    public BufferedOutputStream[] getWriteBufs()
+    public OutputStream[] getWriteBufs()
     {
         return writeBufs;
     }

@@ -93,7 +93,7 @@ public class EncoderRSTest {
         
         reed.encode();
         String[] teste = reed.getPartsHash();
-        BufferedOutputStream[] partesSaida = reed.getWriteBufs();
+        OutputStream[] partesSaida = reed.getWriteBufs();
         
         File[] partesEntrada = new File[7];
         

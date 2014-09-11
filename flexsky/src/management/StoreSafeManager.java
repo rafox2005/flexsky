@@ -88,8 +88,10 @@ public class StoreSafeManager {
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class); //Needed for lasAccess file variable
             ssf = new StoreSafeFile(file.getName(), file.length(), type, dispersalMethod, totalParts, reqParts, "0", new Date(attrs.lastAccessTime().toMillis()), new Date(attrs.lastModifiedTime().toMillis()), revision);
             ssf.setOptions(options);
+            
             int fileID = this.db.insertFile(ssf);
-
+            
+            
             ArrayList<StoreSafeSlice> slices = new ArrayList<>();
 
             for (int i = 0; i < totalParts; i++) {

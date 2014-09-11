@@ -80,7 +80,7 @@ public class EncoderRabinIDATest
 
         ida.encode();
         String teste[] = ida.getPartsHash();
-        BufferedOutputStream[] partesSaida = ida.getWriteBufs();
+        OutputStream[] partesSaida = ida.getWriteBufs();
 
         File[] partesEntrada = new File[3];
 

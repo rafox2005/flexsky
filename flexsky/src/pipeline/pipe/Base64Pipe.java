@@ -49,14 +49,13 @@ public class Base64Pipe implements IPipeProcess
             }
             else
             {
-                inputStream = new BufferedInputStream(io);
-                outputStream = new BufferedOutputStream(os);
+                inputStream = io;
+                outputStream = os;
             }
 
             BASE64Encoder encoder = new BASE64Encoder();
             encoder.encode(inputStream, outputStream);
 
-            io.close();
         } 
         catch (IOException ex)
         {
@@ -94,15 +93,12 @@ public class Base64Pipe implements IPipeProcess
             }
             else
             {
-                inputStream = new BufferedInputStream(io);
-                outputStream = new BufferedOutputStream(os);
+                inputStream = io;
+                outputStream = os;
             }
 
             BASE64Decoder decoder = new BASE64Decoder();
             decoder.decodeBuffer(inputStream, outputStream);
-            
-            outputStream.flush();
-            outputStream.close();
 
         } 
         catch (IOException ex)

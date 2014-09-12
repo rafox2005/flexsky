@@ -16,50 +16,136 @@ limitations under the License.
 -->
 
 
-<scenario name="backupOnly">
- <repeat>10</repeat>
- <db resetOnStart="true">pathToDB</db>
- <log_db>pathToLogDB</log_db>
- <providerList>
- <account name="box">
-  <type>driver.WebDavDriver</type>
-   <path>https://dav.box.com</path>
-   <parameters>
-    <param key="user" value="ra"></param>
-    <param key="pass" value="un"></param>
-   </parameters>
- </account>
-  <account name="4shared">
-   <type>driver.WebDavDriver</type>
-   <path>https://webdav.4shared.com</path>
-   <parameters>
-    <param key="user" value="ra"></param>
-    <param key="pass" value="un"></param>
-   </parameters>
- </account>
- </providerList>
- <operationList>
-  <operation action="upload">
-   <file>
-    <path>/home/flexsy/document.pdf</path>
-    <revision>1</revision>
-    <type>text</type>
-    <options>
-  <filePipeline>
-   <pipe name="pipeline.pipe.PipeTest"></pipe>
-  </filePipeline>
-  <slicePipeline>
-   <pipe name="pipeline.pipe.PipeTest"></pipe>
-  </slicePipeline>
-  <parameters>
-   <param key="p1" value="v1"></param>
-   <param key="p" value="v2"></param>
-  </parameters>
-  </options>
-   </file>
-   <totalParts>2</totalParts>
-   <reqParts>1</reqParts>
-   <idaMethod>RabinIDA</idaMethod>
-  </operation>
- </operationList>
+<scenario name="SAC-Experiments">
+    <repeat>10</repeat>
+    <db resetOnStart="true">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-files.db</db>
+    <log_db>/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-log.db</log_db>
+    <providerList>
+        <account name="remote-box">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://dav.box.com/dav/</path>
+            <parameters>
+                <param key="username" value="rafox2005@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-DriveHQ">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://dhqid1219757767114119952.webdav.drivehq.com/flexsky/</path>
+        </account>
+        <account name="remote-HiDrive">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://rafox.webdav.hidrive.strato.com/users/rafox/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-CloudDrive">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://webdav.cloudme.com/rafox/CloudDrive/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-smeUS">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://webdav.storagemadeeasy.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-smeEU">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://webdaveu.storagemadeeasy.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-PowerFolder">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://my.powerfolder.com/webdav/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-GoldenFrog">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://dav.dumptruck.goldenfrog.com/dav/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-SafeStore">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://723703236.webdav.cloudsafe.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="Z4FHSP-R6AED2-L47TZY-FFEWQM"></param>
+            </parameters>
+        </account>
+    </providerList>
+    <operationList>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file100K</path>
+                <revision>1</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>9</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file100K</path>
+                <revision>2</revision>
+                <type>random</type>
+            </file>
+            <totalParts>9</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file100</path>
+                <revision>3</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>9</totalParts>
+            <reqParts>8</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file100</path>
+                <revision>4</revision>
+                <type>random</type>
+            </file>
+            <totalParts>9</totalParts>
+            <reqParts>8</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+    </operationList>
 </scenario>

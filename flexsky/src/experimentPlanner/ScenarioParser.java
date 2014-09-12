@@ -124,6 +124,16 @@ public class ScenarioParser {
                 {
                     NodeList fileAttr = operAttr.item(j).getChildNodes();
                     StoreSafeFile ssf = new StoreSafeFile(null, 0);
+                    ArrayList<IPipeProcess> filePipeline = new ArrayList();
+                    ArrayList<IPipeProcess> slicePipeline = new ArrayList();
+                    StorageOptions options = new StorageOptions();
+                    
+                    options.filePipeline = filePipeline;
+                    options.slicePipeline = slicePipeline;
+                    operation.setOptions(options);
+                    
+                    HashMap map = new HashMap();
+                    
 
                     for (int k = 0; k < fileAttr.getLength(); k++)
                     {
@@ -137,10 +147,7 @@ public class ScenarioParser {
                         {
                             ssf.setType(fileAttr.item(k).getFirstChild().getNodeValue());
                         } else if (fileAttr.item(k).getNodeName() == "options")
-                        {
-                            ArrayList<IPipeProcess> filePipeline = new ArrayList();
-                            ArrayList<IPipeProcess> slicePipeline = new ArrayList();
-                            StorageOptions options = new StorageOptions();
+                        {                            
 
                             NodeList optionsAttr = fileAttr.item(k).getChildNodes();
 
@@ -173,7 +180,7 @@ public class ScenarioParser {
                                 } else if (optionsAttr.item(m).getNodeName() == "parameters")
                                 {
                                     NodeList fileParam = optionsAttr.item(m).getChildNodes();
-                                    HashMap map = new HashMap();
+                                    
                                     for (int l = 0; l < fileParam.getLength(); l++)
                                     {
                                         if (fileParam.item(l).getNodeName() == "param")
@@ -183,16 +190,16 @@ public class ScenarioParser {
                                             map.put(key, value);
                                         }
                                     }
-                                    options.additionalParameters = map;
+                                    
                                 }
 
                             }
-                            options.filePipeline = filePipeline;
-                            options.slicePipeline = slicePipeline;
-                            operation.setOptions(options);
+                            
                         }
                     }
                     operation.setFile(ssf);
+                    ssf.setOptions(options);
+                    options.additionalParameters = map;
 
                 }
 

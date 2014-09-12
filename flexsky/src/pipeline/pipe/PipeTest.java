@@ -66,10 +66,6 @@ public class PipeTest implements IPipeProcess {
             //Do other wanted operations, in this case it logs for Debug Info
             Logger.getLogger(PipeTest.class.getName()).log(Level.INFO, "PROCESS: Input Hash: " + Utils.getStringFromMessageDigest(disFile.getMessageDigest()) + "Output Hash: " + Utils.getStringFromMessageDigest(osFile.getMessageDigest()));
             
-            //Close OutputStream - Very important to close the Output stream after reading from it.
-            osFile.flush();
-            osFile.close();
-            
         } catch (IOException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -108,10 +104,6 @@ public class PipeTest implements IPipeProcess {
             
             //Do other wanted operations, in this case it logs for Debug Info
             Logger.getLogger(PipeTest.class.getName()).log(Level.INFO, "RPROCESS: Input Hash: " + Utils.getStringFromMessageDigest(disFile.getMessageDigest()) + "Output Hash: " + Utils.getStringFromMessageDigest(osFile.getMessageDigest()));
-            
-            //Close inputStream - Very important to close the input stream after reading from it.
-            osFile.flush();
-            osFile.close();
             
         } catch (IOException ex) {
             Logger.getLogger(PipeTest.class.getName()).log(Level.SEVERE, null, ex);

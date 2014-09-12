@@ -153,6 +153,8 @@ class StorageManager {
                                     public void run() {
                                         pipe.process(inT, outT, options.additionalParameters);
                                         try {
+                                            inT.close();
+                                            outT.flush();
                                             outT.close();
                                             //Finish and log everything
                                             FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
@@ -222,6 +224,8 @@ class StorageManager {
                             public void run() {
                                 pipe.process(inT, outT, options.additionalParameters);
                                 try {
+                                    inT.close();
+                                    outT.flush();
                                     outT.close();
                                     //Finish and log everything                                     
                                     FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
@@ -414,7 +418,10 @@ class StorageManager {
                                             //Start time variables
                                             pipe.reverseProcess(inT, outT, options.additionalParameters);
                                             try {
+                                                inT.close();
+                                                outT.flush();
                                                 outT.close();
+                                                
                                                 //Finish and log everything
                                                 FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
 
@@ -490,6 +497,8 @@ class StorageManager {
                             public void run() {
                                 try {
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
+                                    inT.close();
+                                    outT.flush();
                                     outT.close();
                                     //Finish and log everything
                                     FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());

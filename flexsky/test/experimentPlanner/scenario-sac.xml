@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2014 Rafox.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<scenario name="SAC-Experiments">
+    <repeat>10</repeat>
+    <db resetOnStart="yes">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-files.db</db>
+    <log_db>/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-log.db</log_db>
+    <providerList>
+        <account name="remote-box">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://dav.box.com/dav/</path>
+            <parameters>
+                <param key="username" value="rafox2005@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-DriveHQ">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://dhqid1219757767114119952.webdav.drivehq.com/flexsky/</path>
+            <parameters>
+                <param key="username" value=""></param>
+                <param key="password" value=""></param>
+            </parameters>            
+        </account>
+        <account name="remote-HiDrive">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://rafox.webdav.hidrive.strato.com/users/rafox/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-CloudDrive">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://webdav.cloudme.com/rafox/CloudDrive/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-smeUS">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://webdav.storagemadeeasy.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-smeEU">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://webdaveu.storagemadeeasy.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-PowerFolder">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://my.powerfolder.com/webdav/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+        <account name="remote-GoldenFrog">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://dav.dumptruck.goldenfrog.com/dav/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+<!--        <account name="remote-MedienCentre">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://webdav.mediencenter.t-online.de/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafox"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>-->
+        <account name="remote-CloudSafe">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://723703236.webdav.cloudsafe.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="56U2RG-IGAH52-DJYTGB-ZWGHGH"></param>
+            </parameters>
+        </account>
+        <account name="remote-Cubby">
+            <type>storage.driver.WebDavDriver</type>
+            <path>https://webdav.cubby.com/flexsky/</path>
+            <parameters>
+                <param key="username" value="rafspam@gmail.com"></param>
+                <param key="password" value="ra281190"></param>
+            </parameters>
+        </account>
+    </providerList>
+    <operationList>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>1</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>1</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>2</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>2</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>3</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>3</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>4</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>4</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
+                <revision>5</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file10M</path>
+                <revision>5</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
+                <revision>6</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file10M</path>
+                <revision>6</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
+                <revision>7</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file10M</path>
+                <revision>7</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
+                <revision>8</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file10M</path>
+                <revision>8</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+    </operationList>
+</scenario>

@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class ScenarioParserTest {
     
-    String pathToXML = "/home/rlibardi/NetBeansProjects/safestore-leicester/flexsky/test/experimentPlanner/scenarioex3.xml";
+    String pathToXML = "/home/rlibardi/NetBeansProjects/flexsky/flexsky/test/experimentPlanner/scenario-sac.xml";
    
     
     public ScenarioParserTest() {
@@ -33,7 +33,9 @@ public class ScenarioParserTest {
      */
     @Test
     public void testParse() throws Exception {
-        ScenarioParser.parse(this.pathToXML);
+        Scenario test = ScenarioParser.parse(this.pathToXML);
+        ScenarioExecutor ex = ScenarioExecutor.getInstance();
+        ex.execute(test);
     }
     
 }

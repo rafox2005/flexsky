@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package ui;
 
 import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import dispersal.IEncoderIDA;
+import experimentPlanner.Scenario;
+import experimentPlanner.ScenarioExecutor;
+import experimentPlanner.ScenarioParser;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +42,10 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import management.StoreSafeManager;
+import org.xml.sax.SAXException;
 import storage.IDriver;
 
 /**
@@ -51,85 +57,79 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private StoreSafeManager ssm;
     private String db_path;
     private String logDB_path;
+
     /**
      * Creates new form SafeStoreMDIApplication
      */
     public SafeStoreMDIApplication() {
         initComponents();
         populateComponents();
-        
+
     }
-    
+
     private void getDBPaths() {
         int returnVal = jFileChooserDB.showOpenDialog(desktopPane);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
             File file = jFileChooserDB.getSelectedFile();
             this.db_path = file.getAbsolutePath();
         }
-        
-        
+
         jFileChooserDB.setDialogTitle("Choose the SQLite LOG Database File");
         returnVal = jFileChooserDB.showOpenDialog(desktopPane);
-        
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
             File file = jFileChooserDB.getSelectedFile();
             this.logDB_path = file.getAbsolutePath();
         }
     }
-    
+
     private void populateComponents() {
-        this.getDBPaths();       
-        
+        this.getDBPaths();
+
         ssm = StoreSafeManager.getInstance(this.db_path, this.logDB_path);
-        
+
         //Retrieve the lists
         Set listIDA = ssm.getIDAList();
         listIDA.add(null);
         Set listPipe = ssm.getPipeList();
         listPipe.add(null);
-        
+
         JList aux = new JList(listIDA.toArray());
         this.IDAList.setModel(aux.getModel());
-        
+
         //aux = new JList(listPipe.toArray());
         //this.filePipelinejTable.setModel(aux.getModel());       
-        
         this.updateAccounts();
-        
-        JComboBox comboBox = new JComboBox(listPipe.toArray());        
-        
+
+        JComboBox comboBox = new JComboBox(listPipe.toArray());
+
         TableColumn filePipeColumn = this.filePipelinejTable.getColumnModel().getColumn(0);
         filePipeColumn.setCellEditor(new DefaultCellEditor(comboBox));
-        
+
         //Set up tool tips for the sport cells.
-        DefaultTableCellRenderer renderer =
-                new DefaultTableCellRenderer();
+        DefaultTableCellRenderer renderer
+                = new DefaultTableCellRenderer();
         renderer.setToolTipText("Click for combo box");
         filePipeColumn.setCellRenderer(renderer);
-        
+
         TableColumn slicePipeColumn = this.slicePipelinejTable.getColumnModel().getColumn(0);
         slicePipeColumn.setCellEditor(new DefaultCellEditor(comboBox));
         slicePipeColumn.setCellRenderer(renderer);
-        
-        
+
         //DOWNLOAD
-        
         List listFiles = ssm.listFiles();
         aux = new JList(listFiles.toArray());
-        
+
         this.filesToDownloadJList.setModel(aux.getModel());
-        
+
         //Accounts
-        
         Set listDriver = ssm.getDriverList();
         JComboBox aux2 = new JComboBox(listDriver.toArray());
-        
+
         this.driverTypejComboBox.setModel(aux2.getModel());
-        
-        
-        
-        
 
     }
 
@@ -891,18 +891,22 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         // TODO add your handling code here:
         int returnVal = jFileChooser1.showSaveDialog(jPanel2);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
             File file = jFileChooser1.getSelectedFile();
             this.pathToDownloadFolderjLabel.setText(file.getAbsolutePath());
             jDialog1.setVisible(false);
+        } else
+        {
+            jDialog1.setVisible(false);
         }
-        else jDialog1.setVisible(false);
     }//GEN-LAST:event_setDownloadPathjButtonActionPerformed
 
     private void downloadJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_downloadJButtonMouseClicked
         List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
 
-        for (StoreSafeFile storeSafeFile : ssfList) {
+        for (StoreSafeFile storeSafeFile : ssfList)
+        {
             String path = this.pathToDownloadFolderjLabel.getText();
             ssm.downloadFile(path, storeSafeFile);
         }
@@ -911,7 +915,8 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private void deleteJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteJButtonMouseClicked
         List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
 
-        for (StoreSafeFile storeSafeFile : ssfList) {
+        for (StoreSafeFile storeSafeFile : ssfList)
+        {
             ssm.deleteFile(storeSafeFile);
         }
     }//GEN-LAST:event_deleteJButtonMouseClicked
@@ -945,26 +950,34 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         //Get file Pipeline
         ArrayList filePipeline = new ArrayList();
-        TableModel  fileTM = this.filePipelinejTable.getModel();
+        TableModel fileTM = this.filePipelinejTable.getModel();
 
-        for (int i = 0; i < this.filePipelinejTable.getModel().getRowCount(); i++) {
+        for (int i = 0; i < this.filePipelinejTable.getModel().getRowCount(); i++)
+        {
             if (fileTM.getValueAt(i, 0) != null)
             {
-                try {
+                try
+                {
                     Class aux = (Class) fileTM.getValueAt(i, 0);
 
                     filePipeline.add(aux.getConstructor().newInstance());
-                } catch (NoSuchMethodException ex) {
+                } catch (NoSuchMethodException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SecurityException ex) {
+                } catch (SecurityException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InstantiationException ex) {
+                } catch (InstantiationException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
+                } catch (IllegalAccessException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
+                } catch (IllegalArgumentException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
+                } catch (InvocationTargetException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -972,37 +985,46 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         //Get slice Pipeline
         ArrayList slicePipeline = new ArrayList();
-        TableModel  sliceTM = this.slicePipelinejTable.getModel();
+        TableModel sliceTM = this.slicePipelinejTable.getModel();
 
-        for (int i = 0; i < sliceTM.getRowCount(); i++) {
+        for (int i = 0; i < sliceTM.getRowCount(); i++)
+        {
             if (sliceTM.getValueAt(i, 0) != null)
             {
-                try {
+                try
+                {
                     Class aux = (Class) sliceTM.getValueAt(i, 0);
 
                     slicePipeline.add(aux.getConstructor().newInstance());
-                } catch (InstantiationException ex) {
+                } catch (InstantiationException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
+                } catch (IllegalAccessException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
+                } catch (IllegalArgumentException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
+                } catch (InvocationTargetException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NoSuchMethodException ex) {
+                } catch (NoSuchMethodException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SecurityException ex) {
+                } catch (SecurityException ex)
+                {
                     Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
 
         //Get additionalk paramteres
-        HashMap<String,String> param = new HashMap<String, String>();
+        HashMap<String, String> param = new HashMap<String, String>();
 
         TableModel paramTM = this.parametersjTable.getModel();
 
-        for (int i = 0; i < paramTM.getRowCount(); i++) {
+        for (int i = 0; i < paramTM.getRowCount(); i++)
+        {
             if (paramTM.getValueAt(i, 0) != null && paramTM.getValueAt(i, 1) != null)
             {
                 param.put(paramTM.getValueAt(i, 0).toString(), paramTM.getValueAt(i, 1).toString());
@@ -1030,24 +1052,27 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         int returnVal = jFileChooser1.showOpenDialog(jPanel2);
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
             File file = jFileChooser1.getSelectedFile();
             this.pathToFileLabel.setText(file.getAbsolutePath());
             jDialog1.setVisible(false);
+        } else
+        {
+            jDialog1.setVisible(false);
         }
-        else jDialog1.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void delProviderjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delProviderjButtonActionPerformed
         List<StoreSafeAccount> accounts = this.ProviderList1.getSelectedValuesList();
-        
+
         for (StoreSafeAccount account : accounts)
         {
             this.ssm.delAccount(account);
         }
-        
+
         this.updateAccounts();
-        
+
     }//GEN-LAST:event_delProviderjButtonActionPerformed
 
     private void providerAddjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_providerAddjButtonActionPerformed
@@ -1056,11 +1081,12 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         String type = driverTypejComboBox.getSelectedItem().toString().substring(6);
 
         //Get additionalk paramteres
-        HashMap<String,String> param = new HashMap<String, String>();
+        HashMap<String, String> param = new HashMap<String, String>();
 
         TableModel paramTM = this.parametersProviderjTable.getModel();
 
-        for (int i = 0; i < paramTM.getRowCount(); i++) {
+        for (int i = 0; i < paramTM.getRowCount(); i++)
+        {
             if (paramTM.getValueAt(i, 0) != null && paramTM.getValueAt(i, 1) != null)
             {
                 param.put(paramTM.getValueAt(i, 0).toString(), paramTM.getValueAt(i, 1).toString());
@@ -1075,40 +1101,90 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         this.updateAccounts();
     }//GEN-LAST:event_providerAddjButtonActionPerformed
 
- 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
+
+        //Check if UI or Experiment Planner to be used.
+        if (args.length > 0)
+        {
+            try
+            {
+                Scenario test = ScenarioParser.parse(args[0]);
+                ScenarioExecutor ex = ScenarioExecutor.getInstance();
+                ex.execute(test);
+            } catch (ParserConfigurationException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SAXException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (XPathExpressionException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchMethodException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex)
+            {
+                Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else
+        {
+
+            /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+             * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+             */
+            try
+            {
+                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+                {
+                    if ("Nimbus".equals(info.getName()))
+                    {
+                        javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
+            } catch (ClassNotFoundException ex)
+            {
+                java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            } catch (InstantiationException ex)
+            {
+                java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex)
+            {
+                java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            } catch (javax.swing.UnsupportedLookAndFeelException ex)
+            {
+                java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SafeStoreMDIApplication().setVisible(true);
-            }
-        });
+            /* Create and display the form */
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    new SafeStoreMDIApplication().setVisible(true);
+                }
+            });
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1188,9 +1264,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
     private void updateAccounts() {
         //Easy bind for providers
-        JList aux = new JList(ssm.getAccounts().toArray());               
+        JList aux = new JList(ssm.getAccounts().toArray());
         this.ProviderList1.setModel(aux.getModel());
-    
+
     }
 
 }

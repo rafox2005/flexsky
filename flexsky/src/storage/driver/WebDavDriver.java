@@ -89,9 +89,9 @@ public class WebDavDriver implements IDriver {
                                 sardine.exists(remotePath);
                                 sardine.put(remotePath, in);
                             } catch (MalformedURLException ex) {
-                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav URL incorrectly created", ex);
+                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav URL incorrectly created " + pathT, ex);
                             } catch (IOException ex) {
-                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav Upload IO error ", ex);
+                                Logger.getLogger(WebDavDriver.class.getName()).log(Level.SEVERE, "WebDav Upload IO error " + pathT, ex);
                             }
                         }
                     }

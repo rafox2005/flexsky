@@ -16,15 +16,15 @@ import pipeline.pipe.PipeTest;
 
 
 public class ScenarioExecutor {
-    private ScenarioExecutor executor;
+    private static ScenarioExecutor executor;
     
-    ScenarioExecutor getInstance()
+    public static ScenarioExecutor getInstance()
     {
-        if (this.executor == null)
+        if (ScenarioExecutor.executor == null)
         {
-            this.executor = new ScenarioExecutor();
+            ScenarioExecutor.executor = new ScenarioExecutor();
         }
-        return this.executor;
+        return ScenarioExecutor.executor;
     }
 
     private ScenarioExecutor() {
@@ -37,6 +37,8 @@ public class ScenarioExecutor {
       
       System.out.println("Running Scenario " + scenario.name + "...");
       
+      System.out.println("Deleting accounts...");
+      instance.delAllAccounts();
       
       //Adding accounts
       System.out.println("Adding accounts...");
@@ -54,20 +56,27 @@ public class ScenarioExecutor {
             //Run the operations within a scenario
             for (ScenarioOperation operation : scenario.operationList)
             {
-                System.out.println("Running operation " + scenario.operationList.indexOf(operation) + "of " + scenario.operationList.size() + ": " + operation.getAction());
-                if (operation.getAction() == "upload")
+                System.out.println("Running UP operation " + scenario.operationList.indexOf(operation) + " of " + scenario.operationList.size() + ": " + operation.getAction());
+                if (operation.getAction().equalsIgnoreCase("upload"))
                 {                    
                     boolean result = instance.storeFile(operation.getPathForFile(), operation.getFile().getType(), operation.getIdaMethod(), operation.getTotalParts(), operation.getReqParts(), operation.getFile().getRevision(), scenario.providerList, operation.getFile().getOptions());
                     System.out.println(result);
                 }
                 
-                else if (operation.getAction() == "download")
+                else if (operation.getAction().equalsIgnoreCase("download"))
                 {
-                            boolean result = instance.downloadFile(operation.getPathForFile(), operation.getFile());
-                            System.out.println(result);
+                    System.out.println("Running DOWN operation " + scenario.operationList.indexOf(operation) + " of " + scenario.operationList.size() + ": " + operation.getAction());
+                    
+                    File filePath = new File(operation.getPathForFile());
+                    
+                    
+                    StoreSafeFile fileInfo = instance.getFileInfo(filePath.getName(), operation.getFile().getRevision());
+                    
+                    boolean result = instance.downloadFile(operation.getPathForFile(), fileInfo);
+                    System.out.println(result);
                 }
                 
-                else if (operation.getAction() == "delete")
+                else if (operation.getAction().equalsIgnoreCase("delete"))
                 {
                     boolean result = instance.deleteFile(operation.getFile());
                     System.out.println(result);

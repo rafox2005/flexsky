@@ -76,7 +76,7 @@ public class StoreSafeManager {
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
         long start, end;
         //Buffer size must be compatible with reqParts for the Dispersal to work
-        StoreSafeManager.bufferSize = StoreSafeManager.bufferSize + (reqParts - StoreSafeManager.bufferSize % reqParts);
+        StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize % reqParts;
         start = System.currentTimeMillis();
         StoreSafeFile ssf = null;
         try {
@@ -132,15 +132,27 @@ public class StoreSafeManager {
     public ArrayList listFiles() {
         return this.db.listFiles();
     }
+    
+    public StoreSafeFile getFileInfo(String name, int revision)
+    {
+        ArrayList<StoreSafeFile> filesStored = this.db.listFiles();
+        
+        for (StoreSafeFile file : filesStored)
+        {
+            if (file.getName().equalsIgnoreCase(name) && file.getRevision() == revision) return file;
+        }
+        
+        return null;
+    }
 
     public boolean downloadFile(String path, StoreSafeFile ssf) {
         try {
-            StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - (ssf.getReqParts() - StoreSafeManager.bufferSize%ssf.getReqParts());
-            long start = System.currentTimeMillis();
+            StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize%ssf.getReqParts();
+            
             ArrayList<StoreSafeSlice> slicesList = this.db.getFileSlices(ssf);
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
-
+            long start = System.currentTimeMillis();
             this.storage.downloadFile(file, ssf, slicesList, accountList);
             
             //Wait for file download
@@ -154,9 +166,9 @@ public class StoreSafeManager {
 
             //Finish and log everything
             long time = System.currentTimeMillis() - start;
-            long rate = (ssf.getSize() / 1024) / ( time/1000 );
+            double rate = (ssf.getSize() / 1000) / ( time/1000 );
             
-            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, ssf.getSize());
+            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, (double) ssf.getSize()/1000);
             
             return true;
         } catch (IOException ex) {
@@ -244,6 +256,21 @@ public class StoreSafeManager {
     public boolean delAccount(StoreSafeAccount ssa)
     {
         return this.db.deleteAccount(ssa);
+    }
+    
+    public boolean delAllAccounts()
+    {
+        try {
+        ArrayList<StoreSafeAccount> accs = this.db.listAccounts();
+        for (StoreSafeAccount account : accs)
+        {
+            this.db.deleteAccount(account);
+        }
+        return true;
+    }
+        catch (Exception ex) {
+            return false;
+        }
     }
 
 }

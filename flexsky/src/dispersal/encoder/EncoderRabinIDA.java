@@ -55,6 +55,9 @@ public class EncoderRabinIDA extends IEncoderIDA {
 
             while (( len = disFile.read(input, 0, reqParts) ) != -1) {
                 size += len;
+                if (len < reqParts){
+                    disFile.read(input, len, reqParts-len);
+                }
                 byte[] crypt = this.ida.encodeEach(input);
                 for (int i=0; i < totalParts; i++) {
                     

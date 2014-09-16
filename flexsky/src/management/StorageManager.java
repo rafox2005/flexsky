@@ -146,7 +146,7 @@ class StorageManager {
                                             outT.flush();
                                             outT.close();
                                             //Finish and log everything
-                                            FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", time, outT.totalBytes() / (time/1000), outT.totalBytes());
+                                            FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", time, outT.totalKbytes() / (time/1000), outT.totalKbytes());
 
                                         } catch (IOException ex) {
                                             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -220,7 +220,7 @@ class StorageManager {
                                     outT.flush();
                                     outT.close();
                                     //Finish and log everything                                     
-                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
+                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", time, outT.totalKbytes() / (time / 1000), outT.totalKbytes());
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                 }
@@ -263,7 +263,7 @@ class StorageManager {
         double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
 
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "UP", time, (fileInputStream.totalKBytes() / 1000) / (time / 1000), fileInputStream.totalKBytes() / 1000);
+        FlexSkyLogger.addIDALog(ssf, "UP", time, fileInputStream.totalKBytes() / (time / 1000), fileInputStream.totalKBytes() / 1000);
 
         //Update important values
         ssf.setHash(ida.getFileHash());
@@ -281,7 +281,7 @@ class StorageManager {
         for (int i = 0; i < outputStreamsOriginal.size(); i++) {
             RTOutputStream os = outputStreamsOriginal.get(i);
             if (os.totalTime() > 0) {
-                FlexSkyLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalBytes());
+                FlexSkyLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalKbytes());
             }
         }
 
@@ -414,7 +414,7 @@ class StorageManager {
                                                 outT.close();
 
                                                 //Finish and log everything
-                                                FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
+                                                FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", time, outT.totalKbytes() / (time / 1000), outT.totalKbytes());
 
                                             } catch (IOException ex) {
                                                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -496,7 +496,7 @@ class StorageManager {
                                     outT.flush();
                                     outT.close();
                                     //Finish and log everything
-                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
+                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", time, outT.totalKbytes() / (time / 1000), outT.totalKbytes());
 
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -541,7 +541,7 @@ class StorageManager {
         double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
 
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "DOWN", time, (os.totalBytes() / 1000) / (time / 1000), os.totalBytes() / 1000);
+        FlexSkyLogger.addIDALog(ssf, "DOWN", time, os.totalKbytes() / (time / 1000), os.totalKbytes() / 1000);
 
 //        String[] teste = ida.getPartsHash();
 //

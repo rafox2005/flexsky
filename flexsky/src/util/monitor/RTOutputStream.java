@@ -40,7 +40,7 @@ public class RTOutputStream extends FilterOutputStream {
   }
    
    //ms
-   public double totalBytes() {
+   public double totalKbytes() {
     return (byteCount/1000.0);
   }
  

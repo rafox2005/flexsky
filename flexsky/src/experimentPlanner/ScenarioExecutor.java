@@ -56,7 +56,7 @@ public class ScenarioExecutor {
             //Run the operations within a scenario
             for (ScenarioOperation operation : scenario.operationList)
             {
-                System.out.println("Running UP operation " + scenario.operationList.indexOf(operation) + " of " + scenario.operationList.size() + ": " + operation.getAction());
+                System.out.println("Running operation " + scenario.operationList.indexOf(operation) + " of " + scenario.operationList.size() + ": " + operation.getAction());
                 if (operation.getAction().equalsIgnoreCase("upload"))
                 {                    
                     boolean result = instance.storeFile(operation.getPathForFile(), operation.getFile().getType(), operation.getIdaMethod(), operation.getTotalParts(), operation.getReqParts(), operation.getFile().getRevision(), scenario.providerList, operation.getFile().getOptions());
@@ -65,14 +65,12 @@ public class ScenarioExecutor {
                 
                 else if (operation.getAction().equalsIgnoreCase("download"))
                 {
-                    System.out.println("Running DOWN operation " + scenario.operationList.indexOf(operation) + " of " + scenario.operationList.size() + ": " + operation.getAction());
                     
-                    File filePath = new File(operation.getPathForFile());
-                    
+                    File filePath = new File(operation.getPathForFile());                   
                     
                     StoreSafeFile fileInfo = instance.getFileInfo(filePath.getName(), operation.getFile().getRevision());
-                    
-                    boolean result = instance.downloadFile(operation.getPathForFile(), fileInfo);
+                    boolean result = false;
+                    if (fileInfo != null) result = instance.downloadFile(operation.getPathForFile(), fileInfo);
                     System.out.println(result);
                 }
                 

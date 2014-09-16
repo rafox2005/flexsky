@@ -272,7 +272,7 @@ class StorageManager {
 
         long start = tmx.getCurrentThreadUserTime();
         long sliceSize = ida.encode();
-        long time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
+        double time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
         //Finish and log everything
         FlexSkyLogger.addIDALog(ssf, "UP", time, (ssf.getSize() / 1000) / (time / 1000), ssf.getSize() / 1000);
 
@@ -496,7 +496,11 @@ class StorageManager {
                         new Runnable() {
                             public void run() {
                                 try {
+                                    
+                                    long start = StoreSafeManager.tmx.getCurrentThreadUserTime();
+                                        
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
+                                    double time = (StoreSafeManager.tmx.getCurrentThreadUserTime() - start) / 1000000;
                                     inT.close();
                                     outT.flush();
                                     outT.close();
@@ -539,15 +543,13 @@ class StorageManager {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
         }
 
-        ThreadMXBean tmx = ManagementFactory.getThreadMXBean();
-        tmx.setThreadContentionMonitoringEnabled(true);
-        tmx.setThreadCpuTimeEnabled(true);
+        
 
-        long start = tmx.getCurrentThreadUserTime();
+        long start = StoreSafeManager.tmx.getCurrentThreadUserTime();
 
         //Decode
         ida.decode();
-        long time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
+        double time = (StoreSafeManager.tmx.getCurrentThreadUserTime() - start) / 1000000;
 
         //Finish and log everything
         FlexSkyLogger.addIDALog(ssf, "DOWN", time, os.totalBytes() / (time / 1000), os.totalBytes());
@@ -558,7 +560,7 @@ class StorageManager {
 //        {
 //            Logger.getLogger(StorageManager.class.getName()).log(Level.INFO, "RETRIEVAL: " + "P " + i + "H " + teste[i]);
 //        }
-        while (tmx.getThreadCount() - tmx.getDaemonThreadCount() > 3);
+        while (StoreSafeManager.tmx.getThreadCount() - StoreSafeManager.tmx.getDaemonThreadCount() > 3);
         for (int i = 0; i < inputStreamsOriginal.size(); i++) {
             RTInputStream is = inputStreamsOriginal.get(i);
             if (is.totalTime() > 0) {

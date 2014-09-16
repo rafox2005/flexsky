@@ -23,6 +23,7 @@ import dispersal.IEncoderIDA;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Date;
@@ -39,6 +40,7 @@ import java.util.logging.Logger;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import pipeline.IPipeProcess;
+import sun.management.ManagementFactoryHelper;
 import util.FlexSkyLogger;
 
 /**
@@ -52,16 +54,17 @@ public class StoreSafeManager {
     private final StorageManager storage;
     public static int bufferSize = 1024*8;
     
-    private static ExecutorService executor = null;
-    public static final List<FutureTask<Integer>> taskList = new ArrayList<FutureTask<Integer>>();
-    
+   
     public final FlexSkyLogger logger;
     
+    public static final ThreadMXBean tmx = ManagementFactory.getThreadMXBean(); 
 
     protected StoreSafeManager(String pathToDB, String pathToLogDB) {
         this.db = new DatabaseManager(pathToDB);
         this.storage = new StorageManager();
         this.logger = new FlexSkyLogger(pathToLogDB); 
+        StoreSafeManager.tmx.setThreadContentionMonitoringEnabled(true);
+        StoreSafeManager.tmx.setThreadCpuTimeEnabled(true);
     }
 
 
@@ -210,16 +213,7 @@ public class StoreSafeManager {
         return this.db.listAccounts();
     } 
     
-    public static ExecutorService getExecutor()
-    {
-        if (StoreSafeManager.executor == null || StoreSafeManager.executor.isShutdown()) {
-            StoreSafeManager.executor = Executors.newCachedThreadPool();
-        }
-        
-        return StoreSafeManager.executor;
-        
-    }
-    
+   
     public Set getIDAList()
     {
         

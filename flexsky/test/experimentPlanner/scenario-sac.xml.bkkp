@@ -113,6 +113,154 @@ limitations under the License.
     <operationList>
         <operation action="upload">
             <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>1</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>1</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>2</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>2</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>1</reqParts>
+            <idaMethod>ReplicateLucas</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>3</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>3</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file1M</path>
+                <revision>4</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file1M</path>
+                <revision>4</revision>
+                <type>random</type>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
+                <revision>5</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="download">
+            <file>
+                <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/output/file10M</path>
+                <revision>5</revision>
+                <type>random</type>
+                <options>
+                    <filePipeline>
+                        <pipe name="pipeline.pipe.Base64Pipe"></pipe>
+                    </filePipeline>                    
+                    <parameters>
+                        <param key="useHash" value="false"></param>
+                    </parameters>
+                </options>
+            </file>
+            <totalParts>10</totalParts>
+            <reqParts>9</reqParts>
+            <idaMethod>RabinIDA</idaMethod>
+        </operation>
+        <operation action="upload">
+            <file>
                 <path>/var/autofs/home/home/rlibardi/rlibardi-local/safestore/filesToTest/input/file10M</path>
                 <revision>6</revision>
                 <type>random</type>

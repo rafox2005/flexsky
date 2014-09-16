@@ -2,7 +2,6 @@ package experimentPlanner;
 
 import data.StorageOptions;
 import data.StoreSafeFile;
-import java.io.File;
 
 /**
  *

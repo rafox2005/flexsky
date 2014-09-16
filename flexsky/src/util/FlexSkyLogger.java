@@ -47,12 +47,12 @@ public class FlexSkyLogger {
         }
     }
     
-    public static void addFileLog(StoreSafeFile file, String action, double time, double throughput, double size)
+    public static void addFileLog(StoreSafeFile file, String action, double time, double throughput, double size, double size_dispersed)
     {
         try {
             PreparedStatement prepStatement
-                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO file" + "(file, revision, ida, action, time, throughput, size, log_time)"
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO file" + "(file, revision, ida, action, time, throughput, size, log_time, size_dispersed)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
            prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
             prepStatement.setString(3, file.getDispersalMethod());
@@ -61,6 +61,7 @@ public class FlexSkyLogger {
             prepStatement.setDouble(6, throughput);
             prepStatement.setDouble(7, size);
             prepStatement.setDate(8, new Date(System.currentTimeMillis()));
+            prepStatement.setDouble(9, size_dispersed);
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {

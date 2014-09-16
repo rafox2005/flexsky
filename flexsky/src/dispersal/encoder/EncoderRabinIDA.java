@@ -6,18 +6,10 @@ package dispersal.encoder;
 
 import dispersal.IEncoderIDA;
 import dispersal.rabin.RabinIDA;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.DigestInputStream;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
  *  Class that take a file and code into multiple parts using Rabin IDA

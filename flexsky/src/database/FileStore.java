@@ -15,6 +15,7 @@
  */
 package database;
 
+import data.StorageOptions;
 import data.StoreSafeFile;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,9 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import data.StorageOptions;
 import org.apache.commons.lang3.SerializationUtils;
 import pipeline.IPipeProcess;
 

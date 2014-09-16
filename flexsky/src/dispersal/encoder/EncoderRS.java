@@ -6,20 +6,11 @@ package dispersal.encoder;
 
 import com.google.common.primitives.Ints;
 import dispersal.IEncoderIDA;
-import dispersal.rabin.RabinIDA;
 import dispersal.reedsolomon.RsEncode;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import util.Utils;
 
 /**

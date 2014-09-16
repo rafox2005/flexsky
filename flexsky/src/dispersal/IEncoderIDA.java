@@ -5,7 +5,6 @@
  */
 package dispersal;
 
-import dispersal.encoder.EncoderRabinIDA;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import management.StoreSafeManager;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import util.Utils;
 
 /**

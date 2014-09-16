@@ -1,7 +1,6 @@
 package mssf.selector;
 
 import data.StorageOptions;
-import data.StoreSafeFile;
 import java.util.HashMap;
 
 /**

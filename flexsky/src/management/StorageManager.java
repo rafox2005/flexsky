@@ -15,8 +15,6 @@
  */
 package management;
 
-import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
 import com.github.sardine.impl.SardineException;
 import data.StorageOptions;
 import data.StoreSafeAccount;
@@ -24,10 +22,6 @@ import data.StoreSafeFile;
 import data.StoreSafeSlice;
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
-import dispersal.decoder.DecoderRS;
-import dispersal.decoder.DecoderRabinIDA;
-import dispersal.encoder.EncoderRS;
-import dispersal.encoder.EncoderRabinIDA;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,22 +31,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.io.Reader;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
 import pipeline.IPipeProcess;
 import storage.IDriver;
 import storage.driver.DiskDriver;
-import storage.driver.WebDavDriver;
 import util.FlexSkyLogger;
 import util.monitor.RTInputStream;
 import util.monitor.RTOutputStream;
@@ -66,9 +52,9 @@ class StorageManager {
     public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
         IEncoderIDA ida = null;
         StorageOptions options = ssf.getOptions();
-        InputStream fileInputStream = null;
+        RTInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream(file);
+            fileInputStream = new RTInputStream(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to find the file to store", ex);
         }
@@ -151,13 +137,16 @@ class StorageManager {
                         new Thread(
                                 new Runnable() {
                                     public void run() {
+                                        long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
                                         pipe.process(inT, outT, options.additionalParameters);
+                                        double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
+
                                         try {
                                             inT.close();
                                             outT.flush();
                                             outT.close();
                                             //Finish and log everything
-                                            FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
+                                            FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "UP", time, outT.totalBytes() / (time/1000), outT.totalBytes());
 
                                         } catch (IOException ex) {
                                             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -222,13 +211,16 @@ class StorageManager {
                 new Thread(
                         new Runnable() {
                             public void run() {
+                                long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
                                 pipe.process(inT, outT, options.additionalParameters);
+                                double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
+
                                 try {
                                     inT.close();
                                     outT.flush();
                                     outT.close();
                                     //Finish and log everything                                     
-                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", outT.totalTime(), outT.averageRate(), outT.totalBytes());
+                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "UP", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
                                 }
@@ -239,7 +231,7 @@ class StorageManager {
             }
 
             //Get Last InputStream
-            fileInputStream = listPipesIn.get(listPipesIn.size() - 1);
+            fileInputStream = new RTInputStream(listPipesIn.get(listPipesIn.size() - 1));
 
         }
 
@@ -266,15 +258,12 @@ class StorageManager {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "STORAGE: not able to retrieve the IDA to store", ex);
         }
 
-        ThreadMXBean tmx = ManagementFactory.getThreadMXBean();
-        tmx.setThreadContentionMonitoringEnabled(true);
-        tmx.setThreadCpuTimeEnabled(true);
-
-        long start = tmx.getCurrentThreadUserTime();
+        long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
         long sliceSize = ida.encode();
-        double time = (tmx.getCurrentThreadUserTime() - start) / 1000000;
+        double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
+
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "UP", time, (ssf.getSize() / 1000) / (time / 1000), ssf.getSize() / 1000);
+        FlexSkyLogger.addIDALog(ssf, "UP", time, (fileInputStream.totalKBytes() / 1000) / (time / 1000), fileInputStream.totalKBytes() / 1000);
 
         //Update important values
         ssf.setHash(ida.getFileHash());
@@ -288,13 +277,13 @@ class StorageManager {
         }
 
         //Log the slices outputs
-        while (tmx.getThreadCount() - tmx.getDaemonThreadCount() > 3);
+        while (StoreSafeManager.tmx.getThreadCount() - StoreSafeManager.tmx.getDaemonThreadCount() > 3);
         for (int i = 0; i < outputStreamsOriginal.size(); i++) {
             RTOutputStream os = outputStreamsOriginal.get(i);
             if (os.totalTime() > 0) {
                 FlexSkyLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalBytes());
             }
-            }
+        }
 
         return false;
 
@@ -416,14 +405,16 @@ class StorageManager {
                                     new Runnable() {
                                         public void run() {
                                             //Start time variables
+                                            long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
                                             pipe.reverseProcess(inT, outT, options.additionalParameters);
+                                            double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
                                             try {
                                                 inT.close();
                                                 outT.flush();
                                                 outT.close();
-                                                
+
                                                 //Finish and log everything
-                                                FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
+                                                FlexSkyLogger.addSlicePipeLog(ssf, currentSlice, pipe.getClass().getName(), "DOWN", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
 
                                             } catch (IOException ex) {
                                                 Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Pipe problem", ex);
@@ -496,16 +487,16 @@ class StorageManager {
                         new Runnable() {
                             public void run() {
                                 try {
-                                    
-                                    long start = StoreSafeManager.tmx.getCurrentThreadUserTime();
-                                        
+
+                                    long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
                                     pipe.reverseProcess(inT, outT, options.additionalParameters);
-                                    double time = (StoreSafeManager.tmx.getCurrentThreadUserTime() - start) / 1000000;
+                                    double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
+
                                     inT.close();
                                     outT.flush();
                                     outT.close();
                                     //Finish and log everything
-                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", outT.totalTime(), outT.averageRate(), outT.totalBytes());
+                                    FlexSkyLogger.addFilePipeLog(ssf, pipe.getClass().getName(), "DOWN", time, outT.totalBytes() / (time / 1000), outT.totalBytes());
 
                                 } catch (IOException ex) {
                                     Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -543,16 +534,14 @@ class StorageManager {
             Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, "Storage: Not able to retrieve the IDA", ex);
         }
 
-        
-
-        long start = StoreSafeManager.tmx.getCurrentThreadUserTime();
+        long start = StoreSafeManager.tmx.getCurrentThreadCpuTime();
 
         //Decode
         ida.decode();
-        double time = (StoreSafeManager.tmx.getCurrentThreadUserTime() - start) / 1000000;
+        double time = (StoreSafeManager.tmx.getCurrentThreadCpuTime() - start) / 1000000;
 
         //Finish and log everything
-        FlexSkyLogger.addIDALog(ssf, "DOWN", time, os.totalBytes() / (time / 1000), os.totalBytes());
+        FlexSkyLogger.addIDALog(ssf, "DOWN", time, (os.totalBytes() / 1000) / (time / 1000), os.totalBytes() / 1000);
 
 //        String[] teste = ida.getPartsHash();
 //

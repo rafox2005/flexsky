@@ -16,8 +16,6 @@
 
 package data;
 
-import dispersal.IDecoderIDA;
-import dispersal.IEncoderIDA;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

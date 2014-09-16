@@ -19,7 +19,6 @@ import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import data.StoreSafeSlice;
-import dispersal.IEncoderIDA;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -30,17 +29,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.reflections.Reflections;
-import org.reflections.util.ClasspathHelper;
-import pipeline.IPipeProcess;
-import sun.management.ManagementFactoryHelper;
 import util.FlexSkyLogger;
 
 /**
@@ -94,6 +84,7 @@ public class StoreSafeManager {
             
             int fileID = this.db.insertFile(ssf);
             
+            if (fileID == 0) return false;
             
             ArrayList<StoreSafeSlice> slices = new ArrayList<>();
 
@@ -115,7 +106,7 @@ public class StoreSafeManager {
             //Finish and log everything
             double time = System.currentTimeMillis() - start;
             double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
-            FlexSkyLogger.addFileLog(ssf, "UP", time, rate, ssf.getSize()/1000.0);
+            FlexSkyLogger.addFileLog(ssf, "UP", time, rate, ssf.getSize()/1000.0, (slices.get(0).getSize()*totalParts) / 1000.0);
             
            
             return true;
@@ -171,7 +162,7 @@ public class StoreSafeManager {
             long time = System.currentTimeMillis() - start;
             double rate = (ssf.getSize() / 1000) / ( time/1000 );
             
-            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, (double) ssf.getSize()/1000);
+            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, (double) ssf.getSize()/1000, (slicesList.get(0).getSize()*ssf.getTotalParts()) / 1000.0);
             
             return true;
         } catch (IOException ex) {
@@ -195,8 +186,8 @@ public class StoreSafeManager {
         
         //Finish and log everything
             double time = System.currentTimeMillis() - start;
-            double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
-            FlexSkyLogger.addFileLog(ssf, "DEL", time, rate, ssf.getSize()/1024.0);
+            double rate = (ssf.getSize() / 1000.0) / ( time/1000.0 );
+            FlexSkyLogger.addFileLog(ssf, "DEL", time, rate, ssf.getSize()/1000.0, (slices.get(0).getSize()*ssf.getTotalParts()) / 1000.0);
         
         return true;
     }

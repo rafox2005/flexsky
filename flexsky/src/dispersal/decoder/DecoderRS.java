@@ -4,17 +4,13 @@
  */
 package dispersal.decoder;
 
-import java.io.BufferedInputStream;
 import dispersal.IDecoderIDA;
-import java.io.BufferedOutputStream;
 import dispersal.reedsolomon.RsDecode;
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import util.Utils;
 
 /**

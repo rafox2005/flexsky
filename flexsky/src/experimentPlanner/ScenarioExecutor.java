@@ -1,13 +1,9 @@
 package experimentPlanner;
 
-import data.StorageOptions;
 import data.StoreSafeAccount;
 import data.StoreSafeFile;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import management.StoreSafeManager;
-import pipeline.pipe.PipeTest;
 
 /**
  *
@@ -51,7 +47,8 @@ public class ScenarioExecutor {
         for (int i = 0; i < scenario.repeatNo; i++)
         {
             System.out.println("Running repetition " + i + " of " + scenario.repeatNo);
-            if (scenario.resetOnStartDB) instance.deleteAllFiles();
+            System.out.println("Deleting all files...");
+            instance.deleteAllFiles();
             
             //Run the operations within a scenario
             for (ScenarioOperation operation : scenario.operationList)
@@ -60,7 +57,11 @@ public class ScenarioExecutor {
                 if (operation.getAction().equalsIgnoreCase("upload"))
                 {                    
                     boolean result = instance.storeFile(operation.getPathForFile(), operation.getFile().getType(), operation.getIdaMethod(), operation.getTotalParts(), operation.getReqParts(), operation.getFile().getRevision(), scenario.providerList, operation.getFile().getOptions());
-                    System.out.println(result);
+                    if (result == true) System.out.println("Ok...");
+                    else {                        
+                        System.out.println("Failed... Trying again...");
+                        result = instance.storeFile(operation.getPathForFile(), operation.getFile().getType(), operation.getIdaMethod(), operation.getTotalParts(), operation.getReqParts(), operation.getFile().getRevision(), scenario.providerList, operation.getFile().getOptions());
+                    }
                 }
                 
                 else if (operation.getAction().equalsIgnoreCase("download"))
@@ -71,13 +72,21 @@ public class ScenarioExecutor {
                     StoreSafeFile fileInfo = instance.getFileInfo(filePath.getName(), operation.getFile().getRevision());
                     boolean result = false;
                     if (fileInfo != null) result = instance.downloadFile(operation.getPathForFile(), fileInfo);
-                    System.out.println(result);
+                    if (result == true) System.out.println("Ok...");
+                    else {                        
+                        System.out.println("Failed... Trying again...");
+                        result = instance.downloadFile(operation.getPathForFile(), fileInfo);
+                    }
                 }
                 
                 else if (operation.getAction().equalsIgnoreCase("delete"))
                 {
                     boolean result = instance.deleteFile(operation.getFile());
-                    System.out.println(result);
+                    if (result == true) System.out.println("Ok...");
+                    else {                        
+                        System.out.println("Failed... Trying again...");
+                        result = instance.deleteFile(operation.getFile());
+                    }
                 }
             }
             

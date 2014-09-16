@@ -1,9 +1,8 @@
 package util.monitor;
 
-import java.io.OutputStream;
 import java.io.FilterOutputStream;
-import java.util.Date;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class RTOutputStream extends FilterOutputStream {
   long byteCount = 0;

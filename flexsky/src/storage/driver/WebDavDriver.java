@@ -15,25 +15,21 @@
  */
 package storage.driver;
 
-import storage.IDriver;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import data.StoreSafeSlice;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import management.StoreSafeManager;
-import util.FlexSkyLogger;
+import storage.IDriver;
 
 /**
  *

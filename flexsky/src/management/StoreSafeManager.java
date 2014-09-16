@@ -69,6 +69,7 @@ public class StoreSafeManager {
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
         long start, end;
         //Buffer size must be compatible with reqParts for the Dispersal to work
+        StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize % reqParts;
         start = System.currentTimeMillis();
         StoreSafeFile ssf = null;
         try {
@@ -140,7 +141,8 @@ public class StoreSafeManager {
 
     public boolean downloadFile(String path, StoreSafeFile ssf) {
         try {
-           
+            StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize%ssf.getReqParts();
+            
             ArrayList<StoreSafeSlice> slicesList = this.db.getFileSlices(ssf);
             ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);

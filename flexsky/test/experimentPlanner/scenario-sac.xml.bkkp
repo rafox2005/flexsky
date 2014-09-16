@@ -17,10 +17,18 @@ limitations under the License.
 
 
 <scenario name="SAC-Experiments">
-    <repeat>10</repeat>
-    <db resetOnStart="yes">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-files.db</db>
+    <repeat>1</repeat>
+    <db resetOnStart="true">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-files.db</db>
     <log_db>/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-log.db</log_db>
     <providerList>
+         <account name="remote-DriveHQ">
+            <type>storage.driver.WebDavDriver</type>
+            <path>http://dhqid1219757767114119952.webdav.drivehq.com/flexsky/</path>
+            <parameters>
+                <param key="username" value=""></param>
+                <param key="password" value=""></param>
+            </parameters>            
+        </account>
         <account name="remote-box">
             <type>storage.driver.WebDavDriver</type>
             <path>https://dav.box.com/dav/</path>
@@ -28,14 +36,6 @@ limitations under the License.
                 <param key="username" value="rafox2005@gmail.com"></param>
                 <param key="password" value="ra281190"></param>
             </parameters>
-        </account>
-        <account name="remote-DriveHQ">
-            <type>storage.driver.WebDavDriver</type>
-            <path>http://dhqid1219757767114119952.webdav.drivehq.com/flexsky/</path>
-            <parameters>
-                <param key="username" value=""></param>
-                <param key="password" value=""></param>
-            </parameters>            
         </account>
         <account name="remote-HiDrive">
             <type>storage.driver.WebDavDriver</type>
@@ -45,14 +45,14 @@ limitations under the License.
                 <param key="password" value="ra281190"></param>
             </parameters>
         </account>
-        <account name="remote-CloudDrive">
+     <account name="remote-CloudDrive">
             <type>storage.driver.WebDavDriver</type>
             <path>http://webdav.cloudme.com/rafox/CloudDrive/flexsky/</path>
             <parameters>
                 <param key="username" value="rafox"></param>
                 <param key="password" value="ra281190"></param>
             </parameters>
-        </account>
+        </account> 
         <account name="remote-smeUS">
             <type>storage.driver.WebDavDriver</type>
             <path>https://webdav.storagemadeeasy.com/flexsky/</path>
@@ -85,15 +85,17 @@ limitations under the License.
                 <param key="password" value="ra281190"></param>
             </parameters>
         </account>
-<!--        <account name="remote-MedienCentre">
+        <!---
+	<account name="remote-MedienCentre">
             <type>storage.driver.WebDavDriver</type>
-            <path>http://webdav.mediencenter.t-online.de/flexsky/</path>
+            <path>https://webdav.mediencenter.t-online.de/flexsky/</path>
             <parameters>
                 <param key="username" value="rafox"></param>
                 <param key="password" value="ra281190"></param>
             </parameters>
-        </account>-->
-        <account name="remote-CloudSafe">
+        </account>
+        -->
+	<account name="remote-CloudSafe">
             <type>storage.driver.WebDavDriver</type>
             <path>https://723703236.webdav.cloudsafe.com/flexsky/</path>
             <parameters>

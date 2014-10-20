@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -37,8 +38,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -85,6 +89,55 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
             this.logDB_path = file.getAbsolutePath();
         }
     }
+    
+    private void populateComponentsUploadEasy() {
+        
+        //Create the label table
+        Hashtable labelTable = new Hashtable();
+        
+        //Availability
+        int nProv = ssm.getAccounts().size();
+        labelTable.put( new Integer( 0 ), new JLabel("None") );
+        labelTable.put( new Integer( nProv-1 ), new JLabel("Maximum") );         
+        jSliderAvailability.setLabelTable( labelTable );
+        jSliderAvailability.setMinorTickSpacing(1);
+        jSliderAvailability.setPaintTicks(true);
+        jSliderAvailability.setPaintLabels(true);
+        jSliderAvailability.setSnapToTicks(true);
+        jSliderAvailability.setMaximum(nProv-1);       
+        
+        jSliderAvailability.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+            updateFileSize();
+      }
+    });
+        
+        //Security
+        labelTable = new Hashtable();
+        labelTable.put( new Integer( 0 ), new JLabel("None") );
+        labelTable.put( new Integer( 100 ), new JLabel("Maximum") );         
+        jSliderSecurity.setLabelTable( labelTable );
+        jSliderSecurity.setMinorTickSpacing(20);
+        jSliderSecurity.setPaintTicks(true);
+        jSliderSecurity.setPaintLabels(true);
+        jSliderSecurity.setSnapToTicks(true);
+        jSliderSecurity.setMaximum(100);       
+        
+        jSliderSecurity.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+            updateFileSize();
+      }
+    });
+        
+    }
+        
+    private void updateFileSize() {
+        int nProv = ssm.getAccounts().size();
+            long file_size = jFileChooser1.getSelectedFile().length() * nProv/(nProv - jSliderAvailability.getValue());
+            jLabelFinalSize.setText(Long.toString(file_size));
+    }
+
+    
 
     private void populateComponents() {
         this.getDBPaths();
@@ -130,6 +183,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         JComboBox aux2 = new JComboBox(listDriver.toArray());
 
         this.driverTypejComboBox.setModel(aux2.getModel());
+        
+        //Upload Easy
+        this.populateComponentsUploadEasy();
 
     }
 
@@ -200,6 +256,19 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         parametersProviderjTable = new javax.swing.JTable();
         providerAddjButton = new javax.swing.JButton();
         driverTypejComboBox = new javax.swing.JComboBox();
+        jScrollPaneUploadEasy = new javax.swing.JScrollPane();
+        jPanelUPloadEasy = new javax.swing.JPanel();
+        jButtonChooseFile = new javax.swing.JButton();
+        pathToFileLabel1 = new javax.swing.JLabel();
+        uploadJButtonEasy = new javax.swing.JButton();
+        jSliderAvailability = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
+        jSliderSecurity = new javax.swing.JSlider();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jSliderAccessPattern = new javax.swing.JSlider();
+        jLabel4 = new javax.swing.JLabel();
+        jLabelFinalSize = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         openMenuItem = new javax.swing.JMenuItem();
@@ -504,7 +573,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addGap(26, 26, 26)
                                 .addComponent(revTextBox, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(IDALabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 46, Short.MAX_VALUE)
+                        .addGap(18, 101, Short.MAX_VALUE)
                         .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(ProviderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(uploadPanelLayout.createSequentialGroup()
@@ -515,7 +584,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(delProviderjButton)
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 36, Short.MAX_VALUE)))))
+                                .addGap(0, 91, Short.MAX_VALUE)))))
                 .addGap(31, 31, 31)
                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(uploadJButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -545,7 +614,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1)
-                    .addComponent(pathToFileLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pathToFileLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(uploadPanelLayout.createSequentialGroup()
@@ -567,7 +636,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(uploadPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(uploadPanelLayout.createSequentialGroup()
-                                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
                                         .addGap(54, 54, 54))
                                     .addGroup(uploadPanelLayout.createSequentialGroup()
                                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -597,7 +666,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
         jScrollPaneUpload.setViewportView(uploadPanel);
 
-        mainPanel.addTab("Upload", jScrollPaneUpload);
+        mainPanel.addTab("Upload-Advanced", jScrollPaneUpload);
 
         downloadJButton.setText("Download");
         downloadJButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -680,7 +749,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                             .addComponent(jDownloadRefreshListButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(pathToDownloadFolderjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         mainPanel.addTab("Files Stored", jPanelDownload);
@@ -760,7 +829,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(parametersProviderLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(341, Short.MAX_VALUE))
+                .addContainerGap(451, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAccountLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(providerAddjButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -787,7 +856,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                         .addGroup(jPanelAccountLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(providerTypeAddjLabel)
                             .addComponent(driverTypejComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 305, Short.MAX_VALUE)))
+                        .addGap(0, 392, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(providerAddjButton))
         );
@@ -795,6 +864,98 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         jScrollPaneAccount.setViewportView(jPanelAccount);
 
         mainPanel.addTab("Account", jScrollPaneAccount);
+
+        jButtonChooseFile.setText("Choose the file");
+        jButtonChooseFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonChooseFileActionPerformed(evt);
+            }
+        });
+
+        uploadJButtonEasy.setText("Upload");
+        uploadJButtonEasy.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uploadJButtonEasyMouseClicked(evt);
+            }
+        });
+        uploadJButtonEasy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadJButtonEasyActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Availability Increase");
+
+        jLabel2.setText("How important is the security/privacy for this file?");
+
+        jLabel3.setText("How often will you read/write this file?");
+
+        jLabel4.setText("Final Dispersed File Size: ");
+
+        javax.swing.GroupLayout jPanelUPloadEasyLayout = new javax.swing.GroupLayout(jPanelUPloadEasy);
+        jPanelUPloadEasy.setLayout(jPanelUPloadEasyLayout);
+        jPanelUPloadEasyLayout.setHorizontalGroup(
+            jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
+                        .addComponent(jSliderAvailability, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(55, 55, 55)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabelFinalSize))
+                    .addComponent(jSliderSecurity, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(jSliderAccessPattern, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(jButtonChooseFile, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap(359, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelUPloadEasyLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(uploadJButtonEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(413, 413, 413))
+            .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
+                    .addGap(203, 203, 203)
+                    .addComponent(pathToFileLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
+                    .addGap(175, 175, 175)))
+        );
+        jPanelUPloadEasyLayout.setVerticalGroup(
+            jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jButtonChooseFile)
+                .addGap(37, 37, 37)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSliderAvailability, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(jLabelFinalSize)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSliderSecurity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSliderAccessPattern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addComponent(uploadJButtonEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(115, 115, 115))
+            .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
+                    .addGap(21, 21, 21)
+                    .addComponent(pathToFileLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                    .addGap(401, 401, 401)))
+        );
+
+        jScrollPaneUploadEasy.setViewportView(jPanelUPloadEasy);
+
+        mainPanel.addTab("Upload-Easy", jScrollPaneUploadEasy);
 
         desktopPane.add(mainPanel);
 
@@ -1101,6 +1262,32 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         this.updateAccounts();
     }//GEN-LAST:event_providerAddjButtonActionPerformed
 
+    private void jButtonChooseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChooseFileActionPerformed
+        // TODO add your handling code here:
+        jDialog1.setVisible(true);
+        jDialog1.toFront();
+
+        int returnVal = jFileChooser1.showOpenDialog(jPanel2);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
+            File file = jFileChooser1.getSelectedFile();
+            this.pathToFileLabel1.setText(file.getAbsolutePath());
+            jDialog1.setVisible(false);
+        } else
+        {
+            jDialog1.setVisible(false);
+        }
+    }//GEN-LAST:event_jButtonChooseFileActionPerformed
+
+    private void uploadJButtonEasyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadJButtonEasyMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_uploadJButtonEasyMouseClicked
+
+    private void uploadJButtonEasyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonEasyActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_uploadJButtonEasyActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1211,15 +1398,22 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JList filesToDownloadJList;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonChooseFile;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialogDB;
     private javax.swing.JButton jDownloadRefreshListButton;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JFileChooser jFileChooserDB;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabelChooseDB;
+    private javax.swing.JLabel jLabelFinalSize;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelAccount;
     private javax.swing.JPanel jPanelDownload;
+    private javax.swing.JPanel jPanelUPloadEasy;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1229,6 +1423,10 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPaneAccount;
     private javax.swing.JScrollPane jScrollPaneUpload;
+    private javax.swing.JScrollPane jScrollPaneUploadEasy;
+    private javax.swing.JSlider jSliderAccessPattern;
+    private javax.swing.JSlider jSliderAvailability;
+    private javax.swing.JSlider jSliderSecurity;
     private javax.swing.JTabbedPane mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openMenuItem;
@@ -1239,6 +1437,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem pasteMenuItem;
     private javax.swing.JLabel pathToDownloadFolderjLabel;
     private javax.swing.JLabel pathToFileLabel;
+    private javax.swing.JLabel pathToFileLabel1;
     private javax.swing.JButton providerAddjButton;
     private javax.swing.JLabel providerNameAddjLabel;
     private javax.swing.JTextField providerNameAddjTextField;
@@ -1259,6 +1458,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeTextField;
     private javax.swing.JButton uploadJButton;
+    private javax.swing.JButton uploadJButtonEasy;
     private javax.swing.JPanel uploadPanel;
     // End of variables declaration//GEN-END:variables
 

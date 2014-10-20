@@ -17,7 +17,7 @@ limitations under the License.
 
 
 <scenario name="SAC-Experiments">
-    <repeat>1</repeat>
+    <repeat>10</repeat>
     <db resetOnStart="true">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-files.db</db>
     <log_db>/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/SAC/Experiments/db/SAC-experiments-log.db</log_db>
     <providerList>

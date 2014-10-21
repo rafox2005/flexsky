@@ -1111,14 +1111,14 @@
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel1">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Availability Increase"/>
+                        <Property name="text" type="java.lang.String" value="Availability x Storage Space Overhead"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JSlider" name="jSliderSecurity">
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel2">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="How important is the security/privacy for this file?"/>
+                        <Property name="text" type="java.lang.String" value="Security"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel3">

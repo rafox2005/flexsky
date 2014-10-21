@@ -97,8 +97,8 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
         //Availability
         int nProv = ssm.getAccounts().size();
-        labelTable.put( new Integer( 0 ), new JLabel("None") );
-        labelTable.put( new Integer( nProv-1 ), new JLabel("Maximum") );         
+        labelTable.put( new Integer( 0 ), new JLabel("Minimum Space") );
+        labelTable.put( new Integer( nProv-1 ), new JLabel("Maximum Availability") );         
         jSliderAvailability.setLabelTable( labelTable );
         jSliderAvailability.setMinorTickSpacing(1);
         jSliderAvailability.setPaintTicks(true);
@@ -114,10 +114,11 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
         //Security
         labelTable = new Hashtable();
-        labelTable.put( new Integer( 0 ), new JLabel("None") );
-        labelTable.put( new Integer( 100 ), new JLabel("Maximum") );         
+        labelTable.put( new Integer( 0 ), new JLabel("I dont mind") );
+        labelTable.put( new Integer( 50 ), new JLabel("Confidential") ); 
+        labelTable.put( new Integer( 100 ), new JLabel("Very Confidential") );         
         jSliderSecurity.setLabelTable( labelTable );
-        jSliderSecurity.setMinorTickSpacing(20);
+        jSliderSecurity.setMinorTickSpacing(50);
         jSliderSecurity.setPaintTicks(true);
         jSliderSecurity.setPaintLabels(true);
         jSliderSecurity.setSnapToTicks(true);
@@ -125,7 +126,25 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
         jSliderSecurity.addChangeListener(new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
-            updateFileSize();
+            
+      }
+    });
+        
+        //Access
+        labelTable = new Hashtable();
+        labelTable.put( new Integer( 0 ), new JLabel("Almost never") );
+        labelTable.put( new Integer( 50 ), new JLabel("Sometimes") );
+        labelTable.put( new Integer( 100 ), new JLabel("Lots of times") );         
+        jSliderAccessPattern.setLabelTable( labelTable );
+        jSliderAccessPattern.setMinorTickSpacing(50);
+        jSliderAccessPattern.setPaintTicks(true);
+        jSliderAccessPattern.setPaintLabels(true);
+        jSliderAccessPattern.setSnapToTicks(true);
+        jSliderAccessPattern.setMaximum(100);       
+        
+        jSliderAccessPattern.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent e) {
+            
       }
     });
         
@@ -884,9 +903,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Availability Increase");
+        jLabel1.setText("Availability x Storage Space Overhead");
 
-        jLabel2.setText("How important is the security/privacy for this file?");
+        jLabel2.setText("Security");
 
         jLabel3.setText("How often will you read/write this file?");
 

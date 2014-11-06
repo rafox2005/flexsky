@@ -45,6 +45,7 @@ public class AccountStore {
             prepStatement.setString(2, account.getType());
             prepStatement.setString(3, account.getPath());
             prepStatement.setBytes(4, parametersBlob);
+            //TODO SELECTION PARAMETERS
             prepStatement.executeUpdate();
         }
         return true;
@@ -77,6 +78,7 @@ public class AccountStore {
                 if (param != null) {
                     additionalParameters = SerializationUtils.deserialize(param);
                 }
+                //TODO SELECTION PARAMETERS
 
                 list.add(new StoreSafeAccount(rs.getString("name"), rs.getString("type"), rs.getString("path"), additionalParameters));
             }

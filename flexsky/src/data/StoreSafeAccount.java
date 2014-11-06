@@ -28,7 +28,8 @@ public class StoreSafeAccount
     private String name;
     private String type;
     private String path;
-    private HashMap<String,String> additionalParameters; 
+    private HashMap<String,String> additionalParameters;
+    private HashMap<String, Integer> selectionParameters;
 
     public StoreSafeAccount(String name, String type, String path)
     {

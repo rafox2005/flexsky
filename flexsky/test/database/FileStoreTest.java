@@ -16,7 +16,7 @@
 
 package database;
 
-import data.StoreSafeFile;
+import data.DataFile;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -77,7 +77,7 @@ public class FileStoreTest
         System.out.println("testOperations");
         FileStore instance = this.fs;
         int sizeBegin = this.fs.getFiles().size();
-        StoreSafeFile file1 = new StoreSafeFile("teste5",
+        DataFile file1 = new DataFile("teste5",
                                                 new Long("812331230023").longValue(),
                                                 "type/text",
                                                 "rabin",
@@ -87,7 +87,7 @@ public class FileStoreTest
                                                 new Date(System.currentTimeMillis()),
                                                 new Date(System.currentTimeMillis()),
                                                 1);
-        StoreSafeFile file2 = new StoreSafeFile("teste5",
+        DataFile file2 = new DataFile("teste5",
                                                 new Long("212331230025").longValue(),
                                                 "type/text",
                                                 "rabin",
@@ -111,7 +111,7 @@ public class FileStoreTest
     public void testInsertSameFiles() throws SQLException
     {
         FileStore instance = this.fs;
-        StoreSafeFile file1 = new StoreSafeFile("teste5",
+        DataFile file1 = new DataFile("teste5",
                                                 new Long("812331230023").longValue(),
                                                 "type/text",
                                                 "rabin",
@@ -131,7 +131,7 @@ public class FileStoreTest
     public void testGetFile() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
     {
         FileStore instance = this.fs;
-        StoreSafeFile file1 = new StoreSafeFile("book.pdf", 0);
+        DataFile file1 = new DataFile("book.pdf", 0);
         instance.getFile(file1);
         
         Assert.assertEquals(file1.getSize(), 8493855);

@@ -16,7 +16,7 @@
 
 package storage.driver;
 
-import data.StoreSafeSlice;
+import data.DataSlice;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,7 +45,7 @@ public class DiskDriver implements IDriver
     }       
                 
     @Override
-    public OutputStream getSliceUploadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
+    public OutputStream getSliceUploadStream(DataSlice slice, HashMap<String, String> additionalParameters) {
         OutputStream os = null;
         try {
             os = new FileOutputStream(new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex())));
@@ -57,7 +57,7 @@ public class DiskDriver implements IDriver
     }
     
     @Override
-    public InputStream getSliceDownloadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
+    public InputStream getSliceDownloadStream(DataSlice slice, HashMap<String, String> additionalParameters) {
         InputStream is = null;
         try {
             is = new FileInputStream(new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex())));
@@ -69,7 +69,7 @@ public class DiskDriver implements IDriver
     }
     
     @Override
-    public boolean deleteSlice(StoreSafeSlice slice, HashMap<String, String> additionalParameters) {
+    public boolean deleteSlice(DataSlice slice, HashMap<String, String> additionalParameters) {
         File file = new File(this.path, String.valueOf(slice.getFile()) + "-" + String.valueOf(slice.getPartIndex()));
         return file.delete();
     }

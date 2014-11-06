@@ -20,7 +20,7 @@ package data;
  *
  * @author rafox
  */
-public class StoreSafeSlice
+public class DataSlice
 {
     
     private int file;
@@ -39,7 +39,7 @@ public class StoreSafeSlice
      * @param size the value of size
      * @param hash the value of hash
      */
-    public StoreSafeSlice(int file, int partIndex, String account, String path, long size, String hash)
+    public DataSlice(int file, int partIndex, String account, String path, long size, String hash)
     {
         this.file = file;
         this.account = account;        

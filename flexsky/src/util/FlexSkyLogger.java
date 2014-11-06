@@ -16,8 +16,8 @@
 
 package util;
 
-import data.StoreSafeFile;
-import data.StoreSafeSlice;
+import data.DataFile;
+import data.DataSlice;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -47,7 +47,7 @@ public class FlexSkyLogger {
         }
     }
     
-    public static void addFileLog(StoreSafeFile file, String action, double time, double throughput, double size, double size_dispersed)
+    public static void addFileLog(DataFile file, String action, double time, double throughput, double size, double size_dispersed)
     {
         try {
             PreparedStatement prepStatement
@@ -69,7 +69,7 @@ public class FlexSkyLogger {
         }    
     }
     
-    public static void addIDALog(StoreSafeFile file, String action, double time, double throughput, double size)
+    public static void addIDALog(DataFile file, String action, double time, double throughput, double size)
     {
         try {
             PreparedStatement prepStatement
@@ -91,7 +91,7 @@ public class FlexSkyLogger {
     }  
  
     
-    public static void addSliceLog(StoreSafeFile file, StoreSafeSlice slice, String action, double time, double throughput, double size)
+    public static void addSliceLog(DataFile file, DataSlice slice, String action, double time, double throughput, double size)
     {
         try {
             PreparedStatement prepStatement
@@ -114,7 +114,7 @@ public class FlexSkyLogger {
         }
     }
     
-    public static void addFilePipeLog(StoreSafeFile file, String pipe, String action, double time, double throughput, double size)
+    public static void addFilePipeLog(DataFile file, String pipe, String action, double time, double throughput, double size)
     {
         try {
             PreparedStatement prepStatement
@@ -136,7 +136,7 @@ public class FlexSkyLogger {
         }
     }
     
-    public static void addSlicePipeLog(StoreSafeFile file, StoreSafeSlice slice, String pipe, String action, double time, double throughput, double size)
+    public static void addSlicePipeLog(DataFile file, DataSlice slice, String pipe, String action, double time, double throughput, double size)
     {
         try {
             PreparedStatement prepStatement

@@ -16,7 +16,7 @@
 package database;
 
 import data.StorageOptions;
-import data.StoreSafeFile;
+import data.DataFile;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -111,7 +111,7 @@ public class FileStore {
      * @return
      * @throws java.sql.SQLException
      */
-    public boolean insertFile(StoreSafeFile file) throws SQLException {
+    public boolean insertFile(DataFile file) throws SQLException {
         //Get File Pipe Info            
         byte[] parametersBlob = SerializationUtils.serialize(file.getOptions().additionalParameters);
         String pipeFileString = this.serializePipeline(file.getOptions().filePipeline);
@@ -144,9 +144,9 @@ public class FileStore {
      *
      * @return
      */
-    public ArrayList<StoreSafeFile> getFiles() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public ArrayList<DataFile> getFiles() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         ResultSet rs;
-        ArrayList<StoreSafeFile> list = new ArrayList<>();
+        ArrayList<DataFile> list = new ArrayList<>();
         try (PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files")) {
             rs = prepStatement.executeQuery();
 
@@ -159,7 +159,7 @@ public class FileStore {
                 options.filePipeline = pipelineFile;
                 options.slicePipeline = pipelineSlice;
 
-                StoreSafeFile file = new StoreSafeFile(rs.getInt("id"),
+                DataFile file = new DataFile(rs.getInt("id"),
                         rs.getString("name"),
                         rs.getLong("size"),
                         rs.getString("type"),
@@ -183,7 +183,7 @@ public class FileStore {
      * @param file
      * @return
      */
-    public boolean deleteFile(StoreSafeFile file) throws SQLException {
+    public boolean deleteFile(DataFile file) throws SQLException {
         try (PreparedStatement prepStatement = conn.prepareStatement("DELETE FROM files WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getName());
             prepStatement.setInt(2, file.getRevision());
@@ -192,7 +192,7 @@ public class FileStore {
         }
     }
 
-    public int getFileID(StoreSafeFile file) throws SQLException {
+    public int getFileID(DataFile file) throws SQLException {
         ResultSet rs;
         try (PreparedStatement prepStatement = conn.prepareStatement("SELECT id FROM files WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getName());
@@ -202,7 +202,7 @@ public class FileStore {
         }
     }
 
-    public boolean getFile(StoreSafeFile file) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public boolean getFile(DataFile file) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         ResultSet rs;
         PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM files WHERE name=? AND revision=?");
         prepStatement.setString(1, file.getName());
@@ -236,7 +236,7 @@ public class FileStore {
 
     }
 
-    public boolean updateHash(StoreSafeFile file) throws SQLException {
+    public boolean updateHash(DataFile file) throws SQLException {
         try (PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET hash=? WHERE name=? AND revision=?")) {
             prepStatement.setString(1, file.getHash());
             prepStatement.setString(2, file.getName());
@@ -247,7 +247,7 @@ public class FileStore {
         }
     }
 
-    public boolean updateLastAccessedDate(StoreSafeFile file) throws SQLException {
+    public boolean updateLastAccessedDate(DataFile file) throws SQLException {
         try (PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET last_accessed=? WHERE name=? AND revision=?")) {
             prepStatement.setDate(1, file.getLastAccessed());
             prepStatement.setString(2, file.getName());

@@ -21,7 +21,7 @@ import java.sql.Date;
  *
  * @author rafox
  */
-public class StoreSafeFile
+public class DataFile
 {
 
     private Date lastModified;
@@ -50,7 +50,7 @@ public class StoreSafeFile
      * @param lastModified the value of lastModified
      * @param revision the value of revision
      */
-    public StoreSafeFile(String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision)
+    public DataFile(String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision)
     {
         this.lastModified = lastModified;
         this.size = size;
@@ -77,7 +77,7 @@ public class StoreSafeFile
      * @param lastModified the value of lastModified
      * @param revision the value of revision
      */
-    public StoreSafeFile(int id, String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision, StorageOptions options)
+    public DataFile(int id, String name, long size, String type, String dispersalMethod, int totalParts, int reqParts, String hash, Date lastAccessed, Date lastModified, int revision, StorageOptions options)
     {
         this.id = id;
         this.lastModified = lastModified;
@@ -93,7 +93,7 @@ public class StoreSafeFile
         this.options = options;
     }
 
-    public StoreSafeFile(String name, int revision) {
+    public DataFile(String name, int revision) {
         this.revision = revision;
         this.name = name;
     }

@@ -17,7 +17,7 @@ package storage.driver;
 
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
-import data.StoreSafeSlice;
+import data.DataSlice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,14 +47,14 @@ public class WebDavDriver implements IDriver {
     }
 
     @Override
-    public boolean deleteSlice(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException {
+    public boolean deleteSlice(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException {
         Sardine sardine = SardineFactory.begin(additionalParameters.get("username"), additionalParameters.get("password"));
         sardine.delete(this.path + slice.getPath());
         return true;
     }
 
     @Override
-    public InputStream getSliceDownloadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException {
+    public InputStream getSliceDownloadStream(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException {
         Sardine sardine = SardineFactory.begin(additionalParameters.get("username"), additionalParameters.get("password"));
         sardine.exists(this.path + slice.getPath());
         InputStream is = sardine.get(this.path + slice.getPath());
@@ -62,7 +62,7 @@ public class WebDavDriver implements IDriver {
     }
 
     @Override
-    public OutputStream getSliceUploadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException {
+    public OutputStream getSliceUploadStream(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException {
             final String pathT = this.path;
 
             PipedInputStream in = new PipedInputStream(StoreSafeManager.bufferSize);

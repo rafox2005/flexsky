@@ -17,9 +17,9 @@ package management;
 
 import com.github.sardine.impl.SardineException;
 import data.StorageOptions;
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
-import data.StoreSafeSlice;
+import data.DataAccount;
+import data.DataFile;
+import data.DataSlice;
 import dispersal.IDecoderIDA;
 import dispersal.IEncoderIDA;
 import java.io.File;
@@ -49,7 +49,7 @@ import util.monitor.RTOutputStream;
  */
 class StorageManager {
 
-    public boolean storeFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
+    public boolean storeFile(File file, DataFile ssf, ArrayList<DataSlice> slices, ArrayList<DataAccount> listAccounts) {
         IEncoderIDA ida = null;
         StorageOptions options = ssf.getOptions();
         RTInputStream fileInputStream = null;
@@ -65,8 +65,8 @@ class StorageManager {
         //Get the upload streams for each driver
         for (int i = 0; i < slices.size(); i++) {
             IDriver sliceDriver = null;
-            StoreSafeSlice currentSlice = slices.get(i);
-            StoreSafeAccount currentAccount = listAccounts.get(i);
+            DataSlice currentSlice = slices.get(i);
+            DataAccount currentAccount = listAccounts.get(i);
 
             try {
                 sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
@@ -269,7 +269,7 @@ class StorageManager {
         ssf.setHash(ida.getFileHash());
         String[] partsHash = ida.getPartsHash();
         for (int i = 0; i < slices.size(); i++) {
-            StoreSafeSlice currentSlice = slices.get(i);
+            DataSlice currentSlice = slices.get(i);
             currentSlice.setPath(currentSlice.getFile() + "-" + currentSlice.getPartIndex());
             currentSlice.setHash(partsHash[i]);
             currentSlice.setSize(sliceSize);
@@ -289,7 +289,7 @@ class StorageManager {
 
     }
 
-    public boolean downloadFile(File file, StoreSafeFile ssf, ArrayList<StoreSafeSlice> slices, ArrayList<StoreSafeAccount> listAccounts) {
+    public boolean downloadFile(File file, DataFile ssf, ArrayList<DataSlice> slices, ArrayList<DataAccount> listAccounts) {
         IDecoderIDA ida = null;
         ArrayList<InputStream> inputStreams = new ArrayList<>();
         ArrayList<RTInputStream> inputStreamsOriginal = new ArrayList<>();
@@ -304,8 +304,8 @@ class StorageManager {
         //Get the download streams for each driver
         for (int i = 0; i < slices.size(); i++) {
             IDriver sliceDriver = null;
-            StoreSafeSlice currentSlice = slices.get(i);
-            StoreSafeAccount currentAccount = listAccounts.get(i);
+            DataSlice currentSlice = slices.get(i);
+            DataAccount currentAccount = listAccounts.get(i);
 
             try {
                 sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());
@@ -566,7 +566,7 @@ class StorageManager {
         }
     }
 
-    public boolean deleteSlice(StoreSafeFile file, StoreSafeSlice slice, StoreSafeAccount currentAccount) {
+    public boolean deleteSlice(DataFile file, DataSlice slice, DataAccount currentAccount) {
         try {
             long start = System.currentTimeMillis();
             IDriver sliceDriver = (IDriver) Class.forName(currentAccount.getType()).getDeclaredConstructor(String.class, String.class).newInstance(currentAccount.getName(), currentAccount.getPath());

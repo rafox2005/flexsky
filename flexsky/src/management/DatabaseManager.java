@@ -16,9 +16,9 @@
 
 package management;
 
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
-import data.StoreSafeSlice;
+import data.DataAccount;
+import data.DataFile;
+import data.DataSlice;
 import database.AccountStore;
 import database.FileStore;
 import database.SliceStore;
@@ -57,7 +57,7 @@ class DatabaseManager
         }
     }
     
-    public int insertFile(StoreSafeFile ssf)
+    public int insertFile(DataFile ssf)
     {
         try {
             this.fs.insertFile(ssf);
@@ -72,7 +72,7 @@ class DatabaseManager
         return 0;
     }
     
-    public boolean insertSlice(StoreSafeSlice sss) 
+    public boolean insertSlice(DataSlice sss) 
     {
         return this.ss.insertSlice(sss);
         
@@ -105,9 +105,9 @@ class DatabaseManager
         return null;
     }
     
-    public boolean deleteFile(StoreSafeFile file) {
-        ArrayList<StoreSafeSlice> slicesToDelete = this.ss.getSlicesFromFile(file);
-        for (StoreSafeSlice slice : slicesToDelete) {
+    public boolean deleteFile(DataFile file) {
+        ArrayList<DataSlice> slicesToDelete = this.ss.getSlicesFromFile(file);
+        for (DataSlice slice : slicesToDelete) {
             this.ss.deleteSlice(slice);
         }
         try {
@@ -119,7 +119,7 @@ class DatabaseManager
         
     }
     
-    public boolean updateFileHash(StoreSafeFile file)
+    public boolean updateFileHash(DataFile file)
     {
         try {
             return this.fs.updateHash(file);
@@ -129,7 +129,7 @@ class DatabaseManager
         return false;
     }
     
-    public ArrayList<StoreSafeSlice> getFileSlices(StoreSafeFile file)
+    public ArrayList<DataSlice> getFileSlices(DataFile file)
     {
         try {
             this.fs.getFile(file);        
@@ -147,18 +147,18 @@ class DatabaseManager
         
     }
     
-    public ArrayList<StoreSafeAccount> getSlicesAccount(ArrayList<StoreSafeSlice> listSlices)
+    public ArrayList<DataAccount> getSlicesAccount(ArrayList<DataSlice> listSlices)
     {
         try {
-            ArrayList<StoreSafeAccount> listAccounts = new ArrayList<>();
+            ArrayList<DataAccount> listAccounts = new ArrayList<>();
             
             //Get all Accounts
-            ArrayList<StoreSafeAccount> listAccountsAux = this.as.getAccounts();
+            ArrayList<DataAccount> listAccountsAux = this.as.getAccounts();
             
             //Get Slices Accounts
-            for (StoreSafeSlice slice : listSlices)
+            for (DataSlice slice : listSlices)
             {
-                for (StoreSafeAccount account : listAccountsAux)
+                for (DataAccount account : listAccountsAux)
                 {
                     if (slice.getAccount().equals(account.getName())) listAccounts.add(account);
                 }
@@ -172,7 +172,7 @@ class DatabaseManager
         return null;
     }
     
-    public boolean updateFileLastAccessedDate(StoreSafeFile file)
+    public boolean updateFileLastAccessedDate(DataFile file)
     {
         try {
             return this.fs.updateHash(file);
@@ -182,7 +182,7 @@ class DatabaseManager
         }
     }   
 
-    public boolean insertAccount(StoreSafeAccount ssa) {
+    public boolean insertAccount(DataAccount ssa) {
         try
         {
             this.as.insertAccount(ssa);
@@ -194,7 +194,7 @@ class DatabaseManager
         }
     }
     
-    public boolean deleteAccount(StoreSafeAccount ssa) {
+    public boolean deleteAccount(DataAccount ssa) {
         try
         {
             this.as.deleteAccountByName(ssa.getName());

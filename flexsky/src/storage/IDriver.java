@@ -16,7 +16,7 @@
 
 package storage;
 
-import data.StoreSafeSlice;
+import data.DataSlice;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,10 +29,10 @@ import java.util.HashMap;
 public interface IDriver
 {
     
-    boolean deleteSlice(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
+    boolean deleteSlice(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException;
 
-    InputStream getSliceDownloadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
+    InputStream getSliceDownloadStream(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException;
 
-    OutputStream getSliceUploadStream(StoreSafeSlice slice, HashMap<String, String> additionalParameters) throws IOException;
+    OutputStream getSliceUploadStream(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException;
     
 }

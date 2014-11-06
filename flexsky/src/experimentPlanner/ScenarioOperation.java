@@ -1,7 +1,7 @@
 package experimentPlanner;
 
 import data.StorageOptions;
-import data.StoreSafeFile;
+import data.DataFile;
 
 /**
  *
@@ -11,7 +11,7 @@ import data.StoreSafeFile;
 
 public class ScenarioOperation {
     private String action;
-    private StoreSafeFile file;
+    private DataFile file;
     private String pathForFile;
     private StorageOptions options;
     private int totalParts;
@@ -29,11 +29,11 @@ public class ScenarioOperation {
         this.action = action;
     }
 
-    public StoreSafeFile getFile() {
+    public DataFile getFile() {
         return file;
     }
 
-    public void setFile(StoreSafeFile file) {
+    public void setFile(DataFile file) {
         this.file = file;
     }
 

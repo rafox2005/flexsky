@@ -1,8 +1,8 @@
 package experimentPlanner;
 
 import data.StorageOptions;
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
+import data.DataAccount;
+import data.DataFile;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ScenarioParser {
         for (int i = 0; i < nodeList.getLength(); i++)
         {
             String name = nodeList.item(i).getAttributes().getNamedItem("name").getNodeValue();
-            StoreSafeAccount ssa = new StoreSafeAccount(name, name, name);
+            DataAccount ssa = new DataAccount(name, name, name);
 
             NodeList provAttr = nodeList.item(i).getChildNodes();
             for (int j = 0; j < provAttr.getLength(); j++)
@@ -121,7 +121,7 @@ public class ScenarioParser {
                 } else if (operAttr.item(j).getNodeName() == "file")
                 {
                     NodeList fileAttr = operAttr.item(j).getChildNodes();
-                    StoreSafeFile ssf = new StoreSafeFile(null, 0);
+                    DataFile ssf = new DataFile(null, 0);
                     ArrayList<IPipeProcess> filePipeline = new ArrayList();
                     ArrayList<IPipeProcess> slicePipeline = new ArrayList();
                     StorageOptions options = new StorageOptions();

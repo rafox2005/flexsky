@@ -19,8 +19,8 @@ package management;
 import data.StorageOptions;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
+import data.DataAccount;
+import data.DataFile;
 import dispersal.IEncoderIDA;
 import dispersal.rabin.RabinIDA;
 import java.io.File;
@@ -93,7 +93,7 @@ public class StoreSafeManagerTest
         int revision = 0;
         StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);    
         instance.deleteAllFiles();
-        ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
+        ArrayList<DataAccount> listAccounts = instance.listAccounts();    
         
         boolean expResult = true;
         boolean result = instance.storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts);
@@ -106,7 +106,7 @@ public class StoreSafeManagerTest
         StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
-        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 0);
+        DataFile ssf =  new DataFile(new File(pathDown).getName(), 0);
         instance.downloadFile(pathDown, ssf);        
      
     }
@@ -116,7 +116,7 @@ public class StoreSafeManagerTest
     {
         StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         //Delete File       
-        StoreSafeFile ssf =  new StoreSafeFile(new File(StoreSafeManagerTest.pathToTestFile).getName(), 0);
+        DataFile ssf =  new DataFile(new File(StoreSafeManagerTest.pathToTestFile).getName(), 0);
         instance.deleteFile(ssf);
      
     }
@@ -133,7 +133,7 @@ public class StoreSafeManagerTest
         int revision = 1;
         StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);    
         instance.deleteAllFiles();
-        ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
+        ArrayList<DataAccount> listAccounts = instance.listAccounts();    
         
         boolean expResult = true;
         File start = new File(path);
@@ -141,7 +141,7 @@ public class StoreSafeManagerTest
         
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
-        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 1);
+        DataFile ssf =  new DataFile(new File(pathDown).getName(), 1);
         instance.downloadFile(pathDown, ssf);
         
         File end = new File(pathDown);
@@ -168,7 +168,7 @@ public class StoreSafeManagerTest
         int revision = 2;
         StoreSafeManager instance = StoreSafeManager.getInstance(StoreSafeManagerTest.pathToDB, StoreSafeManagerTest.pathToLogDB);  
         instance.deleteAllFiles();
-        ArrayList<StoreSafeAccount> listAccounts = instance.listAccounts();    
+        ArrayList<DataAccount> listAccounts = instance.listAccounts();    
         
         PipeTest pt = new PipeTest();
         PipeTest pt2 = new PipeTest();
@@ -192,7 +192,7 @@ public class StoreSafeManagerTest
         
         //Download part test
         String pathDown = StoreSafeManagerTest.pathToTestFileOutput;
-        StoreSafeFile ssf =  new StoreSafeFile(new File(pathDown).getName(), 2);
+        DataFile ssf =  new DataFile(new File(pathDown).getName(), 2);
         instance.downloadFile(pathDown, ssf);        
      
         File end = new File(pathDown);
@@ -231,7 +231,7 @@ public class StoreSafeManagerTest
 //    {
 //        System.out.println("downloadFile");
 //        String path = "";
-//        StoreSafeFile file = null;
+//        DataFile file = null;
 //        StoreSafeManager instance = new StoreSafeManager();
 //        boolean expResult = false;
 //        boolean result = instance.downloadFile(path, file);

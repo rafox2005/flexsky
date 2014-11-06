@@ -16,7 +16,7 @@
 
 package database;
 
-import data.StoreSafeSlice;
+import data.DataSlice;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -72,13 +72,13 @@ public class SliceStoreTest
         System.out.println("testOperations");
         SliceStore instance = this.ss;
         int sizeBegin = instance.getSlicesFromFile(23).size();
-        StoreSafeSlice slice1 = new StoreSafeSlice(23,
+        DataSlice slice1 = new DataSlice(23,
                                                    1,
                                                    "",
                                                    "teste",
                                                    new Long(123312331).longValue(),
                                                    "HASHTESTE");
-        StoreSafeSlice slice2 = new StoreSafeSlice(23,
+        DataSlice slice2 = new DataSlice(23,
                                                    2,
                                                    "",
                                                    "teste",
@@ -98,7 +98,7 @@ public class SliceStoreTest
     {
         System.out.println("testInsertSameSlices");
         SliceStore instance = this.ss;
-        StoreSafeSlice slice1 = new StoreSafeSlice(23,
+        DataSlice slice1 = new DataSlice(23,
                                                    1,
                                                    "",
                                                    "teste",

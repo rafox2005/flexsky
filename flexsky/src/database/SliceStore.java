@@ -15,8 +15,8 @@
  */
 package database;
 
-import data.StoreSafeFile;
-import data.StoreSafeSlice;
+import data.DataFile;
+import data.DataSlice;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +56,7 @@ public class SliceStore
         this.name = name;
     }
 
-    public boolean insertSlice(StoreSafeSlice slice)
+    public boolean insertSlice(DataSlice slice)
     {
         try {
             PreparedStatement prepStatement
@@ -76,16 +76,16 @@ public class SliceStore
         }
     }
 
-    public ArrayList<StoreSafeSlice> getSlicesFromFile(StoreSafeFile file)
+    public ArrayList<DataSlice> getSlicesFromFile(DataFile file)
     {
         try {
             ResultSet rs;
-            ArrayList<StoreSafeSlice> list = new ArrayList<>();
+            ArrayList<DataSlice> list = new ArrayList<>();
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM slices WHERE file=?");
             prepStatement.setInt(1, file.getId());
             rs = prepStatement.executeQuery();
             while (rs.next()) {
-                list.add(new StoreSafeSlice(rs.getInt("file"),
+                list.add(new DataSlice(rs.getInt("file"),
                         rs.getInt("part_index"),
                         rs.getString("account"),
                         rs.getString("path"),
@@ -99,16 +99,16 @@ public class SliceStore
         }
     }
     
-     public ArrayList<StoreSafeSlice> getSlicesFromFile(int fileId)
+     public ArrayList<DataSlice> getSlicesFromFile(int fileId)
     {
         try {
             ResultSet rs;
-            ArrayList<StoreSafeSlice> list = new ArrayList<>();
+            ArrayList<DataSlice> list = new ArrayList<>();
             PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM slices WHERE file=?");
             prepStatement.setInt(1, fileId);
             rs = prepStatement.executeQuery();
             while (rs.next()) {
-                list.add(new StoreSafeSlice(rs.getInt("file"),
+                list.add(new DataSlice(rs.getInt("file"),
                         rs.getInt("part_index"),
                         rs.getString("account"),
                         rs.getString("path"),
@@ -122,7 +122,7 @@ public class SliceStore
         }
     }
 
-    public boolean deleteSlice(StoreSafeSlice slice)
+    public boolean deleteSlice(DataSlice slice)
     {
         try {
             PreparedStatement prepStatement = conn.prepareStatement("DELETE FROM slices WHERE file=? AND part_index=?");

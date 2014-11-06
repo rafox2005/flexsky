@@ -16,9 +16,9 @@
 package management;
 
 import data.StorageOptions;
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
-import data.StoreSafeSlice;
+import data.DataAccount;
+import data.DataFile;
+import data.DataSlice;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -66,12 +66,12 @@ public class StoreSafeManager {
     }
     
     
-    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts, StorageOptions options) {
+    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<DataAccount> listAccounts, StorageOptions options) {
         long start, end;
         //Buffer size must be compatible with reqParts for the Dispersal to work
         StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize % reqParts;
         start = System.currentTimeMillis();
-        StoreSafeFile ssf = null;
+        DataFile ssf = null;
         try {
             if (totalParts != listAccounts.size()) {
                 throw new IllegalArgumentException("accounts list and total parts differ, please correct!");
@@ -79,17 +79,17 @@ public class StoreSafeManager {
 
             File file = new File(path); //Get File object from the file
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class); //Needed for lasAccess file variable
-            ssf = new StoreSafeFile(file.getName(), file.length(), type, dispersalMethod, totalParts, reqParts, "0", new Date(attrs.lastAccessTime().toMillis()), new Date(attrs.lastModifiedTime().toMillis()), revision);
+            ssf = new DataFile(file.getName(), file.length(), type, dispersalMethod, totalParts, reqParts, "0", new Date(attrs.lastAccessTime().toMillis()), new Date(attrs.lastModifiedTime().toMillis()), revision);
             ssf.setOptions(options);
             
             int fileID = this.db.insertFile(ssf);
             
             if (fileID == 0) return false;
             
-            ArrayList<StoreSafeSlice> slices = new ArrayList<>();
+            ArrayList<DataSlice> slices = new ArrayList<>();
 
             for (int i = 0; i < totalParts; i++) {
-                slices.add(new StoreSafeSlice(fileID, i, listAccounts.get(i).getName(), "", 0, "")); //Prepare a slice without some info
+                slices.add(new DataSlice(fileID, i, listAccounts.get(i).getName(), "", 0, "")); //Prepare a slice without some info
             }
 
             //Store the files and finish the parts to store
@@ -118,7 +118,7 @@ public class StoreSafeManager {
 
     }
 
-    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<StoreSafeAccount> listAccounts) {
+    public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<DataAccount> listAccounts) {
         StorageOptions options = new StorageOptions(null, null, null);
         return storeFile(path, type, dispersalMethod, totalParts, reqParts, revision, listAccounts, options);
     }
@@ -127,11 +127,11 @@ public class StoreSafeManager {
         return this.db.listFiles();
     }
     
-    public StoreSafeFile getFileInfo(String name, int revision)
+    public DataFile getFileInfo(String name, int revision)
     {
-        ArrayList<StoreSafeFile> filesStored = this.db.listFiles();
+        ArrayList<DataFile> filesStored = this.db.listFiles();
         
-        for (StoreSafeFile file : filesStored)
+        for (DataFile file : filesStored)
         {
             if (file.getName().equalsIgnoreCase(name) && file.getRevision() == revision) return file;
         }
@@ -139,12 +139,12 @@ public class StoreSafeManager {
         return null;
     }
 
-    public boolean downloadFile(String path, StoreSafeFile ssf) {
+    public boolean downloadFile(String path, DataFile ssf) {
         try {
             StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize%ssf.getReqParts();
             
-            ArrayList<StoreSafeSlice> slicesList = this.db.getFileSlices(ssf);
-            ArrayList<StoreSafeAccount> accountList = this.db.getSlicesAccount(slicesList);
+            ArrayList<DataSlice> slicesList = this.db.getFileSlices(ssf);
+            ArrayList<DataAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
             long start = System.currentTimeMillis();
             this.storage.downloadFile(file, ssf, slicesList, accountList);
@@ -172,10 +172,10 @@ public class StoreSafeManager {
 
     }
 
-    public boolean deleteFile(StoreSafeFile ssf) {
+    public boolean deleteFile(DataFile ssf) {
         double start = System.currentTimeMillis();
-        ArrayList<StoreSafeSlice> slices = this.db.getFileSlices(ssf);
-        ArrayList<StoreSafeAccount> accounts = this.db.getSlicesAccount(slices);
+        ArrayList<DataSlice> slices = this.db.getFileSlices(ssf);
+        ArrayList<DataAccount> accounts = this.db.getSlicesAccount(slices);
         
         //Delete the slices
         for (int i = 0; i < slices.size(); i++) {
@@ -193,8 +193,8 @@ public class StoreSafeManager {
     }
     
     public boolean deleteAllFiles() {
-        ArrayList<StoreSafeFile> files = this.listFiles();
-        for (StoreSafeFile storeSafeFile : files) {
+        ArrayList<DataFile> files = this.listFiles();
+        for (DataFile storeSafeFile : files) {
             this.deleteFile(storeSafeFile);
         }
         return true;
@@ -233,12 +233,12 @@ public class StoreSafeManager {
         return this.db.listAccounts();
     }
     
-    public boolean addAccount(StoreSafeAccount ssa)
+    public boolean addAccount(DataAccount ssa)
     {
         return this.db.insertAccount(ssa);
     }
     
-    public boolean delAccount(StoreSafeAccount ssa)
+    public boolean delAccount(DataAccount ssa)
     {
         return this.db.deleteAccount(ssa);
     }
@@ -246,8 +246,8 @@ public class StoreSafeManager {
     public boolean delAllAccounts()
     {
         try {
-        ArrayList<StoreSafeAccount> accs = this.db.listAccounts();
-        for (StoreSafeAccount account : accs)
+        ArrayList<DataAccount> accs = this.db.listAccounts();
+        for (DataAccount account : accs)
         {
             this.db.deleteAccount(account);
         }

@@ -16,7 +16,7 @@
 
 package database;
 
-import data.StoreSafeAccount;
+import data.DataAccount;
 import storage.driver.WebDavDriver;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -64,7 +64,7 @@ public class AccountStoreTest
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rlibardi/NetBeansProjects/safestore-leicester/safestore/db/safestore_test.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db");
             as = new AccountStore(this.conn);
         } catch (SQLException ex) {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -150,10 +150,17 @@ public class AccountStoreTest
         System.out.println("testOperations");
         AccountStore instance = this.as;
         HashMap parametros = new HashMap();
+        HashMap selectparametros = new HashMap();
         parametros.put("username", "rafox2005@gmail.com");
         parametros.put("password", "ra281190");
-        //StoreSafeAccount account1 = new StoreSafeAccount("teste5", 0, "path_teste");
-        StoreSafeAccount account2 = new StoreSafeAccount("remote-box", WebDavDriver.class.getName(), "https://dav.box.com/dav", parametros);
+        selectparametros.put("PROV_SEC", 50);
+        selectparametros.put("PROV_PERF", 50);
+        selectparametros.put("PROV_AVAIL", 50);
+        selectparametros.put("PROV_DUR", 50);
+        selectparametros.put("PROV_STORAGECOST", 50);
+        selectparametros.put("PROV_BWCOST", 50);
+        //StoreSafeAccount account1 = new DataAccount("teste5", 0, "path_teste");
+        DataAccount account2 = new DataAccount("remote-box", WebDavDriver.class.getName(), "https://dav.box.com/dav", parametros, selectparametros);
         //instance.insertAccount(account1);
         instance.insertAccount(account2);
         ArrayList acc_list = instance.getAccounts();
@@ -162,6 +169,29 @@ public class AccountStoreTest
         //instance.deleteAccountByName("teste6");
         acc_list = instance.getAccounts();
         assertTrue(acc_list.size() == 2);
+        
+    }
+    
+    public void updateProvidersADDSELECTION() throws SQLException
+    {
+        System.out.println("updateProvidersADDSELECTION");
+        AccountStore instance = this.as;
+        ArrayList<DataAccount> list_accs = this.as.getAccounts();
+        
+        for (DataAccount acc : list_accs)
+        {
+            HashMap selectparametros = new HashMap();     
+            selectparametros.put("PROV_SEC", Math.round(100*Math.random()));
+            selectparametros.put("PROV_PERF", Math.round(100*Math.random()));
+            selectparametros.put("PROV_AVAIL", Math.round(100*Math.random()));
+            selectparametros.put("PROV_DUR", Math.round(100*Math.random()));
+            selectparametros.put("PROV_STORAGECOST", Math.round(100*Math.random()));
+            selectparametros.put("PROV_BWCOST", Math.round(100*Math.random()));
+            
+            this.as.deleteAccountByName(acc.getName());
+            acc.setSelectionParameters(selectparametros);
+            this.as.insertAccount(acc);
+        }
         
     }
 }

@@ -15,7 +15,7 @@
  */
 package database;
 
-import data.StoreSafeAccount;
+import data.DataAccount;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,15 +37,16 @@ public class AccountStore {
         this.conn = conn;
     }
 
-    public boolean insertAccount(StoreSafeAccount account) throws SQLException {
+    public boolean insertAccount(DataAccount account) throws SQLException {
         //Get File Pipe Info            
         byte[] parametersBlob = SerializationUtils.serialize(account.getAdditionalParameters());
-        try (PreparedStatement prepStatement = conn.prepareStatement("INSERT INTO accounts (name, type, path, parameters) VALUES(?, ?, ?, ?)")) {
+        byte[] selectionParametersBlob = SerializationUtils.serialize(account.getSelectionParameters());
+        try (PreparedStatement prepStatement = conn.prepareStatement("INSERT INTO accounts (name, type, path, parameters, selection_parameters) VALUES(?, ?, ?, ?, ?)")) {
             prepStatement.setString(1, account.getName());
             prepStatement.setString(2, account.getType());
             prepStatement.setString(3, account.getPath());
             prepStatement.setBytes(4, parametersBlob);
-            //TODO SELECTION PARAMETERS
+            prepStatement.setBytes(5, selectionParametersBlob);
             prepStatement.executeUpdate();
         }
         return true;
@@ -67,20 +68,26 @@ public class AccountStore {
         return true;
     }
 
-    public ArrayList<StoreSafeAccount> getAccounts() throws SQLException {
+    public ArrayList<DataAccount> getAccounts() throws SQLException {
         ResultSet rs;
-        ArrayList<StoreSafeAccount> list = new ArrayList<>();
+        ArrayList<DataAccount> list = new ArrayList<>();
         try (PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM accounts")) {
             rs = prepStatement.executeQuery();
             while (rs.next()) {
+                //Get add parameters
                 HashMap additionalParameters = null;
                 byte[] param = rs.getBytes("parameters");
                 if (param != null) {
                     additionalParameters = SerializationUtils.deserialize(param);
                 }
-                //TODO SELECTION PARAMETERS
+                //Get Selection Parameters
+                 HashMap selectionParameters = null;
+                byte[] select_param = rs.getBytes("selection_parameters");
+                if (select_param != null) {
+                    selectionParameters = SerializationUtils.deserialize(select_param);
+                }
 
-                list.add(new StoreSafeAccount(rs.getString("name"), rs.getString("type"), rs.getString("path"), additionalParameters));
+                list.add(new DataAccount(rs.getString("name"), rs.getString("type"), rs.getString("path"), additionalParameters, selectionParameters));
             }
         }
         return list;

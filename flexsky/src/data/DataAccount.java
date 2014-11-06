@@ -22,7 +22,7 @@ import java.util.HashMap;
  *
  * @author rafox
  */
-public class StoreSafeAccount
+public class DataAccount
 {
     
     private String name;
@@ -31,7 +31,7 @@ public class StoreSafeAccount
     private HashMap<String,String> additionalParameters;
     private HashMap<String, Integer> selectionParameters;
 
-    public StoreSafeAccount(String name, String type, String path)
+    public DataAccount(String name, String type, String path)
     {
         this.name = name;
         this.type = type;
@@ -39,12 +39,13 @@ public class StoreSafeAccount
         this.additionalParameters = null;
     }
     
-    public StoreSafeAccount(String name, String type, String path, HashMap<String,String> additionalParameters)
+    public DataAccount(String name, String type, String path, HashMap<String,String> additionalParameters, HashMap<String, Integer> selectionParameters)
     {
         this.name = name;
         this.type = type;
         this.path = path;
         this.additionalParameters = additionalParameters;
+        this.selectionParameters = selectionParameters;
     }
     
     @Override
@@ -120,6 +121,14 @@ public class StoreSafeAccount
 
     public void setAdditionalParameters(HashMap<String, String> additionalParameters) {
         this.additionalParameters = additionalParameters;
+    }
+    
+    public HashMap<String, Integer> getSelectionParameters() {
+        return selectionParameters;
+    }
+
+    public void setSelectionParameters(HashMap<String, Integer> additionalParameters) {
+        this.selectionParameters = additionalParameters;
     }
     
     

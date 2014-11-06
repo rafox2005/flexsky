@@ -16,8 +16,8 @@
 package ui;
 
 import data.StorageOptions;
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
+import data.DataAccount;
+import data.DataFile;
 import dispersal.IEncoderIDA;
 import experimentPlanner.Scenario;
 import experimentPlanner.ScenarioExecutor;
@@ -159,6 +159,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     
 
     private void populateComponents() {
+        try{
         this.getDBPaths();
 
         ssm = StoreSafeManager.getInstance(this.db_path, this.logDB_path);
@@ -205,6 +206,12 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         
         //Upload Easy
         this.populateComponentsUploadEasy();
+        }
+        catch (Exception ex)
+        {
+            Logger.getLogger(SafeStoreMDIApplication.class.getName()).log(Level.SEVERE, "Critical Error: Closing application!", ex);
+            System.exit(-1);
+        }
 
     }
 
@@ -1083,9 +1090,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     }//GEN-LAST:event_setDownloadPathjButtonActionPerformed
 
     private void downloadJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_downloadJButtonMouseClicked
-        List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
+        List<DataFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
 
-        for (StoreSafeFile storeSafeFile : ssfList)
+        for (DataFile storeSafeFile : ssfList)
         {
             String path = this.pathToDownloadFolderjLabel.getText();
             ssm.downloadFile(path, storeSafeFile);
@@ -1093,9 +1100,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     }//GEN-LAST:event_downloadJButtonMouseClicked
 
     private void deleteJButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteJButtonMouseClicked
-        List<StoreSafeFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
 
-        for (StoreSafeFile storeSafeFile : ssfList)
+        List<DataFile> ssfList = this.filesToDownloadJList.getSelectedValuesList();
+        for (DataFile storeSafeFile : ssfList)
         {
             ssm.deleteFile(storeSafeFile);
         }
@@ -1244,9 +1251,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void delProviderjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delProviderjButtonActionPerformed
-        List<StoreSafeAccount> accounts = this.ProviderList1.getSelectedValuesList();
+        List<DataAccount> accounts = this.ProviderList1.getSelectedValuesList();
 
-        for (StoreSafeAccount account : accounts)
+        for (DataAccount account : accounts)
         {
             this.ssm.delAccount(account);
         }
@@ -1273,7 +1280,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
             }
         }
 
-        StoreSafeAccount account = new StoreSafeAccount(name, type, path);
+        DataAccount account = new DataAccount(name, type, path);
         account.setAdditionalParameters(param);
 
         this.ssm.addAccount(account);

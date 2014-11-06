@@ -1,7 +1,7 @@
 package experimentPlanner;
 
-import data.StoreSafeAccount;
-import data.StoreSafeFile;
+import data.DataAccount;
+import data.DataFile;
 import java.io.File;
 import management.StoreSafeManager;
 
@@ -38,7 +38,7 @@ public class ScenarioExecutor {
       
       //Adding accounts
       System.out.println("Adding accounts...");
-        for (StoreSafeAccount ssa : scenario.providerList)
+        for (DataAccount ssa : scenario.providerList)
         {
             instance.addAccount(ssa);
         }
@@ -69,7 +69,7 @@ public class ScenarioExecutor {
                     
                     File filePath = new File(operation.getPathForFile());                   
                     
-                    StoreSafeFile fileInfo = instance.getFileInfo(filePath.getName(), operation.getFile().getRevision());
+                    DataFile fileInfo = instance.getFileInfo(filePath.getName(), operation.getFile().getRevision());
                     boolean result = false;
                     if (fileInfo != null) result = instance.downloadFile(operation.getPathForFile(), fileInfo);
                     if (result == true) System.out.println("Ok...");

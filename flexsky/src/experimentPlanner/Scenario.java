@@ -1,6 +1,6 @@
  package experimentPlanner;
 
-import data.StoreSafeAccount;
+import data.DataAccount;
 import java.util.ArrayList;
 
 /**
@@ -17,11 +17,11 @@ public class Scenario {
     public String path_to_logDB;
     public boolean resetOnStartDB;
     
-    ArrayList<StoreSafeAccount> providerList;
+    ArrayList<DataAccount> providerList;
     ArrayList<ScenarioOperation> operationList;
 
     public Scenario() {
-        this.providerList = new ArrayList<StoreSafeAccount>();
+        this.providerList = new ArrayList<DataAccount>();
         this.operationList = new ArrayList<>();
     }
     

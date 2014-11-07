@@ -203,8 +203,8 @@ public class StoreSafeManager {
     public ArrayList listAccounts() {
         return this.db.listAccounts();
     } 
-    
-   
+      
+       
     public Set getIDAList()
     {
         
@@ -257,5 +257,9 @@ public class StoreSafeManager {
             return false;
         }
     }
-
+    
+    public ArrayList listModules() {
+        return this.db.listModules();
+    } 
+    
 }

@@ -24,6 +24,8 @@
 package mssf.selector;
 
 import data.DataAccount;
+import database.AccountStore;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -68,20 +70,63 @@ public class LPSelector extends ISelector{
             
             Utils.executeCommand(command);
             
-            //Read solution file and create dispersal selection object   TODO         
-            FileReader reader = new FileReader(fileTempSolution);
+            //Read solution file and create dispersal selection object   TODO   
             
-            reader.
+            DispersalMethod dm = new DispersalMethod();
+            ArrayList<DataAccount> selectedProviders = new ArrayList();
+            DispersalSelection ds = new DispersalSelection(dm, selectedProviders);
+           
+            BufferedReader br = new BufferedReader(new FileReader(fileTempSolution));
+            String line;
+            while ((line = br.readLine()) != null) {
+            String[] result = line.split(";");
             
+            //Get the providers
+                if (result[0].equalsIgnoreCase("provider"))
+                {                    
+                    for (DataAccount provider : providers)
+                    {
+                        if (provider.getName().equalsIgnoreCase(result[1]))
+                        {
+                            selectedProviders.add(provider);
+                        }
+                    }
+                }
+                
+                else if (result[0].equalsIgnoreCase("ida"))
+                {                    
+                    for (PipeModule module : modules)
+                    {
+                        if (module.getName().equalsIgnoreCase(result[1]))
+                        {
+                            dm.getFile_pipeline().add(module);
+                        }
+                    }
+                }
+                
+                else if (result[0].equalsIgnoreCase("comp"))
+                {                    
+                    for (PipeModule module : modules)
+                    {
+                        if (module.getName().equalsIgnoreCase(result[1]))
+                        {
+                            dm.getFile_pipeline().add(module);
+                        }
+                    }
+                }
             
-            
-            
-            
+            }
+            br.close(); 
+            return ds;
+                                 
             
         } catch (IOException ex)
         {
             Logger.getLogger(LPSelector.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
+        
+        
     
     }
             

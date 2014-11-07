@@ -37,11 +37,17 @@ import org.apache.commons.lang3.SerializationUtils;
  * @author rlibardi
  */
 public class ModuleStore {
+    private String name;
     private final Connection conn;
 
     public ModuleStore(Connection conn) throws ClassNotFoundException {
         Class.forName("org.sqlite.JDBC");
         this.conn = conn;
+    }
+
+    public ModuleStore(String testFS, Connection conn) throws ClassNotFoundException {
+        this(conn);
+        this.name = testFS;        
     }
     
     public boolean insertModule(PipeModule module) throws SQLException {

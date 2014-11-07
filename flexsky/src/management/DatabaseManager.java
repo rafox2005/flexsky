@@ -21,6 +21,7 @@ import data.DataFile;
 import data.DataSlice;
 import database.AccountStore;
 import database.FileStore;
+import database.ModuleStore;
 import database.SliceStore;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,6 +39,7 @@ class DatabaseManager
     private AccountStore as;
     private FileStore fs;
     private SliceStore ss;
+    private ModuleStore ms;
     private Connection conn;
 
     public DatabaseManager(String pathToDB)
@@ -50,6 +52,7 @@ class DatabaseManager
             this.as = new AccountStore(this.conn);
             this.fs = new FileStore("TestFS", this.conn);
             this.ss = new SliceStore("TestFS", this.conn);
+            this.ms = new ModuleStore("TestFS", this.conn);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: jdbc adapter driver not found", ex);
         } catch (SQLException ex) {
@@ -101,6 +104,16 @@ class DatabaseManager
             return this.as.getAccounts();
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when listing accounts", ex);
+        }
+        return null;
+    }
+    
+    public ArrayList listModules()
+    {
+        try {
+            return this.ms.getModules();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error when listing modules", ex);
         }
         return null;
     }

@@ -11,6 +11,6 @@ import java.util.HashMap;
 
 
 public abstract class ISelector {
-    public abstract DispersalSelection select(ArrayList<DataAccount> providers, ArrayList<String> idas, ArrayList<DispersalMethod> methods, HashMap<String, Integer> userConstraints);
+    public abstract DispersalSelection select(ArrayList<DataAccount> providers, ArrayList<PipeModule> modules, HashMap<String, Integer> userConstraints, HashMap<String, String> parameters);
 
 }

@@ -38,6 +38,22 @@ public class DispersalSelection {
         this.method = method;
         this.providers = providers;
     }
+
+    public DispersalMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(DispersalMethod method) {
+        this.method = method;
+    }
+
+    public ArrayList<DataAccount> getProviders() {
+        return providers;
+    }
+
+    public void setProviders(ArrayList<DataAccount> providers) {
+        this.providers = providers;
+    }
     
     
     

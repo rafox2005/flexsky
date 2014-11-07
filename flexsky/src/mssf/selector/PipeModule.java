@@ -29,10 +29,42 @@ import java.util.HashMap;
  *
  * @author rlibardi
  */
-public class PipeModules {
+public class PipeModule {
     private String name;
     private String pipe_name;
     private String type;
-    private HashMap<String
+    private HashMap<String, String> parameters;
+    private HashMap<String, Integer> selectionParameters;
+
+    public PipeModule(String name, String type, String pipe_name, HashMap<String, String> parameters, HashMap<String, Integer> selectionParameters) {
+        this.name = name;
+        this.pipe_name = pipe_name;
+        this.type = type;
+        this.parameters = parameters;
+        this.selectionParameters = selectionParameters;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPipe_name() {
+        return pipe_name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
+
+    public HashMap<String, Integer> getSelectionParameters() {
+        return selectionParameters;
+    }
+    
+    
+    
     
 }

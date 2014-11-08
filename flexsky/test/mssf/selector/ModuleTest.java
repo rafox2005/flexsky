@@ -43,12 +43,12 @@ import static org.junit.Assert.*;
  *
  * @author rlibardi
  */
-public class PipeModuleTest {
+public class ModuleTest {
     
     public Connection conn;
     public ModuleStore ms;
     
-    public PipeModuleTest() {
+    public ModuleTest() {
     }
     
     @Before
@@ -91,51 +91,51 @@ public class PipeModuleTest {
                 selectparametros.put("PERF", Math.round(100*Math.random()));
                 selectparametros.put("STO", Math.round(100*Math.random()));
                 
-                PipeModule pm1 = new PipeModule("testeCOMP" + i, "comp", "pipeline.pipe.Base64Pipe", parametros, selectparametros);
-                PipeModule pm2 = new PipeModule("testeENC" + i, "enc", "pipeline.pipe.PipeTest", parametros, selectparametros);
-                PipeModule pm3 = new PipeModule("testeIDA" + i, "ida", "RabinIDA", parametros, selectparametros);
+                Module pm1 = new Module("testeCOMP" + i, "comp", "pipeline.pipe.Base64Pipe", parametros, selectparametros);
+                Module pm2 = new Module("testeENC" + i, "enc", "pipeline.pipe.PipeTest", parametros, selectparametros);
+                Module pm3 = new Module("testeIDA" + i, "ida", "RabinIDA", parametros, selectparametros);
                 
                 ms.insertModule(pm1);
                 ms.insertModule(pm2);
                 ms.insertModule(pm3);
             } catch (SQLException ex)
             {
-                Logger.getLogger(PipeModuleTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ModuleTest.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         }
     }
 
     /**
-     * Test of getName method, of class PipeModule.
+     * Test of getName method, of class Module.
      */
     @Test
     public void testGetName() {
     }
 
     /**
-     * Test of getPipe_name method, of class PipeModule.
+     * Test of getPipe_name method, of class Module.
      */
     @Test
     public void testGetPipe_name() {
     }
 
     /**
-     * Test of getType method, of class PipeModule.
+     * Test of getType method, of class Module.
      */
     @Test
     public void testGetType() {
     }
 
     /**
-     * Test of getParameters method, of class PipeModule.
+     * Test of getParameters method, of class Module.
      */
     @Test
     public void testGetParameters() {
     }
 
     /**
-     * Test of getSelectionParameters method, of class PipeModule.
+     * Test of getSelectionParameters method, of class Module.
      */
     @Test
     public void testGetSelectionParameters() {

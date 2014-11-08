@@ -29,7 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import mssf.selector.PipeModule;
+import mssf.selector.Module;
 import org.apache.commons.lang3.SerializationUtils;
 
 /**
@@ -50,7 +50,7 @@ public class ModuleStore {
         this.name = testFS;        
     }
     
-    public boolean insertModule(PipeModule module) throws SQLException {
+    public boolean insertModule(Module module) throws SQLException {
         //Get File Pipe Info            
         byte[] parametersBlob = SerializationUtils.serialize(module.getParameters());
         byte[] selectionParametersBlob = SerializationUtils.serialize(module.getSelectionParameters());
@@ -73,9 +73,9 @@ public class ModuleStore {
         return true;
     }
     
-    public ArrayList<PipeModule> getModules() throws SQLException {
+    public ArrayList<Module> getModules() throws SQLException {
         ResultSet rs;
-        ArrayList<PipeModule> list = new ArrayList<>();
+        ArrayList<Module> list = new ArrayList<>();
         try (PreparedStatement prepStatement = conn.prepareStatement("SELECT * FROM modules")) {
             rs = prepStatement.executeQuery();
             while (rs.next()) {
@@ -92,7 +92,7 @@ public class ModuleStore {
                     selectionParameters = SerializationUtils.deserialize(select_param);
                 }
 
-                list.add(new PipeModule(rs.getString("name"), rs.getString("type"), rs.getString("pipe_name"), additionalParameters, selectionParameters));
+                list.add(new Module(rs.getString("name"), rs.getString("type"), rs.getString("pipe_name"), additionalParameters, selectionParameters));
             }
         }
         return list;

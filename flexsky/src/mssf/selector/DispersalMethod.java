@@ -13,10 +13,16 @@ import java.util.HashMap;
 
 public class DispersalMethod {
     private HashMap<String, Double> selectionParameters;    
-    private ArrayList<PipeModule> filePipeline;
+    private ArrayList<Module> modules;
     private int totalParts;
     private int reqParts;
-    private String ida;    
+
+    public DispersalMethod() {
+        this.selectionParameters = new HashMap<>();
+        this.modules = new ArrayList<>();        
+    }
+    
+    
 
     public HashMap<String, Double> getSelectionParameters() {
         return selectionParameters;
@@ -26,12 +32,12 @@ public class DispersalMethod {
         this.selectionParameters = selectionParameters;
     }
 
-    public ArrayList<PipeModule> getFile_pipeline() {
-        return filePipeline;
+    public ArrayList<Module> getFile_pipeline() {
+        return modules;
     }
 
-    public void setFile_pipeline(ArrayList<PipeModule> file_pipeline) {
-        this.filePipeline = file_pipeline;
+    public void setFile_pipeline(ArrayList<Module> file_pipeline) {
+        this.modules = file_pipeline;
     }
         
     public int getTotalParts() {
@@ -48,15 +54,6 @@ public class DispersalMethod {
 
     public void setReqParts(int reqParts) {
         this.reqParts = reqParts;
-    }
-
-    public String getIda() {
-        return ida;
-    }
-
-    public void setIda(String ida) {
-        this.ida = ida;
-    }
-    
+    }    
     
 }

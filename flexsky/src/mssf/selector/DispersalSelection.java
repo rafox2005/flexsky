@@ -53,6 +53,7 @@ public class DispersalSelection {
 
     public void setProviders(ArrayList<DataAccount> providers) {
         this.providers = providers;
+        this.method.setTotalParts(providers.size());
     }
     
     

@@ -126,9 +126,9 @@ solve;
 
 /*Print the results*/
 
-printf{i in Provider: PROV_take[i] == 1} 'provider;%d\n',i;
-printf{i in Ida: IDA_take[i] == 1} 'ida;%d\n',i;
-printf{i in Enc: ENC_take[i] == 1} 'enc;%d\n',i;
-printf{i in Enc: COMP_take[i] == 1} 'comp;%d\n',i;
+printf{i in Provider: PROV_take[i] == 1} 'provider;%s\n',i;
+printf{i in Ida: IDA_take[i] == 1} 'ida;%s\n',i;
+printf{i in Comp: COMP_take[i] == 1} 'comp;%s\n',i;
+printf{i in Enc: ENC_take[i] == 1} 'enc;%s\n',i;
 
 end;

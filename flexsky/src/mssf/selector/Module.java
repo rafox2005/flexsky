@@ -29,14 +29,14 @@ import java.util.HashMap;
  *
  * @author rlibardi
  */
-public class PipeModule {
+public class Module {
     private String name;
     private String pipe_name;
     private String type;
     private HashMap<String, String> parameters;
     private HashMap<String, Integer> selectionParameters;
 
-    public PipeModule(String name, String type, String pipe_name, HashMap<String, String> parameters, HashMap<String, Integer> selectionParameters) {
+    public Module(String name, String type, String pipe_name, HashMap<String, String> parameters, HashMap<String, Integer> selectionParameters) {
         this.name = name;
         this.pipe_name = pipe_name;
         this.type = type;

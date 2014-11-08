@@ -23,11 +23,13 @@
  */
 package mssf.selector;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import management.StoreSafeManager;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import util.FlexSkyLogger;
 
 /**
@@ -43,7 +45,9 @@ public class LPSelectorTest {
     
     @Before
     public void setUp() {
-        ssm = StoreSafeManager.getInstance("/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db", "/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/safestore_log.db");
+        //ssm = StoreSafeManager.getInstance("/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db", "/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/safestore_log.db");
+        ssm = StoreSafeManager.getInstance("C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\SAC-experiments-files.db", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\safestore_log.db");
+   
     }
     
     @After
@@ -53,12 +57,30 @@ public class LPSelectorTest {
     @Test
     public void testSomeMethod() {
         
+        HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("model_path", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\optimization.mod");
+        
         //User parameters - TODO
-
+        HashMap<String, Number> userParam = new HashMap<>();
+        userParam.put("MIN_SEC", -20);
+        userParam.put("MIN_PERF", -20);
+        userParam.put("MIN_STO", -20);
+        
+        userParam.put("WEIGHT_SEC", 0.8);
+        userParam.put("WEIGHT_PERF", 0);
+        userParam.put("WEIGHT_STO", 0);
+        userParam.put("WEIGHT_STOCOST", 0.1);
+        userParam.put("WEIGHT_BWCOST", 0.1);
+        userParam.put("WEIGHT_AVAIL", 0);
+        userParam.put("WEIGHT_DUR", 0);
+        
+        userParam.put("PROV_REQ", 7);
+        
+        
         
         LPSelector lps = new LPSelector();
-        lps.select(ssm.getAccounts(), ssm.listModules(), null, null)
-        ssm.getAccounts()
+        DispersalSelection ds = lps.select(new ArrayList(ssm.getAccounts()), ssm.listModules(), userParam, parameters);
+        
     }
     
 }

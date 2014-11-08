@@ -48,7 +48,7 @@ import util.Utils;
 public class LPSelector extends ISelector{
 
     @Override
-    public DispersalSelection select(ArrayList<DataAccount> providers, ArrayList<PipeModule> modules, HashMap<String, Integer> userConstraints, HashMap<String, String> parameters)
+    public DispersalSelection select(ArrayList<DataAccount> providers, ArrayList<Module> modules, HashMap<String, Number> userConstraints, HashMap<String, String> parameters)
     {
         try
         {
@@ -57,12 +57,14 @@ public class LPSelector extends ISelector{
             File fileTempSolution = File.createTempFile("flexsky-opt-solution", ".tmp");
             File fileModel = new File(parameters.get("model_path"));
             
+            String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
+            
             
             //WriteDataFile            
             writeDataFile(fileTempData, providers, modules, userConstraints);
             
             //Generate execution string
-            String command = "glpsol -m " + 
+            String command = pathToSolver + " -m " + 
                     fileModel.getAbsolutePath() + 
                     " -d " + fileTempData.getAbsolutePath() + 
                     " -y " + fileTempSolution.getAbsolutePath();
@@ -95,7 +97,7 @@ public class LPSelector extends ISelector{
                 
                 else if (result[0].equalsIgnoreCase("ida"))
                 {                    
-                    for (PipeModule module : modules)
+                    for (Module module : modules)
                     {
                         if (module.getName().equalsIgnoreCase(result[1]))
                         {
@@ -106,7 +108,7 @@ public class LPSelector extends ISelector{
                 
                 else if (result[0].equalsIgnoreCase("comp"))
                 {                    
-                    for (PipeModule module : modules)
+                    for (Module module : modules)
                     {
                         if (module.getName().equalsIgnoreCase(result[1]))
                         {
@@ -130,7 +132,7 @@ public class LPSelector extends ISelector{
     
     }
             
-    private void writeDataFile(File dataFile, ArrayList<DataAccount> providers, ArrayList<PipeModule> modules, HashMap<String, Integer> userConstraints)
+    private void writeDataFile(File dataFile, ArrayList<DataAccount> providers, ArrayList<Module> modules, HashMap<String, Number> userConstraints)
     {
         
         
@@ -144,11 +146,11 @@ public class LPSelector extends ISelector{
             
             //Write IDAs
             out.println("param: Ida: IDA_SEC IDA_PERF IDA_STO :=");
-            for (PipeModule module : modules)
+            for (Module module : modules)
             {
                 if (module.getType().equalsIgnoreCase("ida"))
                 {
-                    out.printf("%s %s %s %s\n",
+                    out.printf("%s %d %d %d\n",
                             module.getName(),
                             module.getSelectionParameters().get("SEC"),
                             module.getSelectionParameters().get("PERF"),
@@ -160,11 +162,11 @@ public class LPSelector extends ISelector{
             
             //Write ENCs
             out.println("param: Enc: ENC_SEC ENC_PERF ENC_STO :=");
-            for (PipeModule module : modules)
+            for (Module module : modules)
             {
                 if (module.getType().equalsIgnoreCase("enc"))
                 {
-                    out.printf("%s %s %s %s\n",
+                    out.printf("%s %d %d %d\n",
                             module.getName(),
                             module.getSelectionParameters().get("SEC"),
                             module.getSelectionParameters().get("PERF"),
@@ -176,11 +178,11 @@ public class LPSelector extends ISelector{
             
              //Write COMPs
             out.println("param: Comp: COMP_SEC COMP_PERF COMP_STO :=");
-            for (PipeModule module : modules)
+            for (Module module : modules)
             {
                 if (module.getType().equalsIgnoreCase("comp"))
                 {
-                    out.printf("%s %s %s %s\n",
+                    out.printf("%s %d %d %d\n",
                             module.getName(),
                             module.getSelectionParameters().get("SEC"),
                             module.getSelectionParameters().get("PERF"),
@@ -194,7 +196,7 @@ public class LPSelector extends ISelector{
             out.println("param: Provider: PROV_SEC PROV_PERF PROV_DUR PROV_AVAIL PROV_STORAGECOST PROV_BWCOST:=");
             for (DataAccount provider : providers)
             {
-                    out.printf("%s %s %s %s %s %s\n",
+                    out.printf("%s %d %d %d %d %d %d\n",
                             provider.getName(),
                             provider.getSelectionParameters().get("PROV_SEC"),
                             provider.getSelectionParameters().get("PROV_PERF"),
@@ -209,9 +211,8 @@ public class LPSelector extends ISelector{
             //Write User Parameters and Limits
             for (Map.Entry param : userConstraints.entrySet())
             {
-                out.printf("param %s:= %d;\n", param.getKey(), param.getValue());
+                out.printf("param %s:= %s;\n", param.getKey(), param.getValue().toString());
             }
-            out.println(";");
             out.println();
             
             //End the file

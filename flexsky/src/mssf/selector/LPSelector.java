@@ -39,6 +39,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.SysexMessage;
+import util.FlexSkyLogger;
 import util.Utils;
 
 /**
@@ -69,8 +70,12 @@ public class LPSelector extends ISelector{
                     " -d " + fileTempData.getAbsolutePath() + 
                     " -y " + fileTempSolution.getAbsolutePath();
             
-            
+            long start=System.currentTimeMillis();
             Utils.executeCommand(command);
+            long time=System.currentTimeMillis() - start;
+            
+            FlexSkyLogger.addSelection(providers.size(), modules.size(), userConstraints, parameters, time);
+            
             
             //Read solution file and create dispersal selection object   TODO   
             

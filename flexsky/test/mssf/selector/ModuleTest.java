@@ -47,6 +47,7 @@ public class ModuleTest {
     
     public Connection conn;
     public ModuleStore ms;
+    public AccountStore as;
     
     public ModuleTest() {
     }
@@ -59,8 +60,9 @@ public class ModuleTest {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\experiments\\CLOUD-experiments-files-m10000-p10000.db");
             ms = new ModuleStore(this.conn);
+            as = new AccountStore(this.conn);
         } catch (SQLException ex) {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,14 +76,14 @@ public class ModuleTest {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void AddModules() {
         System.out.println("addModules");
         ModuleStore ms = this.ms;
         
         
        
-        for (int i=0; i<10;i++)
+        for (int i=0; i<10000;i++)
         {            
             try
             {
@@ -104,6 +106,35 @@ public class ModuleTest {
             }
             
         }
+    }
+    
+    @Test
+    public void addAccounts() throws SQLException
+    {
+        System.out.println("addAccounts");
+        DataAccount da = as.getAccounts().get(1);
+        
+        for (DataAccount dai : as.getAccounts()) {
+            if (dai != null) as.deleteAccountByName(dai.getName());
+        }
+        
+        for (int i = 0; i < 10000; i++) {
+            da.setName("ACCTEST" + i);
+            
+            HashMap selectparametros = new HashMap();
+            selectparametros.put("PROV_BWCOST", Math.round(100*Math.random()));
+            selectparametros.put("PROV_AVAIL", Math.round(100*Math.random()));
+            selectparametros.put("PROV_STORAGECOST", Math.round(100*Math.random()));
+            selectparametros.put("PROV_DUR", Math.round(100*Math.random()));
+            selectparametros.put("PROV_SEC", Math.round(100*Math.random()));
+            selectparametros.put("PROV_PERF", Math.round(100*Math.random()));
+            
+            da.setSelectionParameters(selectparametros);
+            
+            this.as.deleteAccountByName(da.getName());
+            this.as.insertAccount(da);
+        }
+        
     }
 
     /**

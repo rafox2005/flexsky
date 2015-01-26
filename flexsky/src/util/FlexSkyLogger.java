@@ -23,8 +23,10 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -33,6 +35,28 @@ import java.util.logging.Logger;
 public class FlexSkyLogger {
     
     private static Connection conn;
+
+    public static void addSelection(int nProviders, int nModules, HashMap<String, Number> userConstraints, HashMap<String, String> parameters, long time) {
+        try {
+            byte[] userConstraintsBlob = SerializationUtils.serialize(userConstraints);
+            byte[] parametersBlob = SerializationUtils.serialize(parameters);
+            
+            PreparedStatement prepStatement
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO mssf" + "(log_time, nmodules, nproviders, action, user_constraints, parameters, time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?)");
+            prepStatement.setDate(1, new Date(System.currentTimeMillis()));
+            prepStatement.setInt(2, nModules);
+            prepStatement.setInt(3, nProviders);            
+           prepStatement.setString(4, "SELECT");
+           prepStatement.setBytes(5, userConstraintsBlob);
+           prepStatement.setBytes(6, parametersBlob);
+           prepStatement.setLong(7, time);       
+            prepStatement.executeUpdate();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(FlexSkyLogger.class.getName()).log(Level.SEVERE, null, ex);
+        }    
+    }
 
     public FlexSkyLogger(String log_db_path) {
         try {

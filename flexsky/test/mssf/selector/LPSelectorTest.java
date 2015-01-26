@@ -46,7 +46,7 @@ public class LPSelectorTest {
     @Before
     public void setUp() {
         //ssm = StoreSafeManager.getInstance("/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db", "/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/safestore_log.db");
-        ssm = StoreSafeManager.getInstance("C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\SAC-experiments-files.db", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\safestore_log.db");
+        ssm = StoreSafeManager.getInstance("C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\SAC-experiments-files10000.db", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\safestore_log.db");
    
     }
     
@@ -55,8 +55,9 @@ public class LPSelectorTest {
     }
 
     @Test
-    public void testSomeMethod() {
-        
+    public void testSelection() {
+        for (int i = 0; i < 15; i++) {
+                
         HashMap<String, String> parameters = new HashMap<>();
         parameters.put("model_path", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\optimization.mod");
         
@@ -80,6 +81,8 @@ public class LPSelectorTest {
         
         LPSelector lps = new LPSelector();
         DispersalSelection ds = lps.select(new ArrayList(ssm.getAccounts()), ssm.listModules(), userParam, parameters);
+        
+        }
         
     }
     

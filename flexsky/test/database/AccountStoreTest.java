@@ -64,7 +64,7 @@ public class AccountStoreTest
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/rlibardi/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/mira/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db");
             as = new AccountStore(this.conn);
         } catch (SQLException ex) {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -172,6 +172,7 @@ public class AccountStoreTest
         
     }
     
+    @Test
     public void updateProvidersADDSELECTION() throws SQLException
     {
         System.out.println("updateProvidersADDSELECTION");
@@ -180,13 +181,13 @@ public class AccountStoreTest
         
         for (DataAccount acc : list_accs)
         {
-            HashMap selectparametros = new HashMap();     
-            selectparametros.put("PROV_SEC", Math.round(100*Math.random()));
-            selectparametros.put("PROV_PERF", Math.round(100*Math.random()));
-            selectparametros.put("PROV_AVAIL", Math.round(100*Math.random()));
-            selectparametros.put("PROV_DUR", Math.round(100*Math.random()));
-            selectparametros.put("PROV_STORAGECOST", Math.round(100*Math.random()));
-            selectparametros.put("PROV_BWCOST", Math.round(100*Math.random()));
+            HashMap<String, Integer> selectparametros = new HashMap();     
+            selectparametros.put("PROV_SEC", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_PERF", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_AVAIL", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_DUR", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_STORAGECOST", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_BWCOST", (int) Math.round(100*Math.random()));
             
             this.as.deleteAccountByName(acc.getName());
             acc.setSelectionParameters(selectparametros);

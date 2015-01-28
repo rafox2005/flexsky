@@ -1265,7 +1265,7 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
 
     private void uploadJButtonEasyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonEasyActionPerformed
        //Get parameters
-        int reqProv = this.jSliderAvailability.getValue();
+        int provFail = this.jSliderAvailability.getValue();
         int secLevel = this.jSliderSecurity.getValue();
         String fileType = this.jComboBoxFileType.getSelectedItem().toString();
         
@@ -1274,43 +1274,100 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         switch(secLevel)
         {
             case 0: weightSec = 0; break;
-            case 50: weightSec = 0.4; break;
-            case 100: weightSec = 0.7; break;                
+            case 50: weightSec = 0.2; break;
+            case 100: weightSec = 0.3; break;                
         }
         
         double weight = 1-weightSec;
-        double weightPerf;
-        double weightSto;
-        double weightStoCost;
-        double weightBwCost;
-        double weightAvail;
-        double weightDur;
+        double weightPerf = 0;
+        double weightSto = 0;
+        double weightStoCost = 0;
+        double weightBwCost = 0;
+        double weightAvail = 0;
+        double weightDur = 0;
+        double weightSum = 0;
+        double weightRest = 0;
             
         switch (fileType)
         {
             case "Working":
-                weightPerf = 0.3 * weight;
-                weightSto = 0.2 * weight;
-                weightStoCost = 0 * weight;
-                weightBwCost = 0.2 * weight; 
-                weightAvail = 0.2 * weight;
-                weightDur = 0.1 * weight;        
+                weightPerf = (double)(Math.round((0.4 * weight)*100))/100;
+                weightSto = (double)(Math.round((0.0 * weight)*100))/100;
+                weightStoCost = (double)(Math.round((0 * weight)*100))/100;
+                weightBwCost = (double)(Math.round((0.3 * weight)*100))/100; 
+                weightAvail = (double)(Math.round((0.3 * weight)*100))/100;
+                weightDur = (double)(Math.round((0.0 * weight)*100))/100;
+                weightSum = weightSec + weightPerf + weightSto + weightStoCost + weightBwCost + weightAvail + weightDur;
+                weightRest = 1-weightSum;
+                if (weightSum != 1) weightPerf = (double)(Math.round((weightPerf)*100))/100; 
+                break;
+                
+            case "Active":
+                weightPerf = (double)(Math.round((0.3 * weight)*100))/100;
+                weightSto = (double)(Math.round((0.2 * weight)*100))/100;
+                weightStoCost = (double)(Math.round((0 * weight)*100))/100;
+                weightBwCost = (double)(Math.round((0.1 * weight)*100))/100; 
+                weightAvail = (double)(Math.round((0.3 * weight)*100))/100;
+                weightDur = (double)(Math.round((0.1 * weight)*100))/100;
+                weightSum = weightSec + weightPerf + weightSto + weightStoCost + weightBwCost + weightAvail + weightDur;
+                weightRest = 1-weightSum;
+                if (weightSum != 1) weightPerf = (double)(Math.round((weightPerf)*100))/100; 
+                break;
+                
+            case "Backup-Active":
+                weightPerf = (double)(Math.round((0.2 * weight)*100))/100;
+                weightSto = (double)(Math.round((0.2 * weight)*100))/100;
+                weightStoCost = (double)(Math.round((0 * weight)*100))/100;
+                weightBwCost = (double)(Math.round((0.2 * weight)*100))/100; 
+                weightAvail = (double)(Math.round((0.2 * weight)*100))/100;
+                weightDur = (double)(Math.round((0.2 * weight)*100))/100;
+                weightSum = weightSec + weightPerf + weightSto + weightStoCost + weightBwCost + weightAvail + weightDur;
+                weightRest = 1-weightSum;
+                if (weightSum != 1) weightDur = (double)(Math.round((weightDur)*100))/100; 
+                break;
+                
+            case "Backup-Inactive":
+                weightPerf = (double)(Math.round((0 * weight)*100))/100;
+                weightSto = (double)(Math.round((0.25 * weight)*100))/100;
+                weightStoCost = (double)(Math.round((0.25 * weight)*100))/100;
+                weightBwCost = (double)(Math.round((0 * weight)*100))/100; 
+                weightAvail = (double)(Math.round((0.1 * weight)*100))/100;
+                weightDur = (double)(Math.round((0.4 * weight)*100))/100;
+                weightSum = weightSec + weightPerf + weightSto + weightStoCost + weightBwCost + weightAvail + weightDur;
+                weightRest = 1-weightSum;
+                if (weightSum != 1) weightDur = (double)(Math.round((weightRest)*100))/100;                
+                break;
         }
         
         //User parameters - TODO
-                    HashMap<String, Number> userParam = new HashMap<>();
-                    userParam.put("MIN_SEC", -20);
-                    userParam.put("MIN_PERF", -20);
-                    userParam.put("MIN_STO", -20);
-                    userParam.put("WEIGHT_SEC", 0.8);
-                    userParam.put("WEIGHT_PERF", 0);
-                    userParam.put("WEIGHT_STO", 0);
-                    userParam.put("WEIGHT_STOCOST", 0.1);
-                    userParam.put("WEIGHT_BWCOST", 0.1);
-                    userParam.put("WEIGHT_AVAIL", 0);
-                    userParam.put("WEIGHT_DUR", 0);
+        HashMap<String, Number> userParam = new HashMap<>();
+        userParam.put("MIN_SEC", -100);
+        userParam.put("MIN_PERF", -100);
+        userParam.put("MIN_STO", -100);
+        userParam.put("WEIGHT_SEC", weightSec);
+        userParam.put("WEIGHT_PERF", weightPerf);
+        userParam.put("WEIGHT_STO", weightSto);
+        userParam.put("WEIGHT_STOCOST", weightStoCost);
+        userParam.put("WEIGHT_BWCOST", weightBwCost);
+        userParam.put("WEIGHT_AVAIL", weightAvail);
+        userParam.put("WEIGHT_DUR", weightDur);
 
-                    userParam.put("PROV_REQ", Integer.parseInt(args[3]));
+        userParam.put("PROV_REQ", this.ssm.listAccounts().size());
+        
+        HashMap<String, String> parameters = new HashMap<>();
+        //parameters.put("model_path", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\optimization.mod");
+        parameters.put("model_path", "/home/mira/NetBeansProjects/flexsky/flexsky/optimization.mod");
+
+        
+        LPSelector lps = new LPSelector();
+        DispersalSelection ds = lps.select(new ArrayList(ssm.getAccounts()), ssm.listModules(), userParam, parameters);
+        
+        //Set totalParts and ReqParts
+        ds.getMethod().setTotalParts(this.ssm.listAccounts().size());
+        ds.getMethod().setReqParts(this.ssm.listAccounts().size() - provFail);
+        
+
+        
     }//GEN-LAST:event_uploadJButtonEasyActionPerformed
 
     private void uploadJButtonEasyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadJButtonEasyMouseClicked

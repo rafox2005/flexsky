@@ -60,7 +60,7 @@ public class ModuleTest {
             Logger.getLogger(AccountStoreTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            this.conn = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\db\\experiments\\CLOUD-experiments-files-m10000-p10000.db");
+            this.conn = DriverManager.getConnection("jdbc:sqlite:/home/mira/NetBeansProjects/flexsky/flexsky/db/SAC-experiments-files.db");
             ms = new ModuleStore(this.conn);
             as = new AccountStore(this.conn);
         } catch (SQLException ex) {
@@ -77,28 +77,32 @@ public class ModuleTest {
         }
     }
 
+    @Test
     public void AddModules() {
         System.out.println("addModules");
         ModuleStore ms = this.ms;
         
         
        
-        for (int i=0; i<10000;i++)
+        for (int i=0; i<10;i++)
         {            
             try
             {
                 HashMap parametros = new HashMap();
-                HashMap selectparametros = new HashMap();
-                selectparametros.put("SEC", Math.round(100*Math.random()));
-                selectparametros.put("PERF", Math.round(100*Math.random()));
-                selectparametros.put("STO", Math.round(100*Math.random()));
+                HashMap<String, Integer> selectparametros = new HashMap();
+                selectparametros.put("SEC", (int) Math.round(100*Math.random()));
+                selectparametros.put("PERF", (int) Math.round(100*Math.random()));
+                selectparametros.put("STO", (int) Math.round(100*Math.random()));
                 
                 Module pm1 = new Module("testeCOMP" + i, "comp", "pipeline.pipe.Base64Pipe", parametros, selectparametros);
                 Module pm2 = new Module("testeENC" + i, "enc", "pipeline.pipe.PipeTest", parametros, selectparametros);
                 Module pm3 = new Module("testeIDA" + i, "ida", "RabinIDA", parametros, selectparametros);
                 
+                ms.deleteModuleByName(pm1.getName());
                 ms.insertModule(pm1);
+                ms.deleteModuleByName(pm2.getName());
                 ms.insertModule(pm2);
+                ms.deleteModuleByName(pm3.getName());
                 ms.insertModule(pm3);
             } catch (SQLException ex)
             {
@@ -121,13 +125,13 @@ public class ModuleTest {
         for (int i = 0; i < 10000; i++) {
             da.setName("ACCTEST" + i);
             
-            HashMap selectparametros = new HashMap();
-            selectparametros.put("PROV_BWCOST", Math.round(100*Math.random()));
-            selectparametros.put("PROV_AVAIL", Math.round(100*Math.random()));
-            selectparametros.put("PROV_STORAGECOST", Math.round(100*Math.random()));
-            selectparametros.put("PROV_DUR", Math.round(100*Math.random()));
-            selectparametros.put("PROV_SEC", Math.round(100*Math.random()));
-            selectparametros.put("PROV_PERF", Math.round(100*Math.random()));
+            HashMap<String, Integer> selectparametros = new HashMap();
+            selectparametros.put("PROV_BWCOST", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_AVAIL", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_STORAGECOST", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_DUR", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_SEC", (int) Math.round(100*Math.random()));
+            selectparametros.put("PROV_PERF", (int) Math.round(100*Math.random()));
             
             da.setSelectionParameters(selectparametros);
             

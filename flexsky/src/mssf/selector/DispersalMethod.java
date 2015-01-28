@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 
 public class DispersalMethod {
-    private HashMap<String, Double> selectionParameters;    
+    private HashMap<String, Integer> selectionParameters;    
     private ArrayList<Module> modules;
     private int totalParts;
     private int reqParts;
@@ -24,11 +24,11 @@ public class DispersalMethod {
     
     
 
-    public HashMap<String, Double> getSelectionParameters() {
+    public HashMap<String, Integer> getSelectionParameters() {
         return selectionParameters;
     }
 
-    public void setSelectionParameters(HashMap<String, Double> selectionParameters) {
+    public void setSelectionParameters(HashMap<String, Integer> selectionParameters) {
         this.selectionParameters = selectionParameters;
     }
 

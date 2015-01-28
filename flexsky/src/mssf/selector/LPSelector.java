@@ -58,7 +58,8 @@ public class LPSelector extends ISelector{
             File fileTempSolution = File.createTempFile("flexsky-opt-solution", ".tmp");
             File fileModel = new File(parameters.get("model_path"));
             
-            String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
+            //String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
+            String pathToSolver = "glpsol";
             
             
             //WriteDataFile            
@@ -121,9 +122,67 @@ public class LPSelector extends ISelector{
                         }
                     }
                 }
+                
+                else if (result[0].equalsIgnoreCase("enc"))
+                {                    
+                    for (Module module : modules)
+                    {
+                        if (module.getName().equalsIgnoreCase(result[1]))
+                        {
+                            dm.getFile_pipeline().add(module);
+                        }
+                    }
+                }
             
             }
             br.close(); 
+            
+            if (selectedProviders.isEmpty()) new Exception("GLPSOL Error in the selection.");
+            
+            //Calculate values
+            
+            int secParameter = 0;
+            int perfParameter = 0;
+            int availParameter = 0;
+            int durParameter = 0;
+            int stoCostParameter = 0;
+            int bwCostParameter = 0;
+            int stoParameter = 0;
+            
+            HashMap<String, Integer> resultSelectParameters = new HashMap<>();
+            for (DataAccount selectedProvider : selectedProviders) {
+                secParameter += selectedProvider.getSelectionParameters().get("PROV_SEC");
+                perfParameter += (int) selectedProvider.getSelectionParameters().get("PROV_PERF");
+                availParameter += selectedProvider.getSelectionParameters().get("PROV_AVAIL");
+                durParameter += selectedProvider.getSelectionParameters().get("PROV_DUR");
+                stoCostParameter += selectedProvider.getSelectionParameters().get("PROV_STORAGECOST");
+                bwCostParameter += selectedProvider.getSelectionParameters().get("PROV_BWCOST");      
+            }
+            
+            secParameter = secParameter/selectedProviders.size();
+            perfParameter = perfParameter/selectedProviders.size();
+            availParameter = availParameter/selectedProviders.size();
+            durParameter = durParameter/selectedProviders.size();
+            stoCostParameter = stoCostParameter/selectedProviders.size();
+            bwCostParameter = bwCostParameter/selectedProviders.size();
+            
+            
+            for (Module module : dm.getFile_pipeline()) {
+                secParameter = (secParameter + module.getSelectionParameters().get("SEC"))/2;
+                perfParameter = (perfParameter + module.getSelectionParameters().get("PERF"))/2;
+                stoParameter = (stoParameter + module.getSelectionParameters().get("STO"))/2;
+            }
+            
+            resultSelectParameters.put("SEC", secParameter);
+            resultSelectParameters.put("PERF", perfParameter);
+            resultSelectParameters.put("AVAIL", availParameter);
+            resultSelectParameters.put("DUR", durParameter);
+            resultSelectParameters.put("STORAGECOST", stoCostParameter);
+            resultSelectParameters.put("BWCOST", bwCostParameter);
+            resultSelectParameters.put("STO", stoParameter);
+            
+            dm.setSelectionParameters(resultSelectParameters);            
+            
             return ds;
                                  
             

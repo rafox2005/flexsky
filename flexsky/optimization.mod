@@ -80,7 +80,7 @@ COMP_only : sum{t in Comp} COMP_take[t] <= 1;
 PROV_sel : sum{t in Provider} PROV_take[t] = PROV_REQ;
 
 /* Check if weights add up to 1 */
-check WEIGHT_SEC + WEIGHT_PERF + WEIGHT_STO + WEIGHT_STOCOST + WEIGHT_BWCOST + WEIGHT_AVAIL + WEIGHT_DUR = 1;
+/* check WEIGHT_SEC + WEIGHT_PERF + WEIGHT_STO + WEIGHT_STOCOST + WEIGHT_BWCOST + WEIGHT_AVAIL + WEIGHT_DUR = 1; */
 
 /* Objective */
 maximize knap_value:

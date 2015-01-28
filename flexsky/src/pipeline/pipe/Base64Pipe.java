@@ -33,8 +33,8 @@ public class Base64Pipe implements IPipeProcess
         try
         {
             // Use hash param.
-            boolean useHash = parameters.get("useHash").equals("true");
-            
+            boolean useHash = false;
+            if (!parameters.isEmpty()) useHash = parameters.get("useHash").equals("true");
             InputStream inputStream;
             OutputStream outputStream;
             

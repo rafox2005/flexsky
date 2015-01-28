@@ -920,10 +920,6 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         jPanelUPloadEasy.setLayout(jPanelUPloadEasyLayout);
         jPanelUPloadEasyLayout.setHorizontalGroup(
             jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelUPloadEasyLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(uploadJButtonEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(413, 413, 413))
             .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -944,9 +940,13 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                             .addGroup(jPanelUPloadEasyLayout.createSequentialGroup()
                                 .addComponent(jButtonChooseFile, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(41, 41, 41)
-                                .addComponent(pathToFileLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE))
+                                .addComponent(pathToFileLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 887, Short.MAX_VALUE))
                             .addComponent(jLabel1))
-                        .addGap(190, 190, 190))))
+                        .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelUPloadEasyLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(uploadJButtonEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelUPloadEasyLayout.setVerticalGroup(
             jPanelUPloadEasyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -971,9 +971,9 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jComboBoxFileType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 185, Short.MAX_VALUE)
+                .addGap(45, 45, 45)
                 .addComponent(uploadJButtonEasy, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(115, 115, 115))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jScrollPaneUploadEasy.setViewportView(jPanelUPloadEasy);
@@ -1264,7 +1264,53 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
     }//GEN-LAST:event_providerAddjButtonActionPerformed
 
     private void uploadJButtonEasyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uploadJButtonEasyActionPerformed
-        // TODO add your handling code here:
+       //Get parameters
+        int reqProv = this.jSliderAvailability.getValue();
+        int secLevel = this.jSliderSecurity.getValue();
+        String fileType = this.jComboBoxFileType.getSelectedItem().toString();
+        
+        double weightSec = 0;
+        
+        switch(secLevel)
+        {
+            case 0: weightSec = 0; break;
+            case 50: weightSec = 0.4; break;
+            case 100: weightSec = 0.7; break;                
+        }
+        
+        double weight = 1-weightSec;
+        double weightPerf;
+        double weightSto;
+        double weightStoCost;
+        double weightBwCost;
+        double weightAvail;
+        double weightDur;
+            
+        switch (fileType)
+        {
+            case "Working":
+                weightPerf = 0.3 * weight;
+                weightSto = 0.2 * weight;
+                weightStoCost = 0 * weight;
+                weightBwCost = 0.2 * weight; 
+                weightAvail = 0.2 * weight;
+                weightDur = 0.1 * weight;        
+        }
+        
+        //User parameters - TODO
+                    HashMap<String, Number> userParam = new HashMap<>();
+                    userParam.put("MIN_SEC", -20);
+                    userParam.put("MIN_PERF", -20);
+                    userParam.put("MIN_STO", -20);
+                    userParam.put("WEIGHT_SEC", 0.8);
+                    userParam.put("WEIGHT_PERF", 0);
+                    userParam.put("WEIGHT_STO", 0);
+                    userParam.put("WEIGHT_STOCOST", 0.1);
+                    userParam.put("WEIGHT_BWCOST", 0.1);
+                    userParam.put("WEIGHT_AVAIL", 0);
+                    userParam.put("WEIGHT_DUR", 0);
+
+                    userParam.put("PROV_REQ", Integer.parseInt(args[3]));
     }//GEN-LAST:event_uploadJButtonEasyActionPerformed
 
     private void uploadJButtonEasyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadJButtonEasyMouseClicked

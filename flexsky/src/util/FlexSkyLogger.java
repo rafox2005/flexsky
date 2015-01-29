@@ -36,21 +36,23 @@ public class FlexSkyLogger {
     
     private static Connection conn;
 
-    public static void addSelection(int nProviders, int nModules, HashMap<String, Number> userConstraints, HashMap<String, String> parameters, long time) {
+    public static void addSelection(int nProviders, int nModules, HashMap<String, Number> userConstraints, HashMap<String, String> parameters, HashMap<String, Integer> selectParameters, long time) {
         try {
             byte[] userConstraintsBlob = SerializationUtils.serialize(userConstraints);
             byte[] parametersBlob = SerializationUtils.serialize(parameters);
+            byte[] selectParametersBlob = SerializationUtils.serialize(selectParameters);
             
             PreparedStatement prepStatement
-                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO mssf" + "(log_time, nmodules, nproviders, action, user_constraints, parameters, time)"
-                            + " VALUES(?, ?, ?, ?, ?, ?, ?)");
+                    = FlexSkyLogger.conn.prepareStatement("INSERT INTO mssf" + "(log_time, nmodules, nproviders, action, user_constraints, parameters, selection_parameters, time)"
+                            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
             prepStatement.setDate(1, new Date(System.currentTimeMillis()));
             prepStatement.setInt(2, nModules);
             prepStatement.setInt(3, nProviders);            
            prepStatement.setString(4, "SELECT");
            prepStatement.setBytes(5, userConstraintsBlob);
            prepStatement.setBytes(6, parametersBlob);
-           prepStatement.setLong(7, time);       
+           prepStatement.setBytes(7, selectParametersBlob);
+           prepStatement.setLong(8, time);       
             prepStatement.executeUpdate();
             
         } catch (SQLException ex) {

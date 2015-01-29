@@ -1355,8 +1355,8 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         userParam.put("PROV_REQ", this.ssm.listAccounts().size());
         
         HashMap<String, String> parameters = new HashMap<>();
-        //parameters.put("model_path", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\optimization.mod");
-        parameters.put("model_path", "/home/mira/NetBeansProjects/flexsky/flexsky/optimization.mod");
+        parameters.put("model_path", "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\optimization.mod");
+        //parameters.put("model_path", "/home/mira/NetBeansProjects/flexsky/flexsky/optimization.mod");
 
         
         LPSelector lps = new LPSelector();

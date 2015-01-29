@@ -58,8 +58,8 @@ public class LPSelector extends ISelector{
             File fileTempSolution = File.createTempFile("flexsky-opt-solution", ".tmp");
             File fileModel = new File(parameters.get("model_path"));
             
-            //String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
-            String pathToSolver = "glpsol";
+            String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
+            //String pathToSolver = "glpsol";
             
             
             //WriteDataFile            
@@ -74,8 +74,6 @@ public class LPSelector extends ISelector{
             long start=System.currentTimeMillis();
             Utils.executeCommand(command);
             long time=System.currentTimeMillis() - start;
-            
-            FlexSkyLogger.addSelection(providers.size(), modules.size(), userConstraints, parameters, time);
             
             
             //Read solution file and create dispersal selection object   TODO   
@@ -182,6 +180,10 @@ public class LPSelector extends ISelector{
             resultSelectParameters.put("STO", stoParameter);
             
             dm.setSelectionParameters(resultSelectParameters);            
+            
+            
+            FlexSkyLogger.addSelection(providers.size(), modules.size(), userConstraints, parameters, resultSelectParameters, time);
+            
             
             return ds;
                                  

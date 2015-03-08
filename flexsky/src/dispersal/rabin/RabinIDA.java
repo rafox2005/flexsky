@@ -132,6 +132,7 @@ public class RabinIDA {
         
         //Inicio coluna altera a matriz de vandermonde a ser utilizada
         int[][] partVandTransp = Utils.partOfMatrix(vandTransp, vandermondeIndexes);
+        System.out.println(partVandTransp[1]);
         int[][] partVandTranspInverse = GF.vandermondeInverse(partVandTransp[1]);
         int[] dec = GF.multiplyMatrix(partVandTranspInverse, intcrypt);
         

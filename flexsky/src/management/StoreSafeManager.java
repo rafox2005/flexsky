@@ -68,6 +68,7 @@ public class StoreSafeManager {
     
     public boolean storeFile(String path, String type, String dispersalMethod, int totalParts, int reqParts, int revision, ArrayList<DataAccount> listAccounts, StorageOptions options) {
         long start, end;
+        boolean result = false;
         //Buffer size must be compatible with reqParts for the Dispersal to work
         StoreSafeManager.bufferSize = StoreSafeManager.bufferSize - StoreSafeManager.bufferSize % reqParts;
         start = System.currentTimeMillis();
@@ -93,8 +94,14 @@ public class StoreSafeManager {
             }
 
             //Store the files and finish the parts to store
-            this.storage.storeFile(file, ssf, slices, listAccounts);
+            result = this.storage.storeFile(file, ssf, slices, listAccounts);
             
+            //If not able to store the file, delete file from db and send error message
+            if (result == false) {
+                this.db.deleteFile(ssf);            
+                throw new Exception("IO Error, Aborting upload process");
+            }
+            else if (result == true) {
             //After parts are stored insert slices into the DB
             for (int i = 0; i < totalParts; i++) {
                 this.db.insertSlice(slices.get(i));
@@ -108,13 +115,13 @@ public class StoreSafeManager {
             double rate = (ssf.getSize() / 1024.0) / ( time/1000.0 );
             FlexSkyLogger.addFileLog(ssf, "UP", time, rate, ssf.getSize()/1000.0, (slices.get(0).getSize()*totalParts) / 1000.0);
             
-           
-            return true;
+            }
         } catch (Exception ex) {
             Logger.getLogger(StoreSafeManager.class.getName()).log(Level.SEVERE, null, ex);
-            this.db.deleteFile(ssf);
+            this.deleteFile(ssf);
             return false;
         }
+        return true;
 
     }
 
@@ -147,7 +154,7 @@ public class StoreSafeManager {
             ArrayList<DataAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
             long start = System.currentTimeMillis();
-            this.storage.downloadFile(file, ssf, slicesList, accountList);
+            boolean result = this.storage.downloadFile(file, ssf, slicesList, accountList);
             
             //Wait for file download
             //StoreSafeManager.executor.shutdown();
@@ -156,15 +163,19 @@ public class StoreSafeManager {
             BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
             ssf.setLastAccessed(new Date(attrs.lastAccessTime().toMillis()));
 
-            this.db.updateFileLastAccessedDate(ssf);
+            if (result == true) {
+                this.db.updateFileLastAccessedDate(ssf);
+                //Finish and log everything
+                long time = System.currentTimeMillis() - start;
+                double rate = (ssf.getSize() / 1000) / ( time/1000 );
+            
+                FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, (double) ssf.getSize()/1000, (slicesList.get(0).getSize()*ssf.getTotalParts()) / 1000.0);
+            
+                return true;
+            }
+            else return false;
 
-            //Finish and log everything
-            long time = System.currentTimeMillis() - start;
-            double rate = (ssf.getSize() / 1000) / ( time/1000 );
             
-            FlexSkyLogger.addFileLog(ssf, "DOWN", time, rate, (double) ssf.getSize()/1000, (slicesList.get(0).getSize()*ssf.getTotalParts()) / 1000.0);
-            
-            return true;
         } catch (IOException ex) {
             Logger.getLogger(StoreSafeManager.class.getName()).log(Level.SEVERE, null, ex);
             return false;

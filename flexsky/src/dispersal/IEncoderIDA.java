@@ -85,7 +85,9 @@ public abstract class IEncoderIDA
                 //Create Hashes for the parts
                 this.mdParts[i] = MessageDigest.getInstance("SHA1");
                 this.disParts[i] = new DigestOutputStream(writeBufs[i], this.mdParts[i]);
+                this.disParts[i].flush();
                 this.disParts[i].write(i); //Write Part Number
+                this.disParts[i].flush();
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             System.out.println(e.getMessage());

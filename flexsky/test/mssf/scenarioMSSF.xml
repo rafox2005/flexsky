@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2014 Rafox.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<scenario name="CLOUD-Experiments" type=simulation>
+    <repeat>10</repeat>
+    <db resetOnStart="true">/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/CLOUD/Experiments/db/CLOUD-experiments-files.db</db>
+    <log_db>/data/rlibardi/Dropbox/Dropbox/ICMC/Mestrado/Shared Julio/desenvolvimento/artigos/CLOUD/Experiments/db/CLOUD-experiments-log.db</log_db>
+    <providerList amount=100></providerList>
+	<modulesList>
+		<module type="ida" amount=100></module>
+		<module type="enc" amount=100></module>
+		<module type="comp" amount=100></module>
+	</modulesList>
+    <operationList>
+        <operation action="selectOnly">
+			<select_param name="MIN_SEC" value=10></select_param>
+			<select_param name="MIN_PERF" value=10></select_param>
+			<select_param name="MIN_STO" value=10></select_param>
+			<select_param name="WEIGHT_SEC" value=0.4></select_param>
+			<select_param name="WEIGHT_PERF_READ" value=0></select_param>
+			<select_param name="WEIGHT_PERF_WRITE" value=0.1></select_param>
+			<select_param name="WEIGHT_STO" value=0></select_param>
+			<select_param name="WEIGHT_STOCOST" value=0.1></select_param>
+			<select_param name="WEIGHT_BWCOST_IN" value=0.1></select_param>
+			<select_param name="WEIGHT_BWCOST_OUT" value=0.1></select_param>
+			<select_param name="WEIGHT_AVAIL" value=0.2></select_param>
+			<select_param name="WEIGHT_DUR" value=0></select_param>
+			<select_param name="PROV_REQ" value=75%></select_param>
+      
+        </operation>
+    </operationList>
+</scenario>
+
+
+MIN_SEC=10;MIN_PERF=10;MIN_STO=10;
+WEIGHT_SEC=0.4;WEIGHT_PERF_READ=0;
+WEIGHT_PERF_WRITE=0.1;WEIGHT_STO=0;
+WEIGHT_STOCOST=0.1;WEIGHT_BWCOST_IN=0.1;
+WEIGHT_BWCOST_OUT=0.1;WEIGHT_AVAIL=0.2;
+WEIGHT_DUR=0;PROV_REQ=75%.

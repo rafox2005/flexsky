@@ -1205,6 +1205,10 @@ public class SafeStoreMDIApplication extends javax.swing.JFrame {
         if (result == true) {
             JOptionPane.showMessageDialog(this.desktopPane, "Upload success!");
         }
+        else {
+           JOptionPane.showMessageDialog(this.desktopPane, "Upload failed! Try again!"); 
+        }
+        
         }
     }//GEN-LAST:event_uploadJButtonMouseClicked
 

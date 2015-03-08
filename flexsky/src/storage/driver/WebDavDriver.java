@@ -56,9 +56,13 @@ public class WebDavDriver implements IDriver {
     @Override
     public InputStream getSliceDownloadStream(DataSlice slice, HashMap<String, String> additionalParameters) throws IOException {
         Sardine sardine = SardineFactory.begin(additionalParameters.get("username"), additionalParameters.get("password"));
-        sardine.exists(this.path + slice.getPath());
-        InputStream is = sardine.get(this.path + slice.getPath());
-        return is;
+        if (sardine.exists(this.path + slice.getPath()))
+        {
+           InputStream is = sardine.get(this.path + slice.getPath());
+           return is;
+        }
+        else new IOException("Slice not found at the provider");
+        return null;
     }
 
     @Override

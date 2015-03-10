@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,6 +196,36 @@ public abstract class IDecoderIDA
         }
     }
 
+    /**
+     * Read the parts into the readBuffers and get each (one) byte from the parts to
+     * be multiplied later
+     *
+     * @param eachout Byte vector to be written into with each byte from the
+     * parts
+     * @return 1 for success, -1 for failure
+     */
+    protected int readParts(ArrayList eachout, int lenght)
+    {
+        try {
+            ArrayList<byte[]> eachpart = new ArrayList();
+            byte[] eachPartList = new byte[lenght];
+            int len = 0;
+            int read = 0;
+            for (int i = 0; i < this.reqParts; i++) {
+                if ((len = this.disParts[i].read(eachPartList, 0, lenght)) == -1) {
+                    throw new EOFException();
+                }
+                read+=len;
+                eachpart.add(eachPartList);
+                eachPartList = new byte[lenght];
+            }
+            eachout.addAll(eachpart);
+            return read;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+    
     /**
      * Read the parts index to know what parts are recovered
      *

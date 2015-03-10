@@ -77,6 +77,7 @@ public class EncoderRabinIDA extends IEncoderIDA {
             int padding = reqParts - (int) (size % reqParts);
             byte[] toPadding = new byte[padding];
             disFile.getMessageDigest().update(toPadding);
+            this.additionalOptions.put("padding", Integer.toString(padding));
             }
             
             //Flush at the end

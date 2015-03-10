@@ -379,9 +379,16 @@ class StorageManager {
 
                                         pipedOutputStreamSlice.close();
 
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(DiskDriver.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream for the slice", ex);
-                                    }
+                                    } catch (IOException ex) {                                        
+                                        Logger.getLogger(DiskDriver.class.getName()).log(Level.SEVERE, "STORAGE: not able to create the PipedInputStream for the slice - " + currentAccount.getPath() , ex);
+                                        
+                                        //Buffer problem - Increase buffer and restart
+                                        if (ex.toString().contains("reset")) {
+                                            StoreSafeManager.bufferSize = slices.size()+1;
+
+                                        }
+
+                                    }                                    
 
                                 }
                             }).start();
@@ -593,9 +600,16 @@ class StorageManager {
         if (ssf.getHash().equals(ida.getFileHash())) {
             return true;
         } else {
-            file.renameTo(new File(file.getAbsolutePath() + "-failed"));
-            throw new Error("ERROR: recovered file hash differs from the original");
+            try {
+                file.renameTo(new File(file.getAbsolutePath() + "-failed"));       
+                throw new IOException("ERROR: recovered file hash differs from the original");
+            } catch (IOException ex) {
+                Logger.getLogger(StorageManager.class.getName()).log(Level.SEVERE, null, ex);
+
+                return false;
+            }
         }
+
     }
 
     public boolean deleteSlice(DataFile file, DataSlice slice, DataAccount currentAccount) {

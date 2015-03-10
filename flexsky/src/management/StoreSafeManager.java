@@ -42,7 +42,7 @@ public class StoreSafeManager {
     private static StoreSafeManager instance = null;
     private final DatabaseManager db;
     private final StorageManager storage;
-    public static int bufferSize = 1024*8;
+    public static int bufferSize = 1024*1024*15;
     
    
     public final FlexSkyLogger logger;
@@ -154,7 +154,9 @@ public class StoreSafeManager {
             ArrayList<DataAccount> accountList = this.db.getSlicesAccount(slicesList);
             File file = new File(path);
             long start = System.currentTimeMillis();
-            boolean result = this.storage.downloadFile(file, ssf, slicesList, accountList);
+            boolean result = false;
+            
+            while (result != true) result = this.storage.downloadFile(file, ssf, slicesList, accountList);
             
             //Wait for file download
             //StoreSafeManager.executor.shutdown();

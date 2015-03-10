@@ -77,6 +77,7 @@ public class DecoderRabinIDA extends IDecoderIDA
             int len;
             while ((len = this.readParts(input)) != -1) {
                 byte[] decrypt = this.rabin.decodeEachEnough(input, indexes);
+                
                 this.disFile.write(decrypt, 0, len);                
             }
 

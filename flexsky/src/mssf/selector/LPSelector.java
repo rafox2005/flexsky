@@ -58,8 +58,8 @@ public class LPSelector extends ISelector{
             File fileTempSolution = File.createTempFile("flexsky-opt-solution", ".tmp");
             File fileModel = new File(parameters.get("model_path"));
             
-            String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
-            //String pathToSolver = "glpsol";
+            //String pathToSolver = "C:\\Users\\Rafox\\Documents\\NetBeansProjects\\flexsky\\flexsky\\lib\\glpsol.exe";
+            String pathToSolver = "glpsol";
             
             
             //WriteDataFile            

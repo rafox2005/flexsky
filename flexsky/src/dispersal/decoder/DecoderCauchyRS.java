@@ -56,8 +56,8 @@ public class DecoderCauchyRS extends IDecoderIDA {
         try {
             ArrayList<byte[]> input = new ArrayList<>();
             int len;
-            while ((len = this.readParts(input, 4096)) != -1) {
-                byte[] decrypt = this.ida.process(input);             
+            while ((len = this.readParts(input, this.ida.getChunkSize())) != -1) {
+                byte[] decrypt = this.ida.process(input);
                 
                 
                 this.disFile.write(decrypt, 0, len);                

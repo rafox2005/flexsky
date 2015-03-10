@@ -24,7 +24,6 @@
 package dispersal.encoder;
 
 import dispersal.IEncoderIDA;
-import dispersal.rabin.RabinIDA;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class EncoderCauchyRS extends IEncoderIDA {
     
     public EncoderCauchyRS(int totalParts, int reqParts, InputStream inputStreamToDisperse, OutputStream[] dispersalStreams, HashMap additionalOptions) throws IDAInvalidParametersException, IDANotInitializedException {
         super(totalParts, reqParts, inputStreamToDisperse, dispersalStreams, additionalOptions);
-        InformationDispersalCodec crsidacodec = new CauchyInformationDispersalCodec(this.totalParts, (this.totalParts-this.reqParts), 4096);
+        InformationDispersalCodec crsidacodec = new CauchyInformationDispersalCodec(this.totalParts, this.reqParts, 4096);
         this.ida = crsidacodec.getEncoder();        
     }
 

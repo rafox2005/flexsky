@@ -226,6 +226,36 @@ public abstract class IDecoderIDA
         }
     }
     
+        /**
+     * Read the parts into the readBuffers and get each (one) byte from the parts to
+     * be multiplied later
+     *
+     * @param eachout Byte vector to be written into with each byte from the
+     * parts
+     * @return 1 for success, -1 for failure
+     */
+    protected int readParts(ArrayList eachout, long lenght)
+    {
+        try {
+            ArrayList<byte[]> eachpart = new ArrayList();
+            byte[] eachPartList = new byte[(int) lenght];
+            int len = 0;
+            int read = 0;
+            for (int i = 0; i < this.reqParts; i++) {
+                if ((len = this.disParts[i].read(eachPartList, 0, (int) lenght)) == -1) {
+                    throw new EOFException();
+                }
+                read+=len;
+                eachpart.add(eachPartList);
+                eachPartList = new byte[(int) lenght];
+            }
+            eachout.addAll(eachpart);
+            return read;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+    
     /**
      * Read the parts index to know what parts are recovered
      *

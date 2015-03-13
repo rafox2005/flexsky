@@ -218,5 +218,14 @@ class DatabaseManager
             return false;
         }
     }
+
+    public boolean updateFileParameters(DataFile ssf) {
+        try {
+            return this.fs.updateParam(ssf);
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManager.class.getName()).log(Level.SEVERE, "DB: SQL error trying to update last accessed file date", ex);
+            return false;
+        }
+    }
     
 }

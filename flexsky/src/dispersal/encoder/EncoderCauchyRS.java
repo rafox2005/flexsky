@@ -69,7 +69,7 @@ public class EncoderCauchyRS extends IEncoderIDA {
                     
                     this.disParts[crypt.indexOf(b)].write(b);                    
                 }
-                sliceCount+=4096;
+                sliceCount+=len;
                 input = new byte[4096];
                 
                 
@@ -82,6 +82,7 @@ public class EncoderCauchyRS extends IEncoderIDA {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        this.additionalOptions.put("segmentSize", Long.toString(sliceCount));
         return sliceCount;
     }
     

@@ -72,12 +72,13 @@ public class EncoderRS extends IEncoderIDA
                     this.flush();
                 }
                         */
-            }
+            }            
             this.cleanUp();           
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        this.additionalOptions.put("segmentSize", Long.toString(sliceCount));
         return sliceCount;
 
     }

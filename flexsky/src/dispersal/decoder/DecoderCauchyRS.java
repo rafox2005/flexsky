@@ -29,13 +29,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jigdfs.ida.base.InformationDispersalCodec;
 import org.jigdfs.ida.base.InformationDispersalDecoder;
+import org.jigdfs.ida.cauchyreedsolomon.CauchyDecode;
 import org.jigdfs.ida.cauchyreedsolomon.CauchyInformationDispersalCodec;
 import org.jigdfs.ida.exception.IDADecodeException;
 import org.jigdfs.ida.exception.IDAInvalidParametersException;
+import org.jigdfs.ida.exception.IDAInvalidSliceCountException;
+import org.jigdfs.ida.exception.IDAInvalidSliceFormatException;
 import org.jigdfs.ida.exception.IDANotInitializedException;
 
 /**
@@ -56,10 +60,11 @@ public class DecoderCauchyRS extends IDecoderIDA {
         try {
             ArrayList<byte[]> input = new ArrayList<>();
             int len;
-            while ((len = this.readParts(input, this.ida.getChunkSize())) != -1) {
-                byte[] decrypt = this.ida.process(input);
-                
-                
+            long segmentSize = Long.parseLong(this.additionalOptions.get("segmentSize"));
+                     
+                       
+            while ((len = this.readParts(input, (int) segmentSize)) != -1) {
+                byte[] decrypt = this.ida.process(input);            
                 this.disFile.write(decrypt, 0, len);                
             }
 
@@ -72,6 +77,6 @@ public class DecoderCauchyRS extends IDecoderIDA {
         } catch (IDANotInitializedException ex) {
             Logger.getLogger(DecoderCauchyRS.class.getName()).log(Level.SEVERE, null, ex);
         }
-        }
-    
+        }  
+       
 }

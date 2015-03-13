@@ -256,4 +256,14 @@ public class FileStore {
             return true;
         }
     }
+
+    public boolean updateParam(DataFile ssf) throws SQLException {
+        try (PreparedStatement prepStatement = conn.prepareStatement("UPDATE files SET parameters=? WHERE name=? AND revision=?")) {
+            prepStatement.setBytes(1, SerializationUtils.serialize(ssf.getOptions().additionalParameters));
+            prepStatement.setString(2, ssf.getName());
+            prepStatement.setInt(3, ssf.getRevision());
+            prepStatement.executeUpdate();
+            return true;
+        }
+    }
 }

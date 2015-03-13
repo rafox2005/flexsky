@@ -298,6 +298,8 @@ class StorageManager {
                 FlexSkyLogger.addSliceLog(ssf, slices.get(i), "UP", os.totalTime(), os.averageRate(), os.totalKbytes());
             }
         }
+        
+        
 
         return true;
 

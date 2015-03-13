@@ -107,8 +107,9 @@ public class StoreSafeManager {
                 this.db.insertSlice(slices.get(i));
             }
 
-            //And update the hash of the file            
+            //And update the hash of the file and the possible additional options
             this.db.updateFileHash(ssf);
+            this.db.updateFileParameters(ssf);
             
             //Finish and log everything
             double time = System.currentTimeMillis() - start;
